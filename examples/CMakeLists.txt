@@ -1,0 +1,2 @@
+add_executable(poker_dvs poker_dvs.cpp)
+target_link_libraries(poker_dvs cpphots)
