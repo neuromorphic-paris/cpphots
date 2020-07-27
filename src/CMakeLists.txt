@@ -16,59 +16,13 @@ target_include_directories(cpphots PRIVATE ${SEPIA_DIR})
 
 target_link_libraries(cpphots pthread Eigen3::Eigen)
 
+set_target_properties(cpphots PROPERTIES
+  PUBLIC_HEADER "classification.h;events_utils.h;layer.h;network.h;run.h;time_surface.h")
 
-# installation and packaging
-install(TARGETS cpphots EXPORT cpphotsTargets
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib
-        RUNTIME DESTINATION bin
-        INCLUDES DESTINATION include/cpphots)
-
-install(FILES
-          classification.h
-          events_utils.h
-          layer.h
-          network.h
-          run.h
-          time_surface.h
-        DESTINATION
-          include/cpphots
-        COMPONENT
-          devel)
-
-include(CMakePackageConfigHelpers)
-write_basic_package_version_file(
-  "${CMAKE_CURRENT_BINARY_DIR}/cpphots/cpphotsConfigVersion.cmake"
-  VERSION "1.0.0"
-  COMPATIBILITY AnyNewerVersion
-)
-
-export(EXPORT cpphotsTargets
-  FILE "${CMAKE_CURRENT_BINARY_DIR}/cpphots/cpphotsTargets.cmake"
-  NAMESPACE Upstream::
-)
-
-configure_file(../cmake/cpphotsConfig.cmake
-  "${CMAKE_CURRENT_BINARY_DIR}/cpphots/cpphotsConfig.cmake"
-  COPYONLY
-)
-
-set(ConfigPackageLocation lib/cmake/cpphots)
-install(EXPORT cpphotsTargets
-  FILE
-    cpphotsTargets.cmake
-  NAMESPACE
-    Upstream::
-  DESTINATION
-    ${ConfigPackageLocation}
-)
-
-install(
-  FILES
-    "${CMAKE_CURRENT_BINARY_DIR}/cpphots/cpphotsConfig.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/cpphots/cpphotsConfigVersion.cmake"
-  DESTINATION
-    ${ConfigPackageLocation}
-  COMPONENT
-    Devel
-)
+# installation
+install(TARGETS cpphots
+  # IMPORTANT: Add the cpphots library to the "export-set"
+  EXPORT cpphotsTargets
+  LIBRARY DESTINATION "${INSTALL_LIB_DIR}" COMPONENT shlib
+  PUBLIC_HEADER DESTINATION "${INSTALL_INCLUDE_DIR}/cpphots"
+    COMPONENT dev)
