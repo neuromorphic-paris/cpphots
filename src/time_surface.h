@@ -143,6 +143,7 @@ private:
     uint16_t width, height;
     uint16_t Rx, Ry;
     float tau;
+    uint16_t min_events;
 
 };
 
