@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <random>
 #include <set>
+#include <ctime>
 
 
 namespace cpphots {
@@ -209,7 +210,7 @@ void LayerInitializer::initializePrototypes(Layer& layer, const std::vector<Even
 }
 
 
-void LayerRandomInitializer::initializationAlgorithm(Layer& layer, const std::vector<Eigen::ArrayXXf>& time_surfaces) const {
+void LayerUniformInitializer::initializationAlgorithm(Layer& layer, const std::vector<Eigen::ArrayXXf>& time_surfaces) const {
 
     std::vector<Eigen::ArrayXXf> selected;
     std::sample(time_surfaces.begin(), time_surfaces.end(), std::back_inserter(selected), layer.getFeatures(), std::mt19937{std::random_device{}()});
@@ -274,6 +275,28 @@ void LayerPlusPlusInitializer::initializationAlgorithm(Layer& layer, const std::
 
     if (chosen.size() != layer.getFeatures()) {
         throw std::runtime_error("Something went wrong with the plusplus initialization.");
+    }
+
+}
+
+
+void LayerRandomInitializer::initializePrototypes(Layer& layer, const Events& events) const {
+    initializationAlgorithm(layer, {});
+}
+
+void LayerRandomInitializer::initializePrototypes(Layer& layer, const std::vector<Events>& event_streams) const {
+    initializationAlgorithm(layer, {});
+}
+
+void LayerRandomInitializer::initializationAlgorithm(Layer& layer, const std::vector<Eigen::ArrayXXf>& time_surfaces) const {
+
+    uint16_t Wx = layer.getSurface(0).getWx();
+    uint16_t Wy = layer.getSurface(0).getWy();
+
+    std::srand((unsigned int) std::time(0));
+
+    for (uint16_t i = 0; i < layer.getFeatures(); i++) {
+        layer.addPrototype(Eigen::ArrayXXf::Random(Wy, Wy) + 1.f /2.f);
     }
 
 }

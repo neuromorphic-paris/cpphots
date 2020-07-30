@@ -231,8 +231,8 @@ int main() {
     // test layer initialization
     layer = cpphots::Layer(32, 32, 2, 2, 1000, 2, 8);
 
-    // random initializer
-    cpphots::LayerRandomInitializer lri;
+    // uniform initializer
+    cpphots::LayerUniformInitializer lri;
 
     layer.clearPrototypes();
     lri.initializePrototypes(layer, events);
@@ -246,6 +246,7 @@ int main() {
         return 1;
     }
 
+    // plus plus initializer
     cpphots::LayerPlusPlusInitializer lppi;
 
     layer.clearPrototypes();
@@ -259,6 +260,8 @@ int main() {
     if (!layer.isInitialized()) {
         return 1;
     }
+
+    // random initializer
 
     return 0;
 

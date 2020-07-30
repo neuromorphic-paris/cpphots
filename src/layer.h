@@ -269,11 +269,12 @@ protected:
 
 
 /**
- * @brief Randomly initialize the layer
+ * @brief Uniformly initialize the layer
  * 
- * This class initialize the prototypes by simply choosing random valid time surfaces.
+ * This class initialize the prototypes by simply choosing random valid time surfaces,
+ * generated from streams of events, with uniform probabilities.
  */
-class LayerRandomInitializer : public LayerInitializer {
+class LayerUniformInitializer : public LayerInitializer {
 
 protected:
     void initializationAlgorithm(Layer& layer, const std::vector<Eigen::ArrayXXf>& time_surfaces) const override;
@@ -284,11 +285,57 @@ protected:
 /**
  * @brief k-means++ initialization
  * 
- * This class implements the initialization algorithm of k-means++ to choose the prototypes.
+ * This class implements the initialization algorithm of k-means++ to choose the prototypes
+ * among the valid time surfaces generated from streams of events.
  */
 class LayerPlusPlusInitializer : public LayerInitializer {
 
 protected:
+    void initializationAlgorithm(Layer& layer, const std::vector<Eigen::ArrayXXf>& time_surfaces) const override;
+
+};
+
+
+/**
+ * @brief Random initialization
+ * 
+ * Initialize the prototypes of the layer with random time surfaces, ignoring the input events.
+ * This may be useful for debugging purposes.
+ */
+class LayerRandomInitializer : public LayerInitializer {
+
+public:
+
+    /**
+     * @brief Initialize prototypes from a stream of events
+     * 
+     * In this subclass, events are not used.
+     * 
+     * @param layer the layer to be initialized
+     * @param events not used
+     */
+    void initializePrototypes(Layer& layer, const Events& events) const override;
+
+    /**
+     * @brief Initialize prototypes from a vector of streams of events
+     * 
+     * In this subclass, events are not used.
+     * 
+     * @param layer the layer to be initialized
+     * @param event_streams not used
+     */
+    void initializePrototypes(Layer& layer, const std::vector<Events>& event_streams) const override;
+
+protected:
+
+    /**
+     * @brief Actual initialization algorithm
+     * 
+     * This is the method where the algorithm is performed and must be implemented in subclasses.
+     * 
+     * @param layer the layer to be initialized
+     * @param time_surfaces not used
+     */
     void initializationAlgorithm(Layer& layer, const std::vector<Eigen::ArrayXXf>& time_surfaces) const override;
 
 };
