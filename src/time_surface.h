@@ -39,6 +39,9 @@ public:
      * 
      * The time context is initalized to -tau.
      * 
+     * It is possible to use the whole time context in any dimension to compute the surfaces by setting Rx or Ry to 0.
+     * However, this can break the assumption that the current event is centered in the time surface.
+     * 
      * @param width width of the full time context
      * @param height height of the full time context
      * @param Rx horizontal radius of the window on which surfaces are computed (0 to use the full width)

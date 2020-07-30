@@ -40,6 +40,12 @@ void TimeSurface::update(uint16_t x, uint16_t y, uint64_t t) {
 
 std::pair<Eigen::ArrayXXf, bool> TimeSurface::compute(uint16_t x, uint16_t y, uint64_t t) const {
     
+    // override for the full context
+    if (Rx == 0)
+        x = 0;
+    if (Ry == 0)
+        y = 0;
+
     Eigen::ArrayXXf retmat = context.block(y, x, Wy, Wx);  // should be (x-Rx, y-Ry), but the context is padded
 
     auto ret = 1. - (t - retmat) / tau;
