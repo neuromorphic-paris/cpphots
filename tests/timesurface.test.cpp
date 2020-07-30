@@ -4,7 +4,50 @@
 #include <iostream>
 
 
+bool test_sizes() {
+
+    // square
+    {
+        cpphots::TimeSurface ts(32, 32, 2, 2, 1000);
+        if (ts.getWx() != 5 || ts.getWy() != 5) {
+            return false;
+        }
+    }
+
+    // asymmetric
+    {
+        cpphots::TimeSurface ts(32, 32, 5, 2, 1000);
+        if (ts.getWx() != 11 || ts.getWy() != 5) {
+            return false;
+        }
+    }
+
+    // Rx 0
+    {
+        cpphots::TimeSurface ts(32, 32, 0, 2, 1000);
+        if (ts.getWx() != 32 || ts.getWy() != 5) {
+            return false;
+        }
+    }
+
+    // Ry 0
+    {
+        cpphots::TimeSurface ts(32, 32, 2, 0, 1000);
+        if (ts.getWx() != 5 || ts.getWy() != 32) {
+            return false;
+        }
+    }
+
+    return true;
+
+}
+
 int main() {
+
+    if (!test_sizes()) {
+        std::cerr << "Test sizes failed" << std::endl;
+        return 1;
+    }
 
     // load data
     cpphots::Events events = cpphots::loadFromFile("trcl0.es");

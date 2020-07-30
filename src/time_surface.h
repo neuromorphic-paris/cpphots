@@ -41,8 +41,8 @@ public:
      * 
      * @param width width of the full time context
      * @param height height of the full time context
-     * @param Rx horizontal size of the window on which surfaces are computed
-     * @param Ry vertical size of the window on which surfaces are computed
+     * @param Rx horizontal radius of the window on which surfaces are computed (0 to use the full width)
+     * @param Ry vertical radius of the window on which surfaces are computed (0 to use the full height)
      * @param tau time constant of the surface
      */
     TimeSurface(uint16_t width, uint16_t height, uint16_t Rx, uint16_t Ry, float tau);
@@ -70,8 +70,8 @@ public:
      * 
      * This function does not update the time context.
      * 
-     * A time surface is considered valid if there is a number of relevant events >= 2R,
-     * as described in the paper.
+     * A time surface is considered valid if there is a certain number of relevant events,
+     * determined using an heuristic extended from the on described in the paper.
      * 
      * @param x horizontal coordinate of the event
      * @param y vertical coordinate of the event
@@ -85,8 +85,8 @@ public:
      * 
      * This function does not update the time context.
      * 
-     * A time surface is considered valid if there is a number of relevant events >= 2R,
-     * as described in the paper.
+     * A time surface is considered valid if there is a certain number of relevant events,
+     * determined using an heuristic extended from the on described in the paper.
      * 
      * @param ev the event
      * @return a std::pair with the computed time surface and whether the surface is valid or not
@@ -137,11 +137,30 @@ public:
      */
     void reset();
 
+    /**
+     * @brief Get the horizontal size of the window
+     * 
+     * @return the horizontal size of the window
+     */
+    inline uint16_t getWx() const {
+        return Wx;
+    }
+
+    /**
+     * @brief Get the vertical size of the window
+     * 
+     * @return the vertical size of the window
+     */
+    inline uint16_t getWy() const {
+        return Wy;
+    }
+
 private:
 
     Eigen::ArrayXXf context;  // using float instead of uint64_t for the initialization to -tau
     uint16_t width, height;
     uint16_t Rx, Ry;
+    uint16_t Wx, Wy;
     float tau;
     uint16_t min_events;
 
