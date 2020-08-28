@@ -48,10 +48,10 @@ public:
      * @param K_N growth factor for the number of features
      */
     Network(uint16_t width, uint16_t height, uint16_t polarities,
-                uint16_t num_layers,
-                uint16_t Rx1, uint16_t Ry1, uint16_t K_R,
-                float tau1, float K_tau,
-                uint16_t N1, uint16_t K_N);
+            uint16_t num_layers,
+            uint16_t Rx1, uint16_t Ry1, uint16_t K_R,
+            float tau1, float K_tau,
+            uint16_t N1, uint16_t K_N);
 
     /**
      * @brief Construct a new Network object
@@ -67,9 +67,9 @@ public:
      * @param N numbers of features for each layer
      */
     Network(uint16_t width, uint16_t height, uint16_t polarities,
-                const std::vector<uint16_t>& Rx, const std::vector<uint16_t>& Ry,
-                const std::vector<float> tau,
-                const std::vector<uint16_t> N);
+            const std::vector<uint16_t>& Rx, const std::vector<uint16_t>& Ry,
+            const std::vector<float> tau,
+            const std::vector<uint16_t> N);
 
     /**
      * @brief Process an event

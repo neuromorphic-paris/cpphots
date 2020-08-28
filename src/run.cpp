@@ -11,8 +11,6 @@ Features process_file(Network& network, const std::string& filename) {
 
     bool mergePolarities = network.getInputPolarities() == 1;
 
-    // std::cout << "Learning on file " << filename << std::endl;
-
     // load file
     auto events = loadFromFile(filename, mergePolarities);
 
@@ -23,33 +21,12 @@ Features process_file(Network& network, const std::string& filename) {
     }
 
     auto feats = network.getLastHistogram();
-    // for (auto f : feats) {
-    //     std::cout << f << " ";
-    // }
-    // std::cout << std::endl;
-
-    // auto prototypes = network.getLayer(2).getPrototypes();
-
-    // std::cout << prototypes.size() << std::endl;
-
-    // for (auto& k : prototypes) {
-    //     std::cout << k << "\n\n";
-    // }
 
     return feats;
 
 }
 
-
-void train_oneshot(Network& network, const std::vector<std::string>& training_set, const LayerInitializer& initializer, bool use_all) {
-
-    bool mergePolarities = network.getInputPolarities() == 1;
-
-    // load all training set
-    std::vector<Events> training_events;
-    for (auto& filename : training_set) {
-        training_events.push_back(loadFromFile(filename, mergePolarities));
-    }
+void train_oneshot(Network& network, const std::vector<Events>& training_events, const LayerInitializer& initializer, bool use_all) {
 
     // prototypes initialization
     std::vector<Events> init_events = training_events;
@@ -73,6 +50,43 @@ void train_oneshot(Network& network, const std::vector<std::string>& training_se
 
 }
 
+void train_sequential(Network& network, const std::vector<Events>& training_events, const LayerInitializer& initializer, bool use_all) {
+
+    std::vector<Events> _training_events = training_events;
+
+    for (unsigned int l = 0; l < network.getNumLayers(); l++) {
+
+        // learn prototypes for this layer
+        if (use_all)
+            initializer.initializePrototypes(network.getLayer(l), _training_events);
+        else
+            initializer.initializePrototypes(network.getLayer(l), _training_events[0]);
+
+        network.toggleLearningLayer(l, true);
+        network.getLayer(l).process(_training_events);
+
+        // genereate events for the next layer
+        network.toggleLearningAll(false);
+        _training_events = network.getLayer(l).process(_training_events);
+
+    }
+
+}
+
+void train_oneshot(Network& network, const std::vector<std::string>& training_set, const LayerInitializer& initializer, bool use_all) {
+
+    bool mergePolarities = network.getInputPolarities() == 1;
+
+    // load all training set
+    std::vector<Events> training_events;
+    for (auto& filename : training_set) {
+        training_events.push_back(loadFromFile(filename, mergePolarities));
+    }
+
+    train_oneshot(network, training_events, initializer, use_all);
+
+}
+
 
 void train_sequential(Network& network, const std::vector<std::string>& training_set, const LayerInitializer& initializer, bool use_all) {
 
@@ -84,31 +98,7 @@ void train_sequential(Network& network, const std::vector<std::string>& training
         training_events.push_back(loadFromFile(filename, mergePolarities));
     }
 
-    for (unsigned int l = 0; l < network.getNumLayers(); l++) {
-
-        // learn prototypes for this layer
-        if (use_all)
-            initializer.initializePrototypes(network.getLayer(l), training_events);
-        else
-            initializer.initializePrototypes(network.getLayer(l), training_events[0]);
-
-        network.toggleLearningLayer(l, true);
-        network.getLayer(l).process(training_events);
-        // for (auto& events : training_events) {
-
-        //     // we process the same events two times, once to learn
-        //     network.resetLayers();
-        //     for (auto& ev : events) {
-        //         network.getLayer(l).process(ev);
-        //     }
-
-        // }
-
-        // and once to genereate events for the next layer
-        network.toggleLearningAll(false);
-        training_events = network.getLayer(l).process(training_events);
-
-    }
+    train_sequential(network, training_events, initializer, use_all);
 
 }
 
@@ -142,7 +132,6 @@ std::vector<double> compute_accuracy(Network& network, const std::vector<Classif
     for (auto sample : test_set) {
 
         auto feats = process_file(network, sample.first);
-        // std::cout << feats << std::endl;
         
         // classify
         for (unsigned int i = 0; i < classifiers.size(); i ++) {

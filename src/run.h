@@ -15,6 +15,9 @@ namespace cpphots {
 Features process_file(Network& network, const std::string& filename);
 
 // training
+void train_oneshot(Network& network, const std::vector<Events>& training_events, const LayerInitializer& initializer, bool use_all = true);
+void train_sequential(Network& network, const std::vector<Events>& training_events, const LayerInitializer& initializer, bool use_all = true);
+
 void train_oneshot(Network& network, const std::vector<std::string>& training_set, const LayerInitializer& initializer, bool use_all = true);
 void train_sequential(Network& network, const std::vector<std::string>& training_set, const LayerInitializer& initializer, bool use_all = true);
 
