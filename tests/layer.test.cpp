@@ -227,21 +227,20 @@ int main() {
     if (!(layer.getHist() == compare_afterlearning))
         return 1;
 
-
     // test layer initialization
     layer = cpphots::Layer(32, 32, 2, 2, 1000, 2, 8);
 
     // uniform initializer
-    cpphots::LayerUniformInitializer lri;
+    cpphots::LayerUniformInitializer lui;
 
     layer.clearPrototypes();
-    lri.initializePrototypes(layer, events);
+    lui.initializePrototypes(layer, events);
     if (!layer.isInitialized()) {
         return 1;
     }
 
     layer.clearPrototypes();
-    lri.initializePrototypes(layer, {events, events});
+    lui.initializePrototypes(layer, {events, events});
     if (!layer.isInitialized()) {
         return 1;
     }
@@ -262,6 +261,32 @@ int main() {
     }
 
     // random initializer
+    cpphots::LayerRandomInitializer lri;
+    
+    layer.clearPrototypes();
+    lri.initializePrototypes(layer, cpphots::Events{});
+    if (!layer.isInitialized()) {
+        return 1;
+    }
+
+    layer.clearPrototypes();
+    lri.initializePrototypes(layer, std::vector<cpphots::Events>{});
+    if (!layer.isInitialized()) {
+        return 1;
+    }
+
+
+    // test no validity check
+    layer.resetSurfaces();
+    layer.process(events, true);
+    auto hist = layer.getHist();
+    uint32_t hcount = 0;
+    for (auto& h : hist) {
+        hcount += h;
+    }
+    if (hcount != events.size()) {
+        return 1;
+    }
 
     return 0;
 

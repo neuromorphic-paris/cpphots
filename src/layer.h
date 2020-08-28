@@ -66,7 +66,8 @@ public:
      * @brief Process an event
      * 
      * Process an event and emit a new event, depending on the closest prototype.
-     * If the input event does not produce a valid time surface, then the output event is also not valid.
+     * If the input event does not produce a valid time surface, then the output event is also not valid,
+     * unless validity checks are skipped.
      * 
      * The closest prototype is choosen based on L2 distance.
      * 
@@ -76,56 +77,61 @@ public:
      * @param y vertical coordinate of the event
      * @param t time of the event
      * @param p polarity of the event
+     * @param skip_check if true consider all events as valid
      * @return a std::pair with the new emitted event and whether the event is valid or not
      */
-    std::pair<event, bool> process(uint16_t x, uint16_t y, uint64_t t, uint16_t p);
+    std::pair<event, bool> process(uint16_t x, uint16_t y, uint64_t t, uint16_t p, bool skip_check = false);
     
     /**
      * @brief Process an event
      * 
      * Process an event and emit a new event, depending on the closest prototype.
-     * If the input event does not produce a valid time surface, then the output event is also not valid.
+     * If the input event does not produce a valid time surface, then the output event is also not valid,
+     * unless validity checks are skipped.
      * 
      * The closest prototype is choosen based on L2 distance.
      * 
      * If learning is enabled, this function will also update the matching prototype.
      * 
      * @param ev the event
+     * @param skip_check if true consider all events as valid
      * @return a std::pair with the new emitted event and whether the event is valid or not
      */
-    inline std::pair<event, bool> process(const event& ev) {
-        return process(ev.x, ev.y, ev.t, ev.p);
+    inline std::pair<event, bool> process(const event& ev, bool skip_check = false) {
+        return process(ev.x, ev.y, ev.t, ev.p, skip_check);
     }
 
     /**
      * @brief Process a stream of events
      * 
      * Process a stream of events and emit a new stream of events.
-     * Only valid events are emitted.
+     * Only valid events are emitted, if otherwise specified.
      * 
      * This method resets the time surfaces before processing the events.
      *
      * If learning is enabled, this function will also update matching prototypes.
      * 
      * @param events a stream of events
+     * @param skip_check if true consider all events as valid
      * @return a new stream of valid events
      */
-    Events process(const Events& events);
+    Events process(const Events& events, bool skip_check = false);
 
     /**
      * @brief Process a vector of stream of events
      * 
      * Process each stream of events and emit a new stream of events for every one of the input streams.
-     * Only valid events are emitted.
+     * Only valid events are emitted, if otherwise specified.
      * 
      * This method resets the time surfaces before processing every stream of events.
      *
      * If learning is enabled, this function will also update matching prototypes.
      * 
      * @param event_streams a vector of stream of events
+     * @param skip_check if true consider all events as valid
      * @return a new vector of streams of valid events
      */
-    std::vector<Events> process(const std::vector<Events>& event_streams);
+    std::vector<Events> process(const std::vector<Events>& event_streams, bool skip_check = false);
 
     /**
      * @brief Get the number of output features
@@ -242,16 +248,18 @@ public:
      * 
      * @param layer the layer to be initialized
      * @param events the stream of events to be used
+     * @param valid_only use only valid time surfaces for the initialization
      */
-    virtual void initializePrototypes(Layer& layer, const Events& events) const;
+    virtual void initializePrototypes(Layer& layer, const Events& events, bool valid_only = true) const;
 
     /**
      * @brief Initialize prototypes from a vector of streams of events
      * 
      * @param layer the layer to be initialized
      * @param event_streams the vector of streams of events to be used
+     * @param valid_only use only valid time surfaces for the initialization
      */
-    virtual void initializePrototypes(Layer& layer, const std::vector<Events>& event_streams) const;
+    virtual void initializePrototypes(Layer& layer, const std::vector<Events>& event_streams, bool valid_only = true) const;
 
 protected:
 
@@ -271,7 +279,7 @@ protected:
 /**
  * @brief Uniformly initialize the layer
  * 
- * This class initialize the prototypes by simply choosing random valid time surfaces,
+ * This class initialize the prototypes by simply choosing random time surfaces,
  * generated from streams of events, with uniform probabilities.
  */
 class LayerUniformInitializer : public LayerInitializer {
@@ -286,7 +294,7 @@ protected:
  * @brief k-means++ initialization
  * 
  * This class implements the initialization algorithm of k-means++ to choose the prototypes
- * among the valid time surfaces generated from streams of events.
+ * among the time surfaces generated from streams of events.
  */
 class LayerPlusPlusInitializer : public LayerInitializer {
 
@@ -313,8 +321,9 @@ public:
      * 
      * @param layer the layer to be initialized
      * @param events not used
+     * @param valid_only not used
      */
-    void initializePrototypes(Layer& layer, const Events& events) const override;
+    void initializePrototypes(Layer& layer, const Events& events, bool valid_only = true) const override;
 
     /**
      * @brief Initialize prototypes from a vector of streams of events
@@ -323,8 +332,9 @@ public:
      * 
      * @param layer the layer to be initialized
      * @param event_streams not used
+     * @param valid_only not used
      */
-    void initializePrototypes(Layer& layer, const std::vector<Events>& event_streams) const override;
+    void initializePrototypes(Layer& layer, const std::vector<Events>& event_streams, bool valid_only = true) const override;
 
 protected:
 

@@ -30,7 +30,7 @@ Layer::Layer(uint16_t width, uint16_t height,
 
 }
 
-std::pair<event, bool> Layer::process(uint16_t x, uint16_t y, uint64_t t, uint16_t p) {
+std::pair<event, bool> Layer::process(uint16_t x, uint16_t y, uint64_t t, uint16_t p, bool skip_check) {
 
     if (!isInitialized()) {
         throw std::runtime_error("Cannot process event: Layer is not initialized.");
@@ -40,14 +40,13 @@ std::pair<event, bool> Layer::process(uint16_t x, uint16_t y, uint64_t t, uint16
     auto surface_good = surfaces[p].updateAndCompute(x, y, t);
     
     // if the surface is not good we say it upstream
-    if (!surface_good.second) {
+    if (!skip_check && !surface_good.second) {
         return std::make_pair(event{t, x, y, p}, false);
     }
 
     Eigen::ArrayXXf surface = surface_good.first;
 
     // find closest kernel
-    // TODO: prove that we can just maximise the dot product and remove this operation (it is not the same actually!!!)
     uint16_t k = -1;
     float mindist = std::numeric_limits<float>::max();
     for (uint i = 0; i < prototypes.size(); i++) {
@@ -57,16 +56,6 @@ std::pair<event, bool> Layer::process(uint16_t x, uint16_t y, uint64_t t, uint16
             k = i;
         }
     }
-
-    // uint16_t k = -1;
-    // float maxcosine = -1.0;
-    // for (uint i = 0; i < prototypes.size(); i++) {
-    //     float d = prototypes[i].cwiseProduct(surface).sum() / prototypes[i].matrix().norm() / surface.matrix().norm();
-    //     if (d > maxcosine) {
-    //         maxcosine = d;
-    //         k = i;
-    //     }
-    // }
 
     // update histogram
     hist[k]++;
@@ -93,13 +82,13 @@ std::pair<event, bool> Layer::process(uint16_t x, uint16_t y, uint64_t t, uint16
 
 }
 
-Events Layer::process(const Events& events) {
+Events Layer::process(const Events& events, bool skip_check) {
 
     resetSurfaces();
 
     Events retevents;
     for (const auto& ev : events) {
-        auto nev = process(ev);
+        auto nev = process(ev, skip_check);
         if (nev.second)
             retevents.push_back(nev.first);
     }
@@ -107,11 +96,11 @@ Events Layer::process(const Events& events) {
 
 }
 
-std::vector<Events> Layer::process(const std::vector<Events>& event_streams) {
+std::vector<Events> Layer::process(const std::vector<Events>& event_streams, bool skip_check) {
 
     std::vector<Events> retstreams;
     for (const auto& events : event_streams) {
-        auto nevs = process(events);
+        auto nevs = process(events, skip_check);
         retstreams.push_back(nevs);
     }
     return retstreams;
@@ -167,14 +156,16 @@ void Layer::addPrototype(const Eigen::ArrayXXf& proto) {
 }
 
 
-void LayerInitializer::initializePrototypes(Layer& layer, const Events& events) const {
+void LayerInitializer::initializePrototypes(Layer& layer, const Events& events, bool valid_only) const {
 
-    // store all (good) time surfaces
+    // store all time surfaces
     layer.resetSurfaces();
     std::vector<Eigen::ArrayXXf> time_surfaces;
     for (unsigned int i = 0; i < events.size(); i++) {
         auto surface_good = layer.getSurface(events[i].p).updateAndCompute(events[i]);
-        if (surface_good.second) {
+        if (valid_only && surface_good.second) {
+            time_surfaces.push_back(surface_good.first);
+        } else if (!valid_only) {
             time_surfaces.push_back(surface_good.first);
         }
     }
@@ -187,15 +178,17 @@ void LayerInitializer::initializePrototypes(Layer& layer, const Events& events) 
 
 }
 
-void LayerInitializer::initializePrototypes(Layer& layer, const std::vector<Events>& event_streams) const {
+void LayerInitializer::initializePrototypes(Layer& layer, const std::vector<Events>& event_streams, bool valid_only) const {
 
-    // store all (good) time surfaces
+    // store all time surfaces
     std::vector<Eigen::ArrayXXf> time_surfaces;
     for (unsigned int st = 0; st < event_streams.size(); st++) {
         layer.resetSurfaces();
         for (unsigned int i = 0; i < event_streams[st].size(); i++) {
             auto surface_good = layer.getSurface(event_streams[st][i].p).updateAndCompute(event_streams[st][i]);
-            if (surface_good.second) {
+            if (valid_only && surface_good.second) {
+                time_surfaces.push_back(surface_good.first);
+            } else if (!valid_only) {
                 time_surfaces.push_back(surface_good.first);
             }
         }
@@ -280,11 +273,11 @@ void LayerPlusPlusInitializer::initializationAlgorithm(Layer& layer, const std::
 }
 
 
-void LayerRandomInitializer::initializePrototypes(Layer& layer, const Events& events) const {
+void LayerRandomInitializer::initializePrototypes(Layer& layer, const Events& events, bool valid_only) const {
     initializationAlgorithm(layer, {});
 }
 
-void LayerRandomInitializer::initializePrototypes(Layer& layer, const std::vector<Events>& event_streams) const {
+void LayerRandomInitializer::initializePrototypes(Layer& layer, const std::vector<Events>& event_streams, bool valid_only) const {
     initializationAlgorithm(layer, {});
 }
 
