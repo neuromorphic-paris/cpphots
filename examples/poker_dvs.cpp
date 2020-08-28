@@ -68,7 +68,7 @@ std::vector<std::pair<std::string, std::string>> poker_dvs_all(const std::string
 }
 
 
-std::tuple<double, double, double> test_training(const std::string& folder, bool sequential, bool multi) {
+std::tuple<double, double, double> test_training(const std::string& folder, bool sequential, bool multi, const cpphots::LayerInitializer& initializer) {
 
     cpphots::Network network(128, 128, 2,
                         2,
@@ -85,7 +85,7 @@ std::tuple<double, double, double> test_training(const std::string& folder, bool
                                    train_set[1].first,
                                    train_set[2].first,
                                    train_set[3].first},
-                                  cpphots::LayerPlusPlusInitializer{},
+                                  initializer,
                                   multi);
     } else {
         cpphots::train_oneshot(network,
@@ -93,7 +93,7 @@ std::tuple<double, double, double> test_training(const std::string& folder, bool
                                 train_set[1].first,
                                 train_set[2].first,
                                 train_set[3].first},
-                               cpphots::LayerPlusPlusInitializer{},
+                               initializer,
                                multi);
     }
 
@@ -134,45 +134,82 @@ int main(int argc, char* argv[]) {
         // run training some times
         int n_trainings = 100;
 
-        std::ofstream sequential_file("sequential.csv");
-        sequential_file << "acc1,acc2,acc3" << std::endl;
+        std::ofstream unif_sequential_file("unif_sequential.csv");
+        unif_sequential_file << "acc1,acc2,acc3" << std::endl;
         for (int i = 0; i < n_trainings; i++) {
             std::cout << "training (seq) " << i+1 << "/" << n_trainings << std::endl;
-            auto res = test_training(datafolder, true, false);
-            sequential_file << std::get<0>(res) << "," << std::get<1>(res) << "," << std::get<2>(res) << std::endl;
+            auto res = test_training(datafolder, true, false, cpphots::LayerUniformInitializer{});
+            unif_sequential_file << std::get<0>(res) << "," << std::get<1>(res) << "," << std::get<2>(res) << std::endl;
         }
-        sequential_file.close();
+        unif_sequential_file.close();
 
-        std::ofstream sequentialmulti_file("sequential_multi.csv");
-        sequentialmulti_file << "acc1,acc2,acc3" << std::endl;
+        std::ofstream unif_sequentialmulti_file("unif_sequential_multi.csv");
+        unif_sequentialmulti_file << "acc1,acc2,acc3" << std::endl;
         for (int i = 0; i < n_trainings; i++) {
             std::cout << "training (seq-multi) " << i+1 << "/" << n_trainings << std::endl;
-            auto res = test_training(datafolder, true, true);
-            sequentialmulti_file << std::get<0>(res) << "," << std::get<1>(res) << "," << std::get<2>(res) << std::endl;
+            auto res = test_training(datafolder, true, true, cpphots::LayerUniformInitializer{});
+            unif_sequentialmulti_file << std::get<0>(res) << "," << std::get<1>(res) << "," << std::get<2>(res) << std::endl;
         }
-        sequentialmulti_file.close();
+        unif_sequentialmulti_file.close();
 
-        std::ofstream oneshot_file("oneshot.csv");
-        oneshot_file << "acc1,acc2,acc3" << std::endl;
+        std::ofstream unif_oneshot_file("unif_oneshot.csv");
+        unif_oneshot_file << "acc1,acc2,acc3" << std::endl;
         for (int i = 0; i < n_trainings; i++) {
             std::cout << "training (one) " << i+1 << "/" << n_trainings << std::endl;
-            auto res = test_training(datafolder, false, false);
-            oneshot_file << std::get<0>(res) << "," << std::get<1>(res) << "," << std::get<2>(res) << std::endl;
+            auto res = test_training(datafolder, false, false, cpphots::LayerUniformInitializer{});
+            unif_oneshot_file << std::get<0>(res) << "," << std::get<1>(res) << "," << std::get<2>(res) << std::endl;
         }
-        oneshot_file.close();
+        unif_oneshot_file.close();
 
-        std::ofstream oneshotmulti_file("oneshot_multi.csv");
-        oneshotmulti_file << "acc1,acc2,acc3" << std::endl;
+        std::ofstream unif_oneshotmulti_file("unif_oneshot_multi.csv");
+        unif_oneshotmulti_file << "acc1,acc2,acc3" << std::endl;
         for (int i = 0; i < n_trainings; i++) {
             std::cout << "training (one-multi) " << i+1 << "/" << n_trainings << std::endl;
-            auto res = test_training(datafolder, false, true);
-            oneshotmulti_file << std::get<0>(res) << "," << std::get<1>(res) << "," << std::get<2>(res) << std::endl;
+            auto res = test_training(datafolder, false, true, cpphots::LayerUniformInitializer{});
+            unif_oneshotmulti_file << std::get<0>(res) << "," << std::get<1>(res) << "," << std::get<2>(res) << std::endl;
         }
-        oneshotmulti_file.close();
+        unif_oneshotmulti_file.close();
+
+
+        std::ofstream pp_sequential_file("pp_sequential.csv");
+        pp_sequential_file << "acc1,acc2,acc3" << std::endl;
+        for (int i = 0; i < n_trainings; i++) {
+            std::cout << "training (seq) " << i+1 << "/" << n_trainings << std::endl;
+            auto res = test_training(datafolder, true, false, cpphots::LayerPlusPlusInitializer{});
+            pp_sequential_file << std::get<0>(res) << "," << std::get<1>(res) << "," << std::get<2>(res) << std::endl;
+        }
+        pp_sequential_file.close();
+
+        std::ofstream pp_sequentialmulti_file("pp_sequential_multi.csv");
+        pp_sequentialmulti_file << "acc1,acc2,acc3" << std::endl;
+        for (int i = 0; i < n_trainings; i++) {
+            std::cout << "training (seq-multi) " << i+1 << "/" << n_trainings << std::endl;
+            auto res = test_training(datafolder, true, true, cpphots::LayerPlusPlusInitializer{});
+            pp_sequentialmulti_file << std::get<0>(res) << "," << std::get<1>(res) << "," << std::get<2>(res) << std::endl;
+        }
+        pp_sequentialmulti_file.close();
+
+        std::ofstream pp_oneshot_file("pp_oneshot.csv");
+        pp_oneshot_file << "acc1,acc2,acc3" << std::endl;
+        for (int i = 0; i < n_trainings; i++) {
+            std::cout << "training (one) " << i+1 << "/" << n_trainings << std::endl;
+            auto res = test_training(datafolder, false, false, cpphots::LayerPlusPlusInitializer{});
+            pp_oneshot_file << std::get<0>(res) << "," << std::get<1>(res) << "," << std::get<2>(res) << std::endl;
+        }
+        pp_oneshot_file.close();
+
+        std::ofstream pp_oneshotmulti_file("pp_oneshot_multi.csv");
+        pp_oneshotmulti_file << "acc1,acc2,acc3" << std::endl;
+        for (int i = 0; i < n_trainings; i++) {
+            std::cout << "training (one-multi) " << i+1 << "/" << n_trainings << std::endl;
+            auto res = test_training(datafolder, false, true, cpphots::LayerPlusPlusInitializer{});
+            pp_oneshotmulti_file << std::get<0>(res) << "," << std::get<1>(res) << "," << std::get<2>(res) << std::endl;
+        }
+        pp_oneshotmulti_file.close();
 
     } else {
 
-        auto res = test_training(datafolder, true, true);
+        auto res = test_training(datafolder, true, true, cpphots::LayerPlusPlusInitializer{});
         std::cout << "acc1 = " << std::get<0>(res) << ", acc2 = " << std::get<1>(res) << ", acc3 = " << std::get<2>(res) << std::endl;
     
     }
