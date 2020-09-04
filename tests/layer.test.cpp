@@ -1,6 +1,6 @@
-#include "../src/layer.h"
-#include "../src/events_utils.h"
-#include "../src/classification.h"
+#include <cpphots/layer.h>
+#include <cpphots/events_utils.h>
+#include <cpphots/classification.h>
 
 #include <iostream>
 

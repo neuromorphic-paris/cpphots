@@ -8,6 +8,8 @@ add_library(cpphots SHARED
             run.cpp
             time_surface.cpp)
 
+target_include_directories(cpphots PRIVATE ../include)
+
 # include sepia
 if(NOT SEPIA_DIR)
     message(FATAL_ERROR "The variable SEPIA_DIR must be specified.")
@@ -17,7 +19,7 @@ target_include_directories(cpphots PRIVATE ${SEPIA_DIR})
 target_link_libraries(cpphots pthread Eigen3::Eigen)
 
 set_target_properties(cpphots PROPERTIES
-  PUBLIC_HEADER "classification.h;events_utils.h;layer.h;network.h;run.h;time_surface.h")
+                      PUBLIC_HEADER "../include/cpphots/classification.h;../include/cpphots/events_utils.h;../include/cpphots/layer.h;../include/cpphots/network.h;../include/cpphots/run.h;../include/cpphots/time_surface.h")
 
 # installation
 install(TARGETS cpphots

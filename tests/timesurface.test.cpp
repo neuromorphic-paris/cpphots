@@ -1,5 +1,5 @@
-#include "../src/time_surface.h"
-#include "../src/events_utils.h"
+#include <cpphots/time_surface.h>
+#include <cpphots/events_utils.h>
 
 #include <iostream>
 

@@ -1,9 +1,10 @@
+find_package(cpphots CONFIG REQUIRED)
+
 function(add_new_test target)
     add_executable(${target} ${ARGN})
-    target_link_libraries(${target} cpphots)
-
+    target_include_directories(${target} PRIVATE ${CPPHOTS_INCLUDE_DIRS})
+    target_link_libraries(${target} ${CPPHOTS_LIBRARIES})
     add_test(${target} ${target})
-
 endfunction()
 
 

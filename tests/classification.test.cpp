@@ -1,4 +1,4 @@
-#include "../src/classification.h"
+#include <cpphots/classification.h>
 
 #include <cassert>
 #include <iostream>

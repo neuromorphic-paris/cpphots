@@ -1,11 +1,10 @@
 #include <iostream>
 #include <fstream>
 
-#include "../src/network.h"
-
-#include "../src/events_utils.h"
-#include "../src/classification.h"
-#include "../src/run.h"
+#include <cpphots/network.h>
+#include <cpphots/events_utils.h>
+#include <cpphots/classification.h>
+#include <cpphots/run.h>
 
 
 std::vector<std::pair<std::string, std::string>> poker_dvs_trainset(const std::string& folder) {

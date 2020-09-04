@@ -33,22 +33,6 @@ endforeach()
 add_subdirectory(src)
 
 
-# tests
-option(BUILD_TEST "Build tests" ON)
-if (BUILD_TEST)
-    enable_testing()
-
-    add_subdirectory(tests)
-endif (BUILD_TEST)
-
-
-# examples
-option(BUILD_EXAMPLES "Build examples" ON)
-if (BUILD_EXAMPLES)
-    add_subdirectory(examples)
-endif (BUILD_EXAMPLES)
-
-
 # docs
 option(BUILD_DOC "Build documentation" ON)
 
@@ -84,16 +68,17 @@ export(TARGETS cpphots
 # (this registers the build-tree with a global CMake-registry)
 export(PACKAGE cpphots)
 
-# create the cpphotsConfig.cmake and cpphotsConfigVersion files
+# create the cpphotsConfig.cmake file
 file(RELATIVE_PATH REL_INCLUDE_DIR "${INSTALL_CMAKE_DIR}"
    "${INSTALL_INCLUDE_DIR}")
 # ... for the build tree
-set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}" "${PROJECT_BINARY_DIR}")
+set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/include")
 configure_file(cmake/cpphotsConfig.cmake.in "${PROJECT_BINARY_DIR}/cpphotsConfig.cmake" @ONLY)
 # ... for the install tree
 set(CONF_INCLUDE_DIRS "\${CPPHOTS_CMAKE_DIR}/${REL_INCLUDE_DIR}")
 configure_file(cmake/cpphotsConfig.cmake.in "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/cpphotsConfig.cmake" @ONLY)
-# ... for both
+
+# create cpphotsConfigVersion.cmake file
 configure_file(cmake/cpphotsConfigVersion.cmake.in "${PROJECT_BINARY_DIR}/cpphotsConfigVersion.cmake" @ONLY)
 
 # install the cpphotsConfig.cmake and cpphotsConfigVersion.cmake
@@ -105,3 +90,19 @@ install(FILES
 # install the export set for use with the install-tree
 install(EXPORT cpphotsTargets DESTINATION
   "${INSTALL_CMAKE_DIR}" COMPONENT dev)
+
+
+# tests
+option(BUILD_TEST "Build tests" ON)
+if (BUILD_TEST)
+    enable_testing()
+
+    add_subdirectory(tests)
+endif (BUILD_TEST)
+
+
+# examples
+option(BUILD_EXAMPLES "Build examples" ON)
+if (BUILD_EXAMPLES)
+    add_subdirectory(examples)
+endif (BUILD_EXAMPLES)

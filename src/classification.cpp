@@ -1,4 +1,4 @@
-#include "classification.h"
+#include "cpphots/classification.h"
 
 #include <stdexcept>
 #include <limits>
