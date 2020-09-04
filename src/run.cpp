@@ -9,10 +9,13 @@ namespace cpphots {
 
 Features process_file(Network& network, const std::string& filename) {
 
-    bool mergePolarities = network.getInputPolarities() == 1;
+    std::unordered_map<bool, uint16_t> change_polarities{{false, 0}, {true, 1}};
+    if (network.getInputPolarities() == 1) {
+        change_polarities[true] = 0;
+    }
 
     // load file
-    auto events = loadFromFile(filename, mergePolarities);
+    auto events = loadFromFile(filename, change_polarities);
 
     // run network
     network.resetLayers();
@@ -75,12 +78,15 @@ void train_sequential(Network& network, const std::vector<Events>& training_even
 
 void train_oneshot(Network& network, const std::vector<std::string>& training_set, const LayerInitializer& initializer, bool use_all) {
 
-    bool mergePolarities = network.getInputPolarities() == 1;
+    std::unordered_map<bool, uint16_t> change_polarities{{false, 0}, {true, 1}};
+    if (network.getInputPolarities() == 1) {
+        change_polarities[true] = 0;
+    }
 
     // load all training set
     std::vector<Events> training_events;
     for (auto& filename : training_set) {
-        training_events.push_back(loadFromFile(filename, mergePolarities));
+        training_events.push_back(loadFromFile(filename, change_polarities));
     }
 
     train_oneshot(network, training_events, initializer, use_all);
@@ -90,12 +96,15 @@ void train_oneshot(Network& network, const std::vector<std::string>& training_se
 
 void train_sequential(Network& network, const std::vector<std::string>& training_set, const LayerInitializer& initializer, bool use_all) {
 
-    bool mergePolarities = network.getInputPolarities() == 1;
+    std::unordered_map<bool, uint16_t> change_polarities{{false, 0}, {true, 1}};
+    if (network.getInputPolarities() == 1) {
+        change_polarities[true] = 0;
+    }
 
     // load all traning set
     std::vector<Events> training_events;
     for (auto& filename : training_set) {
-        training_events.push_back(loadFromFile(filename, mergePolarities));
+        training_events.push_back(loadFromFile(filename, change_polarities));
     }
 
     train_sequential(network, training_events, initializer, use_all);
