@@ -4,13 +4,12 @@ An implementation of [HOTS](https://www.neuromorphic-vision.com/public/publicati
 
 ## Install
 
-The library depends on [Eigen](http://eigen.tuxfamily.org) and [Sepia](https://github.com/neuromorphic-paris/sepia). `cpphots` can be built with `cmake` using the normal pipeline of commands, but the folder containing sepia.hpp must be specified to `cmake` using the `SEPIA_DIR` flag:
+The library depends on [Eigen](http://eigen.tuxfamily.org) and [Sepia](https://github.com/neuromorphic-paris/sepia) (which is included automatically). `cpphots` can be built with `cmake` using the normal pipeline of commands:
 
 ```
-mkdir build && cd build
-cmake -DSEPIA_DIR=<path/to/sepia> ..
-make
-make install
+cmake -S . -B build
+cmake --build build
+cmake --build build --target install
 ```
 
 ## Usage
@@ -27,4 +26,4 @@ target_link_libraries(<target> ${CPPHOTS_LIBRARIES})
 
 ## Documentation
 
-After running `cmake`, the documentation can be built with [doxygen](https://www.doxygen.nl) by running `make doc`.
+After configuring with `cmake`, the documentation can be built with [doxygen](https://www.doxygen.nl) by running `cmake --build build --target install`.
