@@ -1,6 +1,4 @@
-find_package(Eigen3 3.3 REQUIRED NO_MODULE)
-
-add_library(cpphots SHARED
+add_library(cpphots
             classification.cpp
             events_utils.cpp
             layer.cpp
@@ -8,23 +6,19 @@ add_library(cpphots SHARED
             run.cpp
             time_surface.cpp)
 
-target_include_directories(cpphots PRIVATE ../include)
+target_include_directories(cpphots PUBLIC 
+                           $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+                           $<INSTALL_INTERFACE:include>)
 
-# include sepia
-if(NOT SEPIA_DIR)
-    message(FATAL_ERROR "The variable SEPIA_DIR must be specified.")
-endif()
-target_include_directories(cpphots PRIVATE ${SEPIA_DIR})
+target_include_directories(cpphots PRIVATE "${sepia_SOURCE_DIR}/source")
 
 target_link_libraries(cpphots pthread Eigen3::Eigen)
 
 set_target_properties(cpphots PROPERTIES
                       PUBLIC_HEADER "../include/cpphots/classification.h;../include/cpphots/events_utils.h;../include/cpphots/layer.h;../include/cpphots/network.h;../include/cpphots/run.h;../include/cpphots/time_surface.h")
 
-# installation
 install(TARGETS cpphots
-  # IMPORTANT: Add the cpphots library to the "export-set"
-  EXPORT cpphotsTargets
-  LIBRARY DESTINATION "${INSTALL_LIB_DIR}" COMPONENT shlib
-  PUBLIC_HEADER DESTINATION "${INSTALL_INCLUDE_DIR}/cpphots"
-    COMPONENT dev)
+        EXPORT cpphotsTargets
+        LIBRARY DESTINATION "${INSTALL_LIB_DIR}"
+        ARCHIVE DESTINATION "${INSTALL_LIB_DIR}"
+        PUBLIC_HEADER DESTINATION "${INSTALL_INCLUDE_DIR}/cpphots")

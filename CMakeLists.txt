@@ -1,17 +1,29 @@
-cmake_minimum_required(VERSION 3.0.0)
-project(cpphots)
+cmake_minimum_required(VERSION 3.11...3.18)
 
+project(cpphots VERSION 1.0.2
+                LANGUAGES CXX)
+
+# C++ version
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-# versioning
-set(CPPHOTS_MAJOR_VERSION 1)
-set(CPPHOTS_MINOR_VERSION 0)
-set(CPPHOTS_PATCH_VERSION 1)
-set(CPPHOTS_VERSION ${CPPHOTS_MAJOR_VERSION}.${CPPHOTS_MINOR_VERSION}.${CPPHOTS_PATCH_VERSION})
+# default to Release
+set(default_build_type "Release")
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  message(STATUS "Setting build type to '${default_build_type}' as none was specified.")
+  set(CMAKE_BUILD_TYPE "${default_build_type}" CACHE
+      STRING "Choose the type of build." FORCE)
+  # Set the possible values of build type for cmake-gui
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS
+    "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+endif()
+
+# default to shared library
+option(BUILD_SHARED_LIBS "Build shared lib" ON)
 
 # installation directories
 set(INSTALL_LIB_DIR lib CACHE PATH "Installation directory for libraries")
-set(INSTALL_BIN_DIR bin CACHE PATH "Installation directory for executables")
 set(INSTALL_INCLUDE_DIR include CACHE PATH "Installation directory for header files")
 if(WIN32 AND NOT CYGWIN)
   set(DEF_INSTALL_CMAKE_DIR CMake)
@@ -29,8 +41,65 @@ foreach(p LIB BIN INCLUDE CMAKE)
 endforeach()
 
 
-# main lib
+# dependencies
+
+# sepia
+include(FetchContent)
+FetchContent_Declare(
+    sepia
+    GIT_REPOSITORY https://github.com/neuromorphic-paris/sepia
+)
+FetchContent_GetProperties(sepia) # these lines should be replaced with FetchContent_MakeAvailable(sepia), but is available only in >= 3.14
+if(NOT sepia_POPULATED)
+  FetchContent_Populate(sepia)
+endif()
+
+
+# Eigen
+find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+
+
+# main library
 add_subdirectory(src)
+
+
+# tests
+option(BUILD_TEST "Build tests" ON)
+if (BUILD_TEST)
+    enable_testing()
+
+    add_subdirectory(tests)
+endif (BUILD_TEST)
+
+
+# examples
+option(BUILD_EXAMPLES "Build examples" ON)
+if (BUILD_EXAMPLES)
+    add_subdirectory(examples)
+endif (BUILD_EXAMPLES)
+
+
+# installing
+
+# create the Config.cmake file
+file(RELATIVE_PATH REL_INCLUDE_DIR "${INSTALL_CMAKE_DIR}"
+   "${INSTALL_INCLUDE_DIR}")
+set(CONF_INCLUDE_DIRS "\${CPPHOTS_CMAKE_DIR}/${REL_INCLUDE_DIR}")
+configure_file(cmake/cpphotsConfig.cmake.in "${PROJECT_BINARY_DIR}/cmake/cpphotsConfig.cmake" @ONLY)
+
+# create cpphotsConfigVersion.cmake file
+configure_file(cmake/cpphotsConfigVersion.cmake.in "${PROJECT_BINARY_DIR}/cmake/cpphotsConfigVersion.cmake" @ONLY)
+
+# install both
+install(FILES
+  "${PROJECT_BINARY_DIR}/cmake/cpphotsConfig.cmake"
+  "${PROJECT_BINARY_DIR}/cmake/cpphotsConfigVersion.cmake"
+  DESTINATION "${INSTALL_CMAKE_DIR}")
+
+# install also export (that are included by Config.cmake)
+install(EXPORT cpphotsTargets
+        FILE cpphotsTargets.cmake
+        DESTINATION lib/cmake/cpphots)
 
 
 # docs
@@ -56,53 +125,3 @@ if (DOXYGEN_FOUND AND BUILD_DOC)
 elseif (BUILD_DOC)
     message("Doxygen need to be installed to generate the doxygen documentation")
 endif (DOXYGEN_FOUND AND BUILD_DOC)
-
-
-# packaging
-
-# add all targets to the build-tree export set
-export(TARGETS cpphots
-  FILE "${PROJECT_BINARY_DIR}/cpphotsTargets.cmake")
-
-# export the package for use from the build-tree
-# (this registers the build-tree with a global CMake-registry)
-export(PACKAGE cpphots)
-
-# create the cpphotsConfig.cmake file
-file(RELATIVE_PATH REL_INCLUDE_DIR "${INSTALL_CMAKE_DIR}"
-   "${INSTALL_INCLUDE_DIR}")
-# ... for the build tree
-set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/include")
-configure_file(cmake/cpphotsConfig.cmake.in "${PROJECT_BINARY_DIR}/cpphotsConfig.cmake" @ONLY)
-# ... for the install tree
-set(CONF_INCLUDE_DIRS "\${CPPHOTS_CMAKE_DIR}/${REL_INCLUDE_DIR}")
-configure_file(cmake/cpphotsConfig.cmake.in "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/cpphotsConfig.cmake" @ONLY)
-
-# create cpphotsConfigVersion.cmake file
-configure_file(cmake/cpphotsConfigVersion.cmake.in "${PROJECT_BINARY_DIR}/cpphotsConfigVersion.cmake" @ONLY)
-
-# install the cpphotsConfig.cmake and cpphotsConfigVersion.cmake
-install(FILES
-  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/cpphotsConfig.cmake"
-  "${PROJECT_BINARY_DIR}/cpphotsConfigVersion.cmake"
-  DESTINATION "${INSTALL_CMAKE_DIR}" COMPONENT dev)
-
-# install the export set for use with the install-tree
-install(EXPORT cpphotsTargets DESTINATION
-  "${INSTALL_CMAKE_DIR}" COMPONENT dev)
-
-
-# tests
-option(BUILD_TEST "Build tests" ON)
-if (BUILD_TEST)
-    enable_testing()
-
-    add_subdirectory(tests)
-endif (BUILD_TEST)
-
-
-# examples
-option(BUILD_EXAMPLES "Build examples" ON)
-if (BUILD_EXAMPLES)
-    add_subdirectory(examples)
-endif (BUILD_EXAMPLES)
