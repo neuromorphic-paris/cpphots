@@ -36,6 +36,10 @@ std::pair<event, bool> Layer::process(uint16_t x, uint16_t y, uint64_t t, uint16
         throw std::runtime_error("Cannot process event: Layer is not initialized.");
     }
 
+    if (p >= surfaces.size()) {
+        throw std::invalid_argument("Received event with polarity " + std::to_string(p) + " but max polarity is " + std::to_string(surfaces.size()-1));
+    }
+
     // compute the current time surface
     auto surface_good = surfaces[p].updateAndCompute(x, y, t);
     

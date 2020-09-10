@@ -288,6 +288,17 @@ int main() {
         return 1;
     }
 
+    // check if an exception is thrown with the wrong polarity
+    bool except_thrown = false;
+    try {
+        layer.process(0, 0, 0, 2);
+    } catch (std::invalid_argument e) {
+        except_thrown = true;
+    }
+    if (!except_thrown) {
+        return 1;   
+    }
+
     return 0;
 
 }
