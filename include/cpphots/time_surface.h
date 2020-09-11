@@ -6,11 +6,17 @@
 #ifndef TIME_SURFACE_H
 #define TIME_SURFACE_H
 
-#include <eigen3/Eigen/Dense>
+#include <Eigen/Dense>
 #include "events_utils.h"
 
 
 namespace cpphots {
+
+/**
+ * @brief Alias type for a time surface
+ */
+using TimeSurfaceType = Eigen::ArrayXXf;
+
 
 /**
  * @brief Class that can compute time surfaces
@@ -81,7 +87,7 @@ public:
      * @param t time of the event
      * @return a std::pair with the computed time surface and whether the surface is valid or not
      */
-    std::pair<Eigen::ArrayXXf, bool> compute(uint16_t x, uint16_t y, uint64_t t) const;
+    std::pair<TimeSurfaceType, bool> compute(uint16_t x, uint16_t y, uint64_t t) const;
 
     /**
      * @brief Compute the time surface for an event
@@ -94,7 +100,7 @@ public:
      * @param ev the event
      * @return a std::pair with the computed time surface and whether the surface is valid or not
      */
-    inline std::pair<Eigen::ArrayXXf, bool> compute(const event& ev) {
+    inline std::pair<TimeSurfaceType, bool> compute(const event& ev) {
         return compute(ev.x, ev.y, ev.t);
     }
 
@@ -106,7 +112,7 @@ public:
      * @param t time of the event
      * @return a std::pair with the computed time surface and whether the surface is valid or not
      */
-    inline std::pair<Eigen::ArrayXXf, bool> updateAndCompute(uint16_t x, uint16_t y, uint64_t t) {
+    inline std::pair<TimeSurfaceType, bool> updateAndCompute(uint16_t x, uint16_t y, uint64_t t) {
         update(x, y, t);
         return compute(x, y, t);
     }
@@ -117,7 +123,7 @@ public:
      * @param ev the event
      * @return a std::pair with the computed time surface and whether the surface is valid or not
      */
-    inline std::pair<Eigen::ArrayXXf, bool> updateAndCompute(const event& ev) {
+    inline std::pair<TimeSurfaceType, bool> updateAndCompute(const event& ev) {
         update(ev.x, ev.y, ev.t);
         return compute(ev.x, ev.y, ev.t);
     }
@@ -129,7 +135,7 @@ public:
      * 
      * @return the temporal context
      */
-    inline const Eigen::ArrayXXf& getFullContext() const {
+    inline const TimeSurfaceType& getFullContext() const {
         return context;
     }
 
@@ -160,7 +166,7 @@ public:
 
 private:
 
-    Eigen::ArrayXXf context;  // using float instead of uint64_t for the initialization to -tau
+    TimeSurfaceType context;  // using float instead of uint64_t for the initialization to -tau
     uint16_t width, height;
     uint16_t Rx, Ry;
     uint16_t Wx, Wy;

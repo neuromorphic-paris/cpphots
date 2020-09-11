@@ -48,7 +48,7 @@ std::pair<event, bool> Layer::process(uint16_t x, uint16_t y, uint64_t t, uint16
         return std::make_pair(event{t, x, y, p}, false);
     }
 
-    Eigen::ArrayXXf surface = surface_good.first;
+    TimeSurfaceType surface = surface_good.first;
 
     // find closest kernel
     uint16_t k = -1;
@@ -119,7 +119,7 @@ std::vector<uint32_t> Layer::getHist() const {
     return hist;
 }
 
-std::vector<Eigen::ArrayXXf> Layer::getPrototypes() const {
+std::vector<TimeSurfaceType> Layer::getPrototypes() const {
     return prototypes;
 }
 
@@ -151,7 +151,7 @@ void Layer::clearPrototypes() {
     prototypes_activations.clear();
 }
 
-void Layer::addPrototype(const Eigen::ArrayXXf& proto) {
+void Layer::addPrototype(const TimeSurfaceType& proto) {
     if (isInitialized()) {
         throw std::runtime_error("Trying to add a prototype to an already initialized Layer.");
     }
@@ -164,7 +164,7 @@ void LayerInitializer::initializePrototypes(Layer& layer, const Events& events, 
 
     // store all time surfaces
     layer.resetSurfaces();
-    std::vector<Eigen::ArrayXXf> time_surfaces;
+    std::vector<TimeSurfaceType> time_surfaces;
     for (unsigned int i = 0; i < events.size(); i++) {
         auto surface_good = layer.getSurface(events[i].p).updateAndCompute(events[i]);
         if (valid_only && surface_good.second) {
@@ -185,7 +185,7 @@ void LayerInitializer::initializePrototypes(Layer& layer, const Events& events, 
 void LayerInitializer::initializePrototypes(Layer& layer, const std::vector<Events>& event_streams, bool valid_only) const {
 
     // store all time surfaces
-    std::vector<Eigen::ArrayXXf> time_surfaces;
+    std::vector<TimeSurfaceType> time_surfaces;
     for (unsigned int st = 0; st < event_streams.size(); st++) {
         layer.resetSurfaces();
         for (unsigned int i = 0; i < event_streams[st].size(); i++) {
@@ -207,9 +207,9 @@ void LayerInitializer::initializePrototypes(Layer& layer, const std::vector<Even
 }
 
 
-void LayerUniformInitializer::initializationAlgorithm(Layer& layer, const std::vector<Eigen::ArrayXXf>& time_surfaces) const {
+void LayerUniformInitializer::initializationAlgorithm(Layer& layer, const std::vector<TimeSurfaceType>& time_surfaces) const {
 
-    std::vector<Eigen::ArrayXXf> selected;
+    std::vector<TimeSurfaceType> selected;
     std::sample(time_surfaces.begin(), time_surfaces.end(), std::back_inserter(selected), layer.getFeatures(), std::mt19937{std::random_device{}()});
 
     for (auto& p : selected) {
@@ -219,7 +219,7 @@ void LayerUniformInitializer::initializationAlgorithm(Layer& layer, const std::v
 }
 
 
-void LayerPlusPlusInitializer::initializationAlgorithm(Layer& layer, const std::vector<Eigen::ArrayXXf>& time_surfaces) const {
+void LayerPlusPlusInitializer::initializationAlgorithm(Layer& layer, const std::vector<TimeSurfaceType>& time_surfaces) const {
 
     // chosen surfaces
     std::set<int> chosen;   
@@ -285,7 +285,7 @@ void LayerRandomInitializer::initializePrototypes(Layer& layer, const std::vecto
     initializationAlgorithm(layer, {});
 }
 
-void LayerRandomInitializer::initializationAlgorithm(Layer& layer, const std::vector<Eigen::ArrayXXf>& time_surfaces) const {
+void LayerRandomInitializer::initializationAlgorithm(Layer& layer, const std::vector<TimeSurfaceType>& time_surfaces) const {
 
     uint16_t Wx = layer.getSurface(0).getWx();
     uint16_t Wy = layer.getSurface(0).getWy();
@@ -293,7 +293,7 @@ void LayerRandomInitializer::initializationAlgorithm(Layer& layer, const std::ve
     std::srand((unsigned int) std::time(0));
 
     for (uint16_t i = 0; i < layer.getFeatures(); i++) {
-        layer.addPrototype(Eigen::ArrayXXf::Random(Wy, Wy) + 1.f /2.f);
+        layer.addPrototype(TimeSurfaceType::Random(Wy, Wy) + 1.f /2.f);
     }
 
 }

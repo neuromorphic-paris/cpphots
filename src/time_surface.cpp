@@ -38,7 +38,7 @@ void TimeSurface::update(uint16_t x, uint16_t y, uint64_t t) {
 
 }
 
-std::pair<Eigen::ArrayXXf, bool> TimeSurface::compute(uint16_t x, uint16_t y, uint64_t t) const {
+std::pair<TimeSurfaceType, bool> TimeSurface::compute(uint16_t x, uint16_t y, uint64_t t) const {
     
     // override for the full context
     if (Rx == 0)
@@ -46,7 +46,7 @@ std::pair<Eigen::ArrayXXf, bool> TimeSurface::compute(uint16_t x, uint16_t y, ui
     if (Ry == 0)
         y = 0;
 
-    Eigen::ArrayXXf retmat = context.block(y, x, Wy, Wx);  // should be (x-Rx, y-Ry), but the context is padded
+    TimeSurfaceType retmat = context.block(y, x, Wy, Wx);  // should be (x-Rx, y-Ry), but the context is padded
 
     auto ret = 1. - (t - retmat) / tau;
 
@@ -57,7 +57,7 @@ std::pair<Eigen::ArrayXXf, bool> TimeSurface::compute(uint16_t x, uint16_t y, ui
 }
 
 void TimeSurface::reset() {
-    context = Eigen::ArrayXXf::Zero(height+2*Ry, width+2*Rx) - tau;  // makes sense, but is not in the paper
+    context = TimeSurfaceType::Zero(height+2*Ry, width+2*Rx) - tau;  // makes sense, but is not in the paper
 }
 
 }

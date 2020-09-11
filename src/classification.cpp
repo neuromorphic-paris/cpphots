@@ -5,6 +5,7 @@
 #include <cmath>
 #include <numeric>
 #include <iomanip>
+#include <algorithm>
 
 
 std::ostream& operator<<(std::ostream& out, const cpphots::Features& feats) {
@@ -14,9 +15,12 @@ std::ostream& operator<<(std::ostream& out, const cpphots::Features& feats) {
         return out;
     }
 
-    out << "[" << std::setw(3) << std::setfill('0') << feats[0];
+    auto maxval = std::max_element(feats.begin(), feats.end());
+    int w = std::to_string(*maxval).size();
+
+    out << "[" << std::setw(w) << std::setfill(' ') << feats[0];
     for (unsigned int i = 1; i < feats.size(); i++) {
-        out << " " << std::setw(3) << std::setfill('0') << feats[i];
+        out << " " << std::setw(w) << std::setfill(' ') << feats[i];
     }
     out << "]";
 

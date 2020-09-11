@@ -10,8 +10,6 @@
 #include <vector>
 #include <string>
 
-#include <eigen3/Eigen/Dense>
-
 #include "time_surface.h"
 
 #include "events_utils.h"
@@ -152,7 +150,7 @@ public:
      * 
      * @return the list of prototypes 
      */
-    std::vector<Eigen::ArrayXXf> getPrototypes() const;
+    std::vector<TimeSurfaceType> getPrototypes() const;
 
     /**
      * @brief Reset the time surfaces
@@ -218,10 +216,10 @@ public:
      * 
      * @param proto the prototype to add
      */
-    void addPrototype(const Eigen::ArrayXXf& proto);
+    void addPrototype(const TimeSurfaceType& proto);
 
 private:
-    std::vector<Eigen::ArrayXXf> prototypes;
+    std::vector<TimeSurfaceType> prototypes;
     std::vector<uint32_t> prototypes_activations;
     std::vector<TimeSurface> surfaces;
     uint16_t features;
@@ -271,7 +269,7 @@ protected:
      * @param layer the layer to be initialized
      * @param time_surfaces a list of valid time surfaces that can be used for the initialization
      */
-    virtual void initializationAlgorithm(Layer& layer, const std::vector<Eigen::ArrayXXf>& time_surfaces) const = 0;
+    virtual void initializationAlgorithm(Layer& layer, const std::vector<TimeSurfaceType>& time_surfaces) const = 0;
 
 };
 
@@ -285,7 +283,7 @@ protected:
 class LayerUniformInitializer : public LayerInitializer {
 
 protected:
-    void initializationAlgorithm(Layer& layer, const std::vector<Eigen::ArrayXXf>& time_surfaces) const override;
+    void initializationAlgorithm(Layer& layer, const std::vector<TimeSurfaceType>& time_surfaces) const override;
 
 };
 
@@ -299,7 +297,7 @@ protected:
 class LayerPlusPlusInitializer : public LayerInitializer {
 
 protected:
-    void initializationAlgorithm(Layer& layer, const std::vector<Eigen::ArrayXXf>& time_surfaces) const override;
+    void initializationAlgorithm(Layer& layer, const std::vector<TimeSurfaceType>& time_surfaces) const override;
 
 };
 
@@ -346,7 +344,7 @@ protected:
      * @param layer the layer to be initialized
      * @param time_surfaces not used
      */
-    void initializationAlgorithm(Layer& layer, const std::vector<Eigen::ArrayXXf>& time_surfaces) const override;
+    void initializationAlgorithm(Layer& layer, const std::vector<TimeSurfaceType>& time_surfaces) const override;
 
 };
 
