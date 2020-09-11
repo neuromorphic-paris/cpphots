@@ -64,7 +64,7 @@ add_subdirectory(src)
 
 
 # tests
-option(BUILD_TEST "Build tests" ON)
+option(BUILD_TEST "Build tests" OFF)
 if (BUILD_TEST)
     enable_testing()
 
@@ -73,7 +73,7 @@ endif (BUILD_TEST)
 
 
 # examples
-option(BUILD_EXAMPLES "Build examples" ON)
+option(BUILD_EXAMPLES "Build examples" OFF)
 if (BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif (BUILD_EXAMPLES)
