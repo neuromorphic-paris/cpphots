@@ -40,6 +40,8 @@ foreach(p LIB BIN INCLUDE CMAKE)
   endif()
 endforeach()
 
+# option for time surface plots
+option(BUILD_PLOTS "Build plots utilities" ON)
 
 # dependencies
 
@@ -54,9 +56,13 @@ if(NOT sepia_POPULATED)
   FetchContent_Populate(sepia)
 endif()
 
-
 # Eigen
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+
+# python
+if ("${BUILD_PLOTS}")
+    find_package(Python3 REQUIRED COMPONENTS Development)
+endif()
 
 
 # main library

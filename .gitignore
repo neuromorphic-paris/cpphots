@@ -38,3 +38,12 @@ build*
 # VSCODE
 *.code-workspace
 .vscode
+
+
+# PYTHON STUFF
+.idea
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class

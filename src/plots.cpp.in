@@ -1,0 +1,92 @@
+#include "cpphots/plots.h"
+
+#include <Python.h>
+
+
+namespace cpphots {
+
+const char* python_init_string = R"cpphots_delim(
+@PYTHON_PLOT_CODE@
+)cpphots_delim";
+
+
+void run_pystring(const char* cmd) {
+
+    if (PyRun_SimpleString(cmd) == -1) {
+        throw std::runtime_error("An error has occurred while running the python interpreter");
+    }
+
+}
+
+
+void initialize_python() {
+
+    static bool python_initialized = false;
+
+    if (python_initialized) {
+        return;
+    }
+
+    // initialize the interpreter
+    Py_Initialize();
+
+    run_pystring(python_init_string);
+
+    python_initialized = true;
+    return;
+
+}
+
+
+std::string convert_ts_to_numpystr(const TimeSurfaceType& ts) {
+
+    std::string npstring("np.array([");
+
+    for (size_t r = 0; r < ts.rows(); r++) {
+        npstring += "[";
+        for (size_t c = 0; c < ts.cols(); c++) {
+            npstring += std::to_string(ts(r, c));
+            npstring += ", ";
+        }
+        npstring += "],";
+    }
+
+    npstring.pop_back();
+
+    npstring += "])\n";
+
+    return npstring;
+}
+
+
+void plot_ts(const TimeSurfaceType& ts) {
+
+    initialize_python();
+
+    std::string cmd("ts = ");
+    cmd += convert_ts_to_numpystr(ts);
+
+    run_pystring(cmd.c_str());
+
+    run_pystring("plot_ts(ts)");
+
+}
+
+void plot_multiple_ts(const std::vector<TimeSurfaceType>& mts) {
+
+    initialize_python();
+
+    std::string cmd("tss = [");
+    for (const auto& ts : mts) {
+        cmd += convert_ts_to_numpystr(ts);
+        cmd += ",";
+    }
+    cmd.pop_back();
+    cmd += "]";
+
+    run_pystring(cmd.c_str());
+    run_pystring("plot_multiple_ts(tss)");
+
+}
+
+}
