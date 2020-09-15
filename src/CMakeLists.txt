@@ -41,7 +41,7 @@ endif()
 
 # installing
 set_target_properties(cpphots PROPERTIES
-                      PUBLIC_HEADER CPPHOTS_HEADERS)
+                      PUBLIC_HEADER "${CPPHOTS_HEADERS}")
 
 install(TARGETS cpphots
         EXPORT cpphotsTargets
