@@ -60,8 +60,8 @@ endif()
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
 # python
-if ("${BUILD_PLOTS}")
-    find_package(Python3 REQUIRED COMPONENTS Development)
+if (BUILD_PLOTS)
+    find_package(Python3 REQUIRED COMPONENTS Development Interpreter)
 endif()
 
 

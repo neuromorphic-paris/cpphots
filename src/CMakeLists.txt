@@ -15,7 +15,7 @@ set(CPPHOTS_HEADERS
     "../include/cpphots/run.h"
     "../include/cpphots/time_surface.h")
 
-if ("${BUILD_PLOTS}")
+if (BUILD_PLOTS)
     file(READ ../python/tsplot.py PYTHON_PLOT_CODE)
     configure_file(plots.cpp.in ${PROJECT_BINARY_DIR}/src/plots.cpp @ONLY)
     list(APPEND CPPHOTS_SOURCES ${PROJECT_BINARY_DIR}/src/plots.cpp)
@@ -34,7 +34,7 @@ target_include_directories(cpphots PRIVATE "${sepia_SOURCE_DIR}/source")
 
 target_link_libraries(cpphots pthread Eigen3::Eigen)
 
-if ("${BUILD_PLOTS}")
+if (BUILD_PLOTS)
     target_include_directories(cpphots PRIVATE ${Python3_INCLUDE_DIRS})
     target_link_libraries(cpphots ${Python3_LIBRARIES})
 endif()
