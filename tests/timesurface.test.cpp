@@ -1,56 +1,38 @@
 #include <cpphots/time_surface.h>
 #include <cpphots/events_utils.h>
 
-#include <iostream>
+#include <gtest/gtest.h>
 
 
-bool test_sizes() {
-
-    // square
-    {
-        cpphots::TimeSurface ts(32, 32, 2, 2, 1000);
-        if (ts.getWx() != 5 || ts.getWy() != 5) {
-            return false;
-        }
-    }
-
-    // asymmetric
-    {
-        cpphots::TimeSurface ts(32, 32, 5, 2, 1000);
-        if (ts.getWx() != 11 || ts.getWy() != 5) {
-            return false;
-        }
-    }
-
-    // Rx 0
-    {
-        cpphots::TimeSurface ts(32, 32, 0, 2, 1000);
-        if (ts.getWx() != 32 || ts.getWy() != 5) {
-            return false;
-        }
-    }
-
-    // Ry 0
-    {
-        cpphots::TimeSurface ts(32, 32, 2, 0, 1000);
-        if (ts.getWx() != 5 || ts.getWy() != 32) {
-            return false;
-        }
-    }
-
-    return true;
-
+TEST(TestTimeSurfaceSize, Square) {
+    cpphots::TimeSurface ts(32, 32, 2, 2, 1000);
+    EXPECT_EQ(ts.getWx(), 5);
+    EXPECT_EQ(ts.getWy(), 5);
 }
 
-int main() {
+TEST(TestTimeSurfaceSize, Asymmetric) {
+    cpphots::TimeSurface ts(32, 32, 5, 2, 1000);
+    EXPECT_EQ(ts.getWx(), 11);
+    EXPECT_EQ(ts.getWy(), 5);
+}
 
-    if (!test_sizes()) {
-        std::cerr << "Test sizes failed" << std::endl;
-        return 1;
-    }
+TEST(TestTimeSurfaceSize, Rx0) {
+    cpphots::TimeSurface ts(32, 32, 0, 2, 1000);
+    EXPECT_EQ(ts.getWx(), 32);
+    EXPECT_EQ(ts.getWy(), 5);
+}
+
+TEST(TestTimeSurfaceSize, Ry0) {
+    cpphots::TimeSurface ts(32, 32, 2, 0, 1000);
+    EXPECT_EQ(ts.getWx(), 5);
+    EXPECT_EQ(ts.getWy(), 32);
+}
+
+
+TEST(TestTimeSurface, Processing) {
 
     // load data
-    cpphots::Events events = cpphots::loadFromFile("trcl0.es");
+    cpphots::Events events = cpphots::loadFromFile("data/trcl0.es");
 
     // create time surface
     cpphots::TimeSurface ts(32, 32, 2, 2, 1000);
@@ -73,20 +55,9 @@ int main() {
         }
         processed++;
     }
-    std::cout << "      sum: " << normsum << std::endl;
-    std::cout << "  goodsum: " << goodsum << std::endl;
-    std::cout << "processed: " << processed << std::endl;
-    std::cout << "     good: " << goodevents << std::endl;
 
-    if (std::abs(normsum - 4740.313427652784) >= 0.1)
-        return 1;
+    ASSERT_NEAR(normsum, 4740.313427652784, 0.1);
+    ASSERT_NEAR(goodsum, 4562.696117657931, 0.1);
+    EXPECT_EQ(goodevents, 1783);
 
-    if (std::abs(goodsum - 4562.696117657931) >= 0.1)
-        return 1;
-    
-    if (goodevents != 1783)
-        return 1;
-
-    return 0;
-    
 }

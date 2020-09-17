@@ -2,7 +2,7 @@
 #include <cpphots/events_utils.h>
 #include <cpphots/classification.h>
 
-#include <iostream>
+#include <gtest/gtest.h>
 
 
 bool operator==(const cpphots::Features& f1, const cpphots::Features& f2) {
@@ -158,18 +158,24 @@ void set_prototpes_learning(cpphots::Layer& layer) {
 }
 
 
-int main() {
+class TestLayerProcessing : public ::testing::Test {
 
-    // load data
-    cpphots::Events events = cpphots::loadFromFile("trcl0.es");
+protected:
 
-    // create layer
-    cpphots::Layer layer(32, 32, 2, 2, 1000, 1, 8);
+    void SetUp() override {
+        events = cpphots::loadFromFile("data/trcl0.es");
+        layer = cpphots::Layer(32, 32, 2, 2, 1000, 1, 8);
+    }
 
-    // no learning
+    cpphots::Events events;
+    cpphots::Layer layer;
+
+};
+
+TEST_F(TestLayerProcessing, WithoutLearning) {
+
     set_prototypes_nolearning(layer);
 
-    // process events
     layer.toggleLearning(false);
     for (auto& ev : events) {
         if (ev.p == 0) {
@@ -180,14 +186,13 @@ int main() {
         layer.process(mev);
     }
 
-    // without learning: [221 231 315 237 246 109 221 203] (cosine) or [188 205 281 233 229 276 194 177] (L2)
-    std::cout << layer.getHist() << std::endl;    
-    cpphots::Features compare_nolearning{188, 205, 281, 233, 229, 276, 194, 177};
-    if (!(layer.getHist() == compare_nolearning))
-        return 1;    
+    cpphots::Features expected{188, 205, 281, 233, 229, 276, 194, 177};
+    EXPECT_EQ(layer.getHist(), expected);
 
+}
 
-    // with learning
+TEST_F(TestLayerProcessing, WithLearning) {
+
     set_prototpes_learning(layer);
 
     // learn
@@ -202,13 +207,10 @@ int main() {
         layer.process(mev);
     }
 
-    std::cout << layer.getHist() << std::endl;
+    cpphots::Features expected_learning{233, 167, 187, 207, 326, 278, 271, 114};
+    EXPECT_EQ(layer.getHist(), expected_learning);
 
-    cpphots::Features compare_learning{233, 167, 187, 207, 326, 278, 271, 114};
-    if (!(layer.getHist() == compare_learning))
-        return 1;
-
-    // final test
+    // post learning
     layer.resetSurfaces();
     layer.toggleLearning(false);
     for (auto& ev : events) {
@@ -220,85 +222,108 @@ int main() {
         layer.process(mev);
     }
 
-    std::cout << layer.getHist() << std::endl;
-
     // after learning: [206 272 202 277 226 181 310 109] (cosine) or [211 173 197 209 295 293 284 121] (L2)
-    cpphots::Features compare_afterlearning{211, 173, 197, 209, 295, 293, 284, 121};
-    if (!(layer.getHist() == compare_afterlearning))
-        return 1;
+    cpphots::Features expected_afterlearning{211, 173, 197, 209, 295, 293, 284, 121};
+    EXPECT_EQ(layer.getHist(), expected_afterlearning);
 
-    // test layer initialization
-    layer = cpphots::Layer(32, 32, 2, 2, 1000, 2, 8);
+}
 
-    // uniform initializer
-    cpphots::LayerUniformInitializer lui;
 
-    layer.clearPrototypes();
-    lui.initializePrototypes(layer, events);
-    if (!layer.isInitialized()) {
-        return 1;
+class TestLayerInitialization : public ::testing::Test {
+
+protected:
+
+    void SetUp() override {
+        events = cpphots::loadFromFile("data/trcl0.es");
+        layer = cpphots::Layer(32, 32, 2, 2, 1000, 2, 8);
     }
 
-    layer.clearPrototypes();
-    lui.initializePrototypes(layer, {events, events});
-    if (!layer.isInitialized()) {
-        return 1;
-    }
+    cpphots::Events events;
+    cpphots::Layer layer;
 
-    // plus plus initializer
-    cpphots::LayerPlusPlusInitializer lppi;
+};
 
-    layer.clearPrototypes();
-    lppi.initializePrototypes(layer, events);
-    if (!layer.isInitialized()) {
-        return 1;
-    }
+TEST_F(TestLayerInitialization, Uniform) {
+
+    cpphots::LayerUniformInitializer initializer;
+    initializer.initializePrototypes(layer, events);
+    ASSERT_TRUE(layer.isInitialized());
 
     layer.clearPrototypes();
-    lppi.initializePrototypes(layer, {events, events});
-    if (!layer.isInitialized()) {
-        return 1;
-    }
+    initializer.initializePrototypes(layer, {events, events});
+    ASSERT_TRUE(layer.isInitialized());
 
-    // random initializer
-    cpphots::LayerRandomInitializer lri;
-    
-    layer.clearPrototypes();
-    lri.initializePrototypes(layer, cpphots::Events{});
-    if (!layer.isInitialized()) {
-        return 1;
-    }
+}
+
+TEST_F(TestLayerInitialization, PlusPLus) {
+
+    cpphots::LayerPlusPlusInitializer initializer;
+    initializer.initializePrototypes(layer, events);
+    ASSERT_TRUE(layer.isInitialized());
 
     layer.clearPrototypes();
-    lri.initializePrototypes(layer, std::vector<cpphots::Events>{});
-    if (!layer.isInitialized()) {
-        return 1;
-    }
+    initializer.initializePrototypes(layer, {events, events});
+    ASSERT_TRUE(layer.isInitialized());
+
+}
+
+TEST_F(TestLayerInitialization, Random) {
+
+    cpphots::LayerRandomInitializer initializer;
+    initializer.initializePrototypes(layer, events);
+    ASSERT_TRUE(layer.isInitialized());
+
+    layer.clearPrototypes();
+    initializer.initializePrototypes(layer, {events, events});
+    ASSERT_TRUE(layer.isInitialized());
+
+    layer.clearPrototypes();
+    initializer.initializePrototypes(layer, cpphots::Events{});
+    ASSERT_TRUE(layer.isInitialized());
+
+    layer.clearPrototypes();
+    initializer.initializePrototypes(layer, std::vector<cpphots::Events>{});
+    ASSERT_TRUE(layer.isInitialized());
+
+}
 
 
-    // test no validity check
-    layer.resetSurfaces();
+TEST(TestLayer, NoInitialization) {
+
+    cpphots::Layer layer = cpphots::Layer(32, 32, 2, 2, 1000, 2, 8);
+
+    ASSERT_THROW(layer.process(0, 0, 0, 0), std::runtime_error);
+
+}
+
+
+TEST(TestLayer, SkipValidityCheck) {
+
+    cpphots::Events events = cpphots::loadFromFile("data/trcl0.es");
+
+    cpphots::Layer layer = cpphots::Layer(32, 32, 2, 2, 1000, 2, 8);
+
+    cpphots::LayerRandomInitializer initializer;
+    initializer.initializePrototypes(layer, events);
+
     layer.process(events, true);
     auto hist = layer.getHist();
     uint32_t hcount = 0;
     for (auto& h : hist) {
         hcount += h;
     }
-    if (hcount != events.size()) {
-        return 1;
-    }
+    EXPECT_EQ(events.size(), hcount);
 
-    // check if an exception is thrown with the wrong polarity
-    bool except_thrown = false;
-    try {
-        layer.process(0, 0, 0, 2);
-    } catch (std::invalid_argument e) {
-        except_thrown = true;
-    }
-    if (!except_thrown) {
-        return 1;   
-    }
+}
 
-    return 0;
+
+TEST(TestLayer, WrongPolarity) {
+
+    cpphots::Layer layer = cpphots::Layer(32, 32, 2, 2, 1000, 2, 8);
+
+    cpphots::LayerRandomInitializer initializer;
+    initializer.initializePrototypes(layer, cpphots::Events{});
+
+    ASSERT_THROW(layer.process(0, 0, 0, 2), std::invalid_argument);
 
 }
