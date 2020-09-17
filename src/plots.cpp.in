@@ -72,7 +72,7 @@ void plot_ts(const TimeSurfaceType& ts) {
 
 }
 
-void plot_multiple_ts(const std::vector<TimeSurfaceType>& mts) {
+void plot_multiple_ts(const std::vector<TimeSurfaceType>& mts, unsigned int rows, unsigned int cols) {
 
     initialize_python();
 
@@ -85,7 +85,20 @@ void plot_multiple_ts(const std::vector<TimeSurfaceType>& mts) {
     cmd += "]";
 
     run_pystring(cmd.c_str());
-    run_pystring("plot_multiple_ts(tss)");
+
+    cmd = "plot_multiple_ts(tss";
+
+    if (rows != 0 && cols != 0) {
+        cmd += ", (";
+        cmd += std::to_string(rows);
+        cmd += ", ";
+        cmd += std::to_string(cols);
+        cmd += ")";
+    }
+
+    cmd += ")";
+
+    run_pystring(cmd.c_str());
 
 }
 
