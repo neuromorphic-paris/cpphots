@@ -27,7 +27,8 @@ void plot_ts(const TimeSurfaceType& ts);
  * @param mts the time surfaces to be plotted
  * @param rows the number of rows for the arrangement
  * @param cols the number of columns for the arrangement
+ * @param colorcode whether a different color should be used for each time surface or not
  */
-void plot_multiple_ts(const std::vector<TimeSurfaceType>& mts, unsigned int rows = 0, unsigned int cols = 0);
+void plot_multiple_ts(const std::vector<TimeSurfaceType>& mts, unsigned int rows = 0, unsigned int cols = 0, bool colorcode = true);
 
 }

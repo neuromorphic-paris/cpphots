@@ -72,7 +72,7 @@ void plot_ts(const TimeSurfaceType& ts) {
 
 }
 
-void plot_multiple_ts(const std::vector<TimeSurfaceType>& mts, unsigned int rows, unsigned int cols) {
+void plot_multiple_ts(const std::vector<TimeSurfaceType>& mts, unsigned int rows, unsigned int cols, bool colorcode) {
 
     initialize_python();
 
@@ -94,7 +94,12 @@ void plot_multiple_ts(const std::vector<TimeSurfaceType>& mts, unsigned int rows
         cmd += ", ";
         cmd += std::to_string(cols);
         cmd += ")";
+    } else {
+        cmd += ", None";
     }
+
+    cmd += ",";
+    cmd += colorcode ? "True" : "False";
 
     cmd += ")";
 
