@@ -95,6 +95,7 @@ install(EXPORT cpphotsTargets
 # tests
 option(BUILD_TEST "Build tests" OFF)
 if (BUILD_TEST)
+    enable_testing()
     add_subdirectory(tests)
 endif (BUILD_TEST)
 

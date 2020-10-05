@@ -1,5 +1,3 @@
-enable_testing()
-
 # disable installing of googletest
 option(INSTALL_GTEST "" OFF)
 set(INSTALL_GTEST OFF)
