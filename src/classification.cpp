@@ -39,7 +39,7 @@ Classifier::Classifier(unsigned int n_classes) {
 
 Classifier::Classifier(const std::vector<std::string>& classes)
     :class_names(classes) {
-    
+
     class_feats.resize(classes.size());
 
     for (unsigned int i = 0; i < classes.size(); i++) {

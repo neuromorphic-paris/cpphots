@@ -44,7 +44,7 @@ std::pair<event, bool> Layer::process(uint16_t x, uint16_t y, uint64_t t, uint16
 
     // compute the current time surface
     auto surface_good = surfaces[p].updateAndCompute(x, y, t);
-    
+
     // if the surface is not good we say it upstream
     if (!skip_check && !surface_good.second) {
         return std::make_pair(event{t, x, y, p}, false);
@@ -202,7 +202,7 @@ std::istream& operator>>(std::istream& in, Layer& layer) {
     for (auto& sur : layer.surfaces) {
         in >> sur;
     }
-    
+
     // prototypes
     uint16_t wx = layer.surfaces[0].getWx();
     uint16_t wy = layer.surfaces[0].getWy();
@@ -228,7 +228,7 @@ std::istream& operator>>(std::istream& in, Layer& layer) {
     layer.hist.resize(layer.features);
 
     return in;
-    
+
 }
 
 
@@ -294,7 +294,7 @@ void LayerUniformInitializer::initializationAlgorithm(Layer& layer, const std::v
 void LayerPlusPlusInitializer::initializationAlgorithm(Layer& layer, const std::vector<TimeSurfaceType>& time_surfaces) const {
 
     // chosen surfaces
-    std::set<int> chosen;   
+    std::set<int> chosen;
 
     // choose first time surface at random
     std::mt19937 gen{std::random_device{}()};
@@ -309,10 +309,10 @@ void LayerPlusPlusInitializer::initializationAlgorithm(Layer& layer, const std::
     for (unsigned int k = 1; k < layer.getFeatures(); k++) {
 
         distsum = 0.0;
-        
+
         // compute all squared distances
         for (unsigned int ts = 0; ts < time_surfaces.size(); ts++) {
-            
+
             float mindist = std::numeric_limits<float>::max();
             for (const auto& p : layer.getPrototypes()) {
                 float d = (p - time_surfaces[ts]).matrix().norm();

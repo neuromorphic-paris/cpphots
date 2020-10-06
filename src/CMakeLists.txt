@@ -26,7 +26,7 @@ endif()
 add_library(cpphots
             ${CPPHOTS_SOURCES})
 
-target_include_directories(cpphots PUBLIC 
+target_include_directories(cpphots PUBLIC
                            $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
                            $<INSTALL_INTERFACE:include>)
 

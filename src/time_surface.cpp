@@ -7,7 +7,7 @@ TimeSurface::TimeSurface() {}
 
 TimeSurface::TimeSurface(uint16_t width, uint16_t height, uint16_t Rx, uint16_t Ry, float tau)
     :width(width), height(height), Rx(Rx), Ry(Ry), tau(tau) {
-    
+
     reset();
 
     // compute window size
@@ -33,13 +33,13 @@ TimeSurface::TimeSurface(uint16_t width, uint16_t height, uint16_t Rx, uint16_t 
 }
 
 void TimeSurface::update(uint16_t x, uint16_t y, uint64_t t) {
-    
+
     context(y+Ry, x+Rx) = t;
 
 }
 
 std::pair<TimeSurfaceType, bool> TimeSurface::compute(uint16_t x, uint16_t y, uint64_t t) const {
-    
+
     // override for the full context
     if (Rx == 0)
         x = 0;

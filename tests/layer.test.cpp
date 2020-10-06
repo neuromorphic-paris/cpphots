@@ -96,7 +96,7 @@ void set_prototpes_learning(cpphots::Layer& layer) {
            0.   , 0.267, 0.692, 0.936, 0.   ,
            0.14 , 0.492, 1.   , 0.   , 0.   ,
            0.   , 0.098, 0.751, 0.   , 0.   ,
-           0.   , 0.   , 0.   , 0.   , 0.   ; 
+           0.   , 0.   , 0.   , 0.   , 0.   ;
     layer.addPrototype(pl0.transpose());
 
     cpphots::TimeSurfaceType pl1(5, 5);
@@ -104,7 +104,7 @@ void set_prototpes_learning(cpphots::Layer& layer) {
            0.696, 0.666, 0.784, 0.892, 0.   ,
            0.396, 0.792, 1.   , 0.966, 0.   ,
            0.958, 0.684, 0.828, 0.   , 0.   ,
-           0.376, 0.811, 0.981, 0.   , 0.   ; 
+           0.376, 0.811, 0.981, 0.   , 0.   ;
     layer.addPrototype(pl1.transpose());
 
     cpphots::TimeSurfaceType pl2(5, 5);
@@ -112,7 +112,7 @@ void set_prototpes_learning(cpphots::Layer& layer) {
            0.   , 0.   , 0.   , 0.   , 0.   ,
            0.   , 0.   , 1.   , 0.   , 0.   ,
            0.   , 0.   , 0.   , 0.   , 0.   ,
-           0.   , 0.   , 0.   , 0.   , 0.   ; 
+           0.   , 0.   , 0.   , 0.   , 0.   ;
     layer.addPrototype(pl2.transpose());
 
     cpphots::TimeSurfaceType pl3(5, 5);
@@ -120,7 +120,7 @@ void set_prototpes_learning(cpphots::Layer& layer) {
            0.   , 0.835, 0.146, 0.775, 0.595,
            0.   , 0.   , 1.   , 0.225, 1.   ,
            0.   , 0.   , 0.   , 0.   , 0.929,
-           0.   , 0.   , 0.   , 0.   , 0.   ; 
+           0.   , 0.   , 0.   , 0.   , 0.   ;
     layer.addPrototype(pl3.transpose());
 
     cpphots::TimeSurfaceType pl4(5, 5);
@@ -128,7 +128,7 @@ void set_prototpes_learning(cpphots::Layer& layer) {
            0.   , 0.985, 0.719, 0.   , 0.   ,
            0.653, 0.   , 1.   , 0.   , 0.   ,
            0.09 , 0.729, 0.   , 0.   , 0.   ,
-           0.702, 0.   , 0.   , 0.   , 0.   ; 
+           0.702, 0.   , 0.   , 0.   , 0.   ;
     layer.addPrototype(pl4.transpose());
 
     cpphots::TimeSurfaceType pl5(5, 5);
@@ -136,7 +136,7 @@ void set_prototpes_learning(cpphots::Layer& layer) {
            0.   , 0.   , 0.163, 0.   , 0.   ,
            0.136, 0.   , 1.   , 0.   , 0.   ,
            0.   , 0.   , 0.   , 0.   , 0.134,
-           0.   , 0.502, 0.   , 0.   , 0.   ; 
+           0.   , 0.502, 0.   , 0.   , 0.   ;
     layer.addPrototype(pl5.transpose());
 
     cpphots::TimeSurfaceType pl6(5, 5);
@@ -144,7 +144,7 @@ void set_prototpes_learning(cpphots::Layer& layer) {
            0.567, 0.386, 0.431, 0.   , 0.   ,
            0.724, 0.842, 1.   , 0.   , 0.   ,
            0.741, 0.876, 0.   , 0.   , 0.   ,
-           0.993, 0.   , 0.902, 0.   , 0.   ; 
+           0.993, 0.   , 0.902, 0.   , 0.   ;
     layer.addPrototype(pl6.transpose());
 
     cpphots::TimeSurfaceType pl7(5, 5);
@@ -154,7 +154,7 @@ void set_prototpes_learning(cpphots::Layer& layer) {
            0.   , 0.   , 0.   , 0.   , 0.   ,
            0.   , 0.   , 0.   , 0.838, 0.   ;
     layer.addPrototype(pl7.transpose());
-    
+
 }
 
 

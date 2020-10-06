@@ -11,7 +11,7 @@ Network::Network(uint16_t width, uint16_t height, uint16_t polarities,
                  float tau1, float K_tau,
                  uint16_t N1, uint16_t K_N)
     :inputPolarities(polarities) {
-    
+
     uint16_t Rx = Rx1;
     uint16_t Ry = Ry1;
     float tau = tau1;
@@ -33,7 +33,7 @@ Network::Network(uint16_t width, uint16_t height, uint16_t polarities,
                 const std::vector<float> tau,
                 const std::vector<uint16_t> N)
     :inputPolarities(polarities) {
-    
+
     // check parameters
     uint16_t num_layers = Rx.size();
 
@@ -156,7 +156,7 @@ std::ostream& operator<<(std::ostream& out, const Network& network) {
 std::istream& operator>>(std::istream& in, Network& network) {
 
     in >> network.inputPolarities;
-    
+
     size_t n_layers;
     in >> n_layers;
     network.layers.clear();

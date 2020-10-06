@@ -42,7 +42,7 @@ public:
      * @param width width of the full time context for the surfaces
      * @param height height of the full time context for the surfaces
      * @param polarities number of input polarities
-     * @param num_layers 
+     * @param num_layers
      * @param Rx1 horizontal size of the window on which surfaces are computed for the first layer
      * @param Ry1 vertical size of the window on which surfaces are computed for the first layer
      * @param K_R growth factor for the windows

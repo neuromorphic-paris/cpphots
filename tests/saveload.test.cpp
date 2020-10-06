@@ -80,7 +80,6 @@ TEST(TestSaveLoad, LSaveLoad) {
 
     ASSERT_EQ(layer1.getDescription(), layer2.getDescription());
     ASSERT_EQ(layer1.getFeatures(), layer2.getFeatures());
-    
 
     auto surface = layer2.getSurface(1);
     ASSERT_EQ(surface.getWx(), 3);

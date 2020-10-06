@@ -23,7 +23,7 @@ using TimeSurfaceType = Eigen::ArrayXXf;  // using float instead of uint64_t for
 /**
  * @brief Class that can compute time surfaces
  * 
- * This class keeps track of the time context for the current stream of events and can compute 
+ * This class keeps track of the time context for the current stream of events and can compute
  * the time surface for new ones.
  * 
  * The time surface has a linear activation as described in (Maro et al., 2020).

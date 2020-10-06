@@ -150,7 +150,7 @@ public:
     /**
      * @brief Get the list of prototypes
      * 
-     * @return the list of prototypes 
+     * @return the list of prototypes
      */
     std::vector<TimeSurfaceType> getPrototypes() const;
 

@@ -13,7 +13,7 @@ std::vector<std::pair<std::string, std::string>> poker_dvs_trainset(const std::s
 
     std::vector<std::string> pips{"cl", "di", "he", "sp"};
 
-    std::unordered_map<std::string, std::string> longer{{"cl", "club"}, 
+    std::unordered_map<std::string, std::string> longer{{"cl", "club"},
                                                         {"di", "diamond"},
                                                         {"he", "heart"},
                                                         {"sp", "spade"}};
@@ -33,7 +33,7 @@ std::vector<std::pair<std::string, std::string>> poker_dvs_testset(const std::st
 
     std::vector<std::string> pips{"cl", "di", "he", "sp"};
 
-    std::unordered_map<std::string, std::string> longer{{"cl", "club"}, 
+    std::unordered_map<std::string, std::string> longer{{"cl", "club"},
                                                         {"di", "diamond"},
                                                         {"he", "heart"},
                                                         {"sp", "spade"}};
@@ -210,7 +210,7 @@ int main(int argc, char* argv[]) {
 
         auto res = test_training(datafolder, true, true, cpphots::LayerPlusPlusInitializer{});
         std::cout << "acc1 = " << std::get<0>(res) << ", acc2 = " << std::get<1>(res) << ", acc3 = " << std::get<2>(res) << std::endl;
-    
+
     }
 
     return 0;
