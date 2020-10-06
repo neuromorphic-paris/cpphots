@@ -100,7 +100,7 @@ TEST_F(TestClassification, StandardClassifier) {
 
     double acc = 0.0;
 
-    for (unsigned int i = 0; i < 68; i++) {
+    for (size_t i = 0; i < 68; i++) {
         if (classifier.classifyName(computed_features[i]) == realclasses[i])
             acc += 1.0;
     }
@@ -121,7 +121,7 @@ TEST_F(TestClassification, NormalizedClassifier) {
 
     double acc = 0.0;
 
-    for (unsigned int i = 0; i < 68; i++) {
+    for (size_t i = 0; i < 68; i++) {
         if (classifier.classifyName(computed_features[i]) == realclasses[i])
             acc += 1.0;
     }
@@ -142,7 +142,7 @@ TEST_F(TestClassification, BhattacharyyaClassifier) {
 
     double acc = 0.0;
 
-    for (unsigned int i = 0; i < 68; i++) {
+    for (size_t i = 0; i < 68; i++) {
         if (classifier.classifyName(computed_features[i]) == realclasses[i])
             acc += 1.0;
     }

@@ -33,7 +33,7 @@ void train_oneshot(Network& network, const std::vector<Events>& training_events,
 
     // prototypes initialization
     std::vector<Events> init_events = training_events;
-    for (unsigned int l = 0; l < network.getNumLayers(); l++) {
+    for (size_t l = 0; l < network.getNumLayers(); l++) {
 
         // learn prototypes for this layer
         if (use_all)
@@ -57,7 +57,7 @@ void train_sequential(Network& network, const std::vector<Events>& training_even
 
     std::vector<Events> _training_events = training_events;
 
-    for (unsigned int l = 0; l < network.getNumLayers(); l++) {
+    for (size_t l = 0; l < network.getNumLayers(); l++) {
 
         // learn prototypes for this layer
         if (use_all)
@@ -143,7 +143,7 @@ std::vector<double> compute_accuracy(Network& network, const std::vector<Classif
         auto feats = process_file(network, sample.first);
 
         // classify
-        for (unsigned int i = 0; i < classifiers.size(); i ++) {
+        for (size_t i = 0; i < classifiers.size(); i ++) {
              auto predicted = classifiers[i]->classifyName(feats);
 
             if (predicted == sample.second) {
@@ -154,7 +154,7 @@ std::vector<double> compute_accuracy(Network& network, const std::vector<Classif
 
     }
 
-    for (unsigned int i = 0; i < classifiers.size(); i ++) {
+    for (size_t i = 0; i < classifiers.size(); i ++) {
         acc[i] = acc[i] / test_set.size();
     }
 

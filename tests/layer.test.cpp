@@ -9,7 +9,7 @@ bool operator==(const cpphots::Features& f1, const cpphots::Features& f2) {
     if (f1.size() != f2.size())
         return false;
     bool ret = true;
-    for (unsigned int i = 0; i < f1.size(); i++) {
+    for (size_t i = 0; i < f1.size(); i++) {
         ret = ret && (f1[i] == f2[i]);
     }
     return ret;

@@ -56,7 +56,7 @@ public:
      * 
      * @param n_classes the number of classes for the classification task
      */
-    explicit Classifier(unsigned int n_classes);
+    explicit Classifier(size_t n_classes);
 
     /**
      * @brief Construct a new Classifier object
@@ -83,7 +83,7 @@ public:
      * @param cid index of the class
      * @param feats features to assign to the class
      */
-    void setClassFeatures(unsigned int cid, const Features& feats);
+    void setClassFeatures(size_t cid, const Features& feats);
 
     /**
      * @brief Assign features to a class
@@ -101,7 +101,7 @@ public:
      * @param feats features
      * @return index the predicted class
      */
-    unsigned int classifyID(const Features& feats) const;
+    size_t classifyID(const Features& feats) const;
 
     /**
      * @brief Classify features
@@ -117,7 +117,7 @@ public:
 private:
     std::vector<Features> class_feats;
     std::vector<std::string> class_names;
-    std::unordered_map<std::string, unsigned int> reverse_class_names;
+    std::unordered_map<std::string, size_t> reverse_class_names;
 
     virtual double computeDistance(const Features& f1, const Features& f2) const = 0;
 

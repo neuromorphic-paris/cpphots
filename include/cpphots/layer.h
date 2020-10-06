@@ -168,7 +168,7 @@ public:
      * @param idx index of the time surface
      * @return reference to the time surface
      */
-    inline TimeSurface& getSurface(unsigned int idx) {
+    inline TimeSurface& getSurface(size_t idx) {
         if (idx >= surfaces.size()) {
             throw std::invalid_argument("Polarity index exceeded: " + std::to_string(idx) + ". Layer has only " + std::to_string(surfaces.size()) + " input polarities.");
         }

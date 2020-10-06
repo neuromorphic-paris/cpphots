@@ -50,7 +50,7 @@ Network::Network(uint16_t width, uint16_t height, uint16_t polarities,
 
 std::pair<event, bool> Network::process(uint16_t x, uint16_t y, uint64_t t, uint16_t p) {
 
-    for (unsigned int l = 0; l < layers.size(); l++) {
+    for (size_t l = 0; l < layers.size(); l++) {
         auto eventgood = layers[l].process(x, y, t, p);
         if (!eventgood.second)
             return {{t, x, y, p}, false};
@@ -84,7 +84,7 @@ std::vector<Events> Network::process(const std::vector<Events>& event_streams) {
 
 }
 
-unsigned int Network::getNumLayers() const {
+size_t Network::getNumLayers() const {
     return layers.size();
 }
 
@@ -92,7 +92,7 @@ unsigned int Network::getInputPolarities() const {
     return inputPolarities;
 }
 
-Layer& Network::getLayer(unsigned int l) {
+Layer& Network::getLayer(size_t l) {
     return layers[l];
 }
 
@@ -112,8 +112,8 @@ void Network::toggleLearningAll(bool enable) {
     }
 }
 
-void Network::toggleLearningLayer(unsigned int l, bool enable) {
-    for (unsigned int i = 0; i < layers.size(); i++) {
+void Network::toggleLearningLayer(size_t l, bool enable) {
+    for (size_t i = 0; i < layers.size(); i++) {
         if (i == l)
             layers[i].toggleLearning(enable);
         else
@@ -125,7 +125,7 @@ std::string Network::getDescription() const {
 
     std::string ret = "[";
 
-    for (unsigned int i = 0; i < layers.size(); i++) {
+    for (size_t i = 0; i < layers.size(); i++) {
         if (i > 0)
             ret += " ";
         ret += "l" + std::to_string(i) + "=" + layers[i].getDescription();

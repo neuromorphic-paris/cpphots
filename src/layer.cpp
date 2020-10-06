@@ -237,7 +237,7 @@ void LayerInitializer::initializePrototypes(Layer& layer, const Events& events, 
     // store all time surfaces
     layer.resetSurfaces();
     std::vector<TimeSurfaceType> time_surfaces;
-    for (unsigned int i = 0; i < events.size(); i++) {
+    for (size_t i = 0; i < events.size(); i++) {
         auto surface_good = layer.getSurface(events[i].p).updateAndCompute(events[i]);
         if (valid_only && surface_good.second) {
             time_surfaces.push_back(surface_good.first);
@@ -258,9 +258,9 @@ void LayerInitializer::initializePrototypes(Layer& layer, const std::vector<Even
 
     // store all time surfaces
     std::vector<TimeSurfaceType> time_surfaces;
-    for (unsigned int st = 0; st < event_streams.size(); st++) {
+    for (size_t st = 0; st < event_streams.size(); st++) {
         layer.resetSurfaces();
-        for (unsigned int i = 0; i < event_streams[st].size(); i++) {
+        for (size_t i = 0; i < event_streams[st].size(); i++) {
             auto surface_good = layer.getSurface(event_streams[st][i].p).updateAndCompute(event_streams[st][i]);
             if (valid_only && surface_good.second) {
                 time_surfaces.push_back(surface_good.first);
@@ -306,12 +306,12 @@ void LayerPlusPlusInitializer::initializationAlgorithm(Layer& layer, const std::
     std::vector<float> distances(time_surfaces.size());
     float distsum = 0.0;
 
-    for (unsigned int k = 1; k < layer.getFeatures(); k++) {
+    for (size_t k = 1; k < layer.getFeatures(); k++) {
 
         distsum = 0.0;
 
         // compute all squared distances
-        for (unsigned int ts = 0; ts < time_surfaces.size(); ts++) {
+        for (size_t ts = 0; ts < time_surfaces.size(); ts++) {
 
             float mindist = std::numeric_limits<float>::max();
             for (const auto& p : layer.getPrototypes()) {
@@ -331,7 +331,7 @@ void LayerPlusPlusInitializer::initializationAlgorithm(Layer& layer, const std::
         float x = rdist(gen);
         float currdist = 0.0;
 
-        for (unsigned int ts = 0; ts < time_surfaces.size(); ts++) {
+        for (size_t ts = 0; ts < time_surfaces.size(); ts++) {
             if (x < currdist + distances[ts]) {
                 layer.addPrototype(time_surfaces[ts]);
                 chosen.insert(ts);

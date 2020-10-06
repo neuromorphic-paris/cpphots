@@ -141,7 +141,7 @@ public:
      * 
      * @return the number of layers in the network
      */
-    unsigned int getNumLayers() const;
+    size_t getNumLayers() const;
 
     /**
      * @brief Get the number of input polarities
@@ -156,7 +156,7 @@ public:
      * @param l index of the Layer to access
      * @return reference to the Layer
      */
-    Layer& getLayer(unsigned int l);
+    Layer& getLayer(size_t l);
 
     /**
      * @brief Get the histogram of prototypes activations
@@ -192,7 +192,7 @@ public:
      * @param l index of the layer
      * @param enable true if learning should be active, false otherwise
      */
-    void toggleLearningLayer(unsigned int l, bool enable = true);
+    void toggleLearningLayer(size_t l, bool enable = true);
 
     /**
      * @brief Get network description

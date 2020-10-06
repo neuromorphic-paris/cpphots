@@ -93,7 +93,7 @@ TEST(TestSaveLoad, NSaveLoad) {
 
     cpphots::Network network1(32, 32, 2, {2, 4, 8}, {1, 2, 3}, {10, 20, 30}, {4, 8, 16});
     cpphots::LayerRandomInitializer initializer;
-    for (unsigned int i = 0; i < network1.getNumLayers(); i++) {
+    for (size_t i = 0; i < network1.getNumLayers(); i++) {
         initializer.initializePrototypes(network1.getLayer(i), cpphots::Events{});
     }
 
@@ -108,7 +108,7 @@ TEST(TestSaveLoad, NSaveLoad) {
     ASSERT_EQ(network1.getInputPolarities(), network2.getInputPolarities());
     ASSERT_EQ(network1.getDescription(), network2.getDescription());
 
-    for (unsigned int i = 0; i < network1.getNumLayers(); i++) {
+    for (size_t i = 0; i < network1.getNumLayers(); i++) {
         ASSERT_EQ(network1.getLayer(i).getDescription(), network2.getLayer(i).getDescription());
     }
 
