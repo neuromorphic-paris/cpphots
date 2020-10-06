@@ -9,6 +9,8 @@
 #include <cstdint>
 #include <vector>
 #include <string>
+#include <istream>
+#include <ostream>
 
 #include "time_surface.h"
 
@@ -39,7 +41,7 @@ public:
      * This constructor should never be used explicitly,
      * it is provided only to create containers with Time Surface instances.
      */
-    Layer() {}
+    Layer();
 
     /**
      * @brief Construct a new Layer object
@@ -210,13 +212,35 @@ public:
     /**
      * @brief Add a new prototype to the layer
      * 
-     * This function should not be manually used, initialization should be done via a LayerInitializer.
+     * This function should not be used manually, initialization should be done via a LayerInitializer.
      * 
      * If the Layer is already initialized, an exception is raised.
      * 
      * @param proto the prototype to add
      */
     void addPrototype(const TimeSurfaceType& proto);
+    
+    /**
+     * @brief Stream insertion operator for Layer
+     * 
+     * Insert parameters of the layer and prototypes on the stream.
+     * 
+     * @param out output stream
+     * @param layer Layer to insert
+     * @return output stream
+     */
+    friend std::ostream& operator<<(std::ostream& out, const Layer& layer);
+
+    /**
+     * @brief Stream extraction operator for Layer
+     * 
+     * Reads parameters and prototypes for the Layer. Previous parameters are overwritten.
+     * 
+     * @param in input stream
+     * @param layer Layer where to extract into
+     * @return input stream
+     */
+    friend std::istream& operator>>(std::istream& in, Layer& layer);
 
 private:
     std::vector<TimeSurfaceType> prototypes;

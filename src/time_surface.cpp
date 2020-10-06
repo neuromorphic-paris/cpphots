@@ -60,4 +60,37 @@ void TimeSurface::reset() {
     context = TimeSurfaceType::Zero(height+2*Ry, width+2*Rx) - tau;  // makes sense, but is not in the paper
 }
 
+
+std::ostream& operator<<(std::ostream& out, const TimeSurface& ts) {
+
+    out << ts.width << " ";
+    out << ts.height << " ";
+    out << ts.Rx << " ";
+    out << ts.Ry << " ";
+    out << ts.Wx << " ";
+    out << ts.Wy << " ";
+    out << ts.tau << " ";
+    out << ts.min_events;
+
+    return out;
+
+}
+
+std::istream& operator>>(std::istream& in, TimeSurface& ts) {
+
+    in >> ts.width;
+    in >> ts.height;
+    in >> ts.Rx;
+    in >> ts.Ry;
+    in >> ts.Wx;
+    in >> ts.Wy;
+    in >> ts.tau;
+    in >> ts.min_events;
+
+    ts.reset();
+
+    return in;
+
+}
+
 }

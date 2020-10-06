@@ -6,6 +6,8 @@
 #ifndef TIME_SURFACE_H
 #define TIME_SURFACE_H
 
+#include <ostream>
+#include <istream>
 #include <Eigen/Dense>
 #include "events_utils.h"
 
@@ -15,7 +17,7 @@ namespace cpphots {
 /**
  * @brief Alias type for a time surface
  */
-using TimeSurfaceType = Eigen::ArrayXXf;
+using TimeSurfaceType = Eigen::ArrayXXf;  // using float instead of uint64_t for the initialization to -tau
 
 
 /**
@@ -36,7 +38,7 @@ public:
      * @brief Construct a new Time Surface object
      * 
      * This constructor should never be used explicitly,
-     * it is provided only to create containers with Time Surface instances.
+     * it is provided only to create containers with Time Surface instances or to load Time Surfaces from files.
      */
     TimeSurface();
 
@@ -164,9 +166,31 @@ public:
         return Wy;
     }
 
+    /**
+     * @brief Stream insertion operator for Time Surfaces
+     * 
+     * Puts all parameters in sequence on the stream, but leaves out the time context.
+     * 
+     * @param out output stream
+     * @param ts TimeSurface to insert
+     * @return output stream
+     */
+    friend std::ostream& operator<<(std::ostream& out, const TimeSurface& ts);
+
+    /**
+     * @brief Stream extraction operator for Time Surfaces
+     * 
+     * Reads all parameters from the stream. Previous parameters are overwritten.
+     * 
+     * @param in input stream
+     * @param ts TimeSurface where to extract into
+     * @return input stream
+     */
+    friend std::istream& operator>>(std::istream& in, TimeSurface& ts);
+
 private:
 
-    TimeSurfaceType context;  // using float instead of uint64_t for the initialization to -tau
+    TimeSurfaceType context;
     uint16_t width, height;
     uint16_t Rx, Ry;
     uint16_t Wx, Wy;

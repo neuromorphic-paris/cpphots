@@ -8,6 +8,8 @@
 
 namespace cpphots {
 
+Layer::Layer() {}
+
 Layer::Layer(uint16_t width, uint16_t height,
              uint16_t Rx,uint16_t Ry, float tau,
              uint16_t polarities, uint16_t features)
@@ -160,6 +162,76 @@ void Layer::addPrototype(const TimeSurfaceType& proto) {
 }
 
 
+std::ostream& operator<<(std::ostream& out, const Layer& layer) {
+
+    out << layer.description << "\n";
+    out << layer.features << " ";
+    out << layer.learning << " ";
+
+    // time surfaces
+    out << layer.surfaces.size() << "\n";
+    for (const auto& ts : layer.surfaces) {
+        out << ts << "\n";
+    }
+
+    // prototypes
+    out << layer.prototypes.size() << " ";
+    for (const auto& pa : layer.prototypes_activations) {
+        out << pa << " ";
+    }
+    out << "\n";
+    for (const auto& p : layer.prototypes) {
+        out << p << "\n";
+    }
+
+    return out;
+
+}
+
+std::istream& operator>>(std::istream& in, Layer& layer) {
+
+    std::getline(in, layer.description);
+    in >> layer.features;
+    in >> layer.learning;
+
+    // surfaces
+    layer.surfaces.clear();
+    size_t n_surfaces;
+    in >> n_surfaces;
+    layer.surfaces.resize(n_surfaces);
+    for (auto& sur : layer.surfaces) {
+        in >> sur;
+    }
+    
+    // prototypes
+    uint16_t wx = layer.surfaces[0].getWx();
+    uint16_t wy = layer.surfaces[0].getWy();
+    size_t n_prototypes;
+    in >> n_prototypes;
+    layer.prototypes_activations.clear();
+    layer.prototypes_activations.resize(n_prototypes);
+    for (auto& pa : layer.prototypes_activations) {
+        in >> pa;
+    }
+    layer.prototypes.clear();
+    for (size_t i = 0; i < n_prototypes; i++) {
+        TimeSurfaceType p = TimeSurfaceType::Zero(wy, wx);
+        for (uint16_t y = 0; y < wy; y++) {
+            for (uint16_t x = 0; x < wx; x++) {
+                in >> p(y, x);
+            }
+        }
+        layer.prototypes.push_back(p);
+    }
+
+    layer.hist.clear();
+    layer.hist.resize(layer.features);
+
+    return in;
+    
+}
+
+
 void LayerInitializer::initializePrototypes(Layer& layer, const Events& events, bool valid_only) const {
 
     // store all time surfaces
@@ -293,7 +365,7 @@ void LayerRandomInitializer::initializationAlgorithm(Layer& layer, const std::ve
     std::srand((unsigned int) std::time(0));
 
     for (uint16_t i = 0; i < layer.getFeatures(); i++) {
-        layer.addPrototype(TimeSurfaceType::Random(Wy, Wy) + 1.f /2.f);
+        layer.addPrototype(TimeSurfaceType::Random(Wy, Wx) + 1.f /2.f);
     }
 
 }

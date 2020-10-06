@@ -3,6 +3,8 @@
 
 namespace cpphots {
 
+Network::Network() {}
+
 Network::Network(uint16_t width, uint16_t height, uint16_t polarities,
                  uint16_t num_layers,
                  uint16_t Rx1, uint16_t Ry1, uint16_t K_R,
@@ -134,6 +136,39 @@ std::string Network::getDescription() const {
     ret += "]";
 
     return ret;
+
+}
+
+
+std::ostream& operator<<(std::ostream& out, const Network& network) {
+
+    out << network.inputPolarities << " ";
+    out << network.layers.size() << "\n";
+
+    for (const auto& l : network.layers) {
+        out << l;
+    }
+
+    return out;
+
+}
+
+std::istream& operator>>(std::istream& in, Network& network) {
+
+    in >> network.inputPolarities;
+    
+    size_t n_layers;
+    in >> n_layers;
+    network.layers.clear();
+    for (size_t i = 0; i < n_layers; i++) {
+        std::string tmp;
+        std::getline(in, tmp);
+        Layer l;
+        in >> l;
+        network.layers.push_back(l);
+    }
+
+    return in;
 
 }
 

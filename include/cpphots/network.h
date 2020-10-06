@@ -9,6 +9,8 @@
 #include <cstdint>
 #include <vector>
 #include <string>
+#include <ostream>
+#include <istream>
 
 #include "layer.h"
 #include "events_utils.h"
@@ -28,6 +30,8 @@ namespace cpphots {
 class Network {
 
 public:
+
+    Network();
 
     /**
      * @brief Construct a new Network object
@@ -196,6 +200,28 @@ public:
      * @return a string describing the parameters of the network
      */
     std::string getDescription() const;
+
+    /**
+     * @brief Stream insertion operator for Network
+     * 
+     * Recursively insert layers into the stream
+     * 
+     * @param out output stream
+     * @param network Network to insert
+     * @return output stream
+     */
+    friend std::ostream& operator<<(std::ostream& out, const Network& network);
+
+    /**
+     * @brief Stream extraction operator for Network
+     * 
+     * Recursively extract network layers. Previous layers are overwritten.
+     * 
+     * @param in input stream
+     * @param network Network where to extract into
+     * @return input stream
+     */
+    friend std::istream& operator>>(std::istream& in, Network& network);
 
 private:
     std::vector<Layer> layers;
