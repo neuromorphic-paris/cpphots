@@ -20,3 +20,14 @@ Events loadFromFile(const std::string& filename, const std::unordered_map<bool, 
 }
 
 }
+
+
+std::ostream& operator<<(std::ostream& out, const cpphots::event& event) {
+    out << "(";
+    out << event.t << ", ";
+    out << event.x << ", ";
+    out << event.y << ", ";
+    out << event.p;
+    out << ")";
+    return out;
+}

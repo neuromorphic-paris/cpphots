@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <string>
 #include <unordered_map>
+#include <ostream>
 
 
 namespace cpphots {
@@ -63,5 +64,16 @@ using Events = std::vector<event>;
 Events loadFromFile(const std::string& filename, const std::unordered_map<bool, uint16_t>& change_polarities = {{false, 0}, {true, 1}});
 
 }
+
+/**
+ * @brief Stream insertion operator for events
+ * 
+ * Insert the event as "(t, x, y, p)".
+ * 
+ * @param out output stream
+ * @param event an event
+ * @return output stream
+ */
+std::ostream& operator<<(std::ostream& out, const cpphots::event& event);
 
 #endif
