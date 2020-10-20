@@ -1,3 +1,11 @@
+/**
+ * @file poker_dvs.cpp
+ * @brief Classification on POKER-DVS
+ * 
+ * Example of how to use cpphots for a classification task, using the dataset from http://www2.imse-cnm.csic.es/caviar/POKERDVS.html
+ * A version of the dataset in EventStream format can be downloaded from https://www.dropbox.com/s/6700gh70mbwzxa0/poker-dvs-eventstream.zip?dl=0
+ */
+
 #include <iostream>
 #include <fstream>
 
@@ -69,7 +77,7 @@ std::vector<std::pair<std::string, std::string>> poker_dvs_all(const std::string
 
 std::tuple<double, double, double> test_training(const std::string& folder, bool sequential, bool multi, const cpphots::LayerInitializer& initializer) {
 
-    cpphots::Network network(128, 128, 2,
+    cpphots::Network network(32, 32, 2,
                         2,
                         2, 2, 2,
                         1000, 5,
