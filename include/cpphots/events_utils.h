@@ -11,6 +11,7 @@
 #include <string>
 #include <unordered_map>
 #include <ostream>
+#include <limits>
 
 
 namespace cpphots {
@@ -46,6 +47,14 @@ struct __attribute__((__packed__)) event {
 };
 
 /**
+ * @brief An invalid event
+ */
+inline const event invalid_event{std::numeric_limits<uint64_t>::max(),
+                                 std::numeric_limits<uint16_t>::max(),
+                                 std::numeric_limits<uint16_t>::max(),
+                                 std::numeric_limits<uint16_t>::max()};
+
+/**
  * @brief A stream of events
  * 
  * This is a typedef of std::vector<event>.
@@ -63,8 +72,6 @@ using Events = std::vector<event>;
  */
 Events loadFromFile(const std::string& filename, const std::unordered_map<bool, uint16_t>& change_polarities = {{false, 0}, {true, 1}});
 
-}
-
 /**
  * @brief Stream insertion operator for events
  * 
@@ -74,6 +81,32 @@ Events loadFromFile(const std::string& filename, const std::unordered_map<bool, 
  * @param event an event
  * @return output stream
  */
-std::ostream& operator<<(std::ostream& out, const cpphots::event& event);
+std::ostream& operator<<(std::ostream& out, const event& event);
+
+
+/**
+ * @brief Equality operator for events
+ * 
+ * @param ev1 first event
+ * @param ev2 second event
+ * @return true if the two events are the same
+ * @return false otherwise
+ */
+bool operator==(const event& ev1, const event& ev2);
+
+
+/**
+ * @brief Inequality operator for events
+ * 
+ * @param ev1 first event
+ * @param ev2 second event
+ * @return true if the two events are not the same
+ * @return false otherwise
+ */
+inline bool operator!=(const event& ev1, const event& ev2) {
+    return !(ev1 == ev2);
+}
+
+}
 
 #endif
