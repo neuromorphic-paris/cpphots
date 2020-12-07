@@ -78,9 +78,9 @@ public:
      * @param t time of the event
      * @param p polarity of the event
      * @param skip_check if true consider all events as valid
-     * @return a std::pair with the new emitted event and whether the event is valid or not
+     * @return the new emitted event, possibly invalid
      */
-    std::pair<event, bool> process(uint16_t x, uint16_t y, uint64_t t, uint16_t p, bool skip_check = false);
+    event process(uint16_t x, uint16_t y, uint64_t t, uint16_t p, bool skip_check = false);
     
     /**
      * @brief Process an event
@@ -95,9 +95,9 @@ public:
      * 
      * @param ev the event
      * @param skip_check if true consider all events as valid
-     * @return a std::pair with the new emitted event and whether the event is valid or not
+     * @return the new emitted event, possibly invalid
      */
-    inline std::pair<event, bool> process(const event& ev, bool skip_check = false) {
+    inline event process(const event& ev, bool skip_check = false) {
         return process(ev.x, ev.y, ev.t, ev.p, skip_check);
     }
 

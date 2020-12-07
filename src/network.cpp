@@ -48,19 +48,19 @@ Network::Network(uint16_t width, uint16_t height, uint16_t polarities,
 
 }
 
-std::pair<event, bool> Network::process(uint16_t x, uint16_t y, uint64_t t, uint16_t p) {
+event Network::process(uint16_t x, uint16_t y, uint64_t t, uint16_t p) {
 
     for (size_t l = 0; l < layers.size(); l++) {
-        auto eventgood = layers[l].process(x, y, t, p);
-        if (!eventgood.second)
-            return {{t, x, y, p}, false};
-        x = eventgood.first.x;
-        y = eventgood.first.y;
-        t = eventgood.first.t;
-        p = eventgood.first.p;
+        event ev = layers[l].process(x, y, t, p);
+        if (ev == invalid_event)
+            return invalid_event;
+        x = ev.x;
+        y = ev.y;
+        t = ev.t;
+        p = ev.p;
     }
 
-    return {{t, x, y, p}, true};
+    return {t, x, y, p};
 
 }
 

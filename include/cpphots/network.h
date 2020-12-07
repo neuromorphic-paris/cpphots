@@ -87,9 +87,9 @@ public:
      * @param y vertical coordinate of the event
      * @param t time of the event
      * @param p polarity of the event
-     * @return a std::pair with the new emitted event and whether the event is valid or not
+     * @return the new emitted event, possibly invalid
      */
-    std::pair<event, bool> process(uint16_t x, uint16_t y, uint64_t t, uint16_t p);
+    event process(uint16_t x, uint16_t y, uint64_t t, uint16_t p);
 
     /**
      * @brief Process an event
@@ -100,9 +100,9 @@ public:
      * If learning is enabled in some layer, this function will also update its prototypes.
      * 
      * @param ev the event
-     * @return a std::pair with the new emitted event and whether the event is valid or not
+     * @return the new emitted event, possibly invalid
      */
-    inline std::pair<event, bool> process(const event& ev) {
+    inline event process(const event& ev) {
         return process(ev.x, ev.y, ev.t, ev.p);
     }
 

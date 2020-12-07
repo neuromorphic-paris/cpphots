@@ -32,7 +32,7 @@ Layer::Layer(uint16_t width, uint16_t height,
 
 }
 
-std::pair<event, bool> Layer::process(uint16_t x, uint16_t y, uint64_t t, uint16_t p, bool skip_check) {
+event Layer::process(uint16_t x, uint16_t y, uint64_t t, uint16_t p, bool skip_check) {
 
     if (!isInitialized()) {
         throw std::runtime_error("Cannot process event: Layer is not initialized.");
@@ -47,7 +47,7 @@ std::pair<event, bool> Layer::process(uint16_t x, uint16_t y, uint64_t t, uint16
 
     // if the surface is not good we say it upstream
     if (!skip_check && !surface_good.second) {
-        return std::make_pair(event{t, x, y, p}, false);
+        return invalid_event;
     }
 
     TimeSurfaceType surface = surface_good.first;
@@ -84,7 +84,7 @@ std::pair<event, bool> Layer::process(uint16_t x, uint16_t y, uint64_t t, uint16
     }
 
     // generate new event
-    return std::make_pair(event{t, x, y, k}, true);
+    return event{t, x, y, k};
 
 }
 
@@ -95,8 +95,8 @@ Events Layer::process(const Events& events, bool skip_check) {
     Events retevents;
     for (const auto& ev : events) {
         auto nev = process(ev, skip_check);
-        if (nev.second)
-            retevents.push_back(nev.first);
+        if (nev != invalid_event)
+            retevents.push_back(nev);
     }
     return retevents;
 
