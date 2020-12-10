@@ -83,13 +83,13 @@ public:
      * 
      * If learning is enabled in some layer, this function will also update its prototypes.
      * 
+     * @param t time of the event
      * @param x horizontal coordinate of the event
      * @param y vertical coordinate of the event
-     * @param t time of the event
      * @param p polarity of the event
      * @return the new emitted event, possibly invalid
      */
-    event process(uint16_t x, uint16_t y, uint64_t t, uint16_t p);
+    event process(uint64_t t, uint16_t x, uint16_t y, uint16_t p);
 
     /**
      * @brief Process an event
@@ -103,7 +103,7 @@ public:
      * @return the new emitted event, possibly invalid
      */
     inline event process(const event& ev) {
-        return process(ev.x, ev.y, ev.t, ev.p);
+        return process(ev.t, ev.x, ev.y, ev.p);
     }
 
     /**

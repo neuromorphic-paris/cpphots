@@ -32,13 +32,13 @@ TimeSurface::TimeSurface(uint16_t width, uint16_t height, uint16_t Rx, uint16_t 
 
 }
 
-void TimeSurface::update(uint16_t x, uint16_t y, uint64_t t) {
+void TimeSurface::update(uint64_t t, uint16_t x, uint16_t y) {
 
     context(y+Ry, x+Rx) = t;
 
 }
 
-std::pair<TimeSurfaceType, bool> TimeSurface::compute(uint16_t x, uint16_t y, uint64_t t) const {
+std::pair<TimeSurfaceType, bool> TimeSurface::compute(uint64_t t, uint16_t x, uint16_t y) const {
 
     // override for the full context
     if (Rx == 0)

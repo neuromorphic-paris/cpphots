@@ -32,18 +32,16 @@ Layer::Layer(uint16_t width, uint16_t height,
 
 }
 
-event Layer::process(uint16_t x, uint16_t y, uint64_t t, uint16_t p, bool skip_check) {
+event Layer::process(uint64_t t, uint16_t x, uint16_t y, uint16_t p, bool skip_check) {
 
     if (!isInitialized()) {
         throw std::runtime_error("Cannot process event: Layer is not initialized.");
     }
 
-    if (p >= surfaces.size()) {
-        throw std::invalid_argument("Received event with polarity " + std::to_string(p) + " but max polarity is " + std::to_string(surfaces.size()-1));
-    }
+    assert_polarity(p);
 
     // compute the current time surface
-    auto surface_good = surfaces[p].updateAndCompute(x, y, t);
+    auto surface_good = updateAndComputeSurface(t, x, y, p);
 
     // if the surface is not good we say it upstream
     if (!skip_check && !surface_good.second) {
@@ -125,7 +123,6 @@ std::vector<TimeSurfaceType> Layer::getPrototypes() const {
     return prototypes;
 }
 
-
 void Layer::resetSurfaces() {
 
     for (auto& ts : surfaces) {
@@ -135,6 +132,26 @@ void Layer::resetSurfaces() {
     hist.clear();
     hist.resize(features);
 
+}
+
+std::pair<TimeSurfaceType, bool> Layer::updateAndComputeSurface(const event& ev) {
+    assert_polarity(ev.p);
+    return surfaces[ev.p].updateAndCompute(ev);
+}
+
+std::pair<TimeSurfaceType, bool> Layer::updateAndComputeSurface(uint64_t t, uint16_t x, uint16_t y, uint16_t p) {
+    assert_polarity(p);
+    return surfaces[p].updateAndCompute(t, x, y);
+}
+
+std::pair<TimeSurfaceType, bool> Layer::computeSurface(const event& ev) const {
+    assert_polarity(ev.p);
+    return surfaces[ev.p].compute(ev);
+}
+
+inline std::pair<TimeSurfaceType, bool> Layer::computeSurface(uint64_t t, uint16_t x, uint16_t y, uint16_t p) const {
+    assert_polarity(p);
+    return surfaces[p].compute(t, x, y);
 }
 
 bool Layer::toggleLearning(bool enable) {
@@ -229,6 +246,12 @@ std::istream& operator>>(std::istream& in, Layer& layer) {
 
     return in;
 
+}
+
+void Layer::assert_polarity(uint16_t p) const {
+    if (p >= surfaces.size()) {
+        throw std::invalid_argument("Polarity index exceeded: " + std::to_string(p) + ". Layer has only " + std::to_string(surfaces.size()) + " input polarities.");
+    }
 }
 
 

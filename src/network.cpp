@@ -48,15 +48,15 @@ Network::Network(uint16_t width, uint16_t height, uint16_t polarities,
 
 }
 
-event Network::process(uint16_t x, uint16_t y, uint64_t t, uint16_t p) {
+event Network::process(uint64_t t, uint16_t x, uint16_t y, uint16_t p) {
 
     for (size_t l = 0; l < layers.size(); l++) {
-        event ev = layers[l].process(x, y, t, p);
+        event ev = layers[l].process(t, x, y, p);
         if (ev == invalid_event)
             return invalid_event;
+        t = ev.t;
         x = ev.x;
         y = ev.y;
-        t = ev.t;
         p = ev.p;
     }
 

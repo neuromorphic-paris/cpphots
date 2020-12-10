@@ -61,11 +61,11 @@ public:
     /**
      * @brief Update the time context with a new event
      * 
+     * @param t time of the event
      * @param x horizontal coordinate of the event
      * @param y vertical coordinate of the event
-     * @param t time of the event
      */
-    void update(uint16_t x, uint16_t y, uint64_t t);
+    void update(uint64_t t, uint16_t x, uint16_t y);
     
     /**
      * @brief Update the time context with a new event
@@ -73,7 +73,7 @@ public:
      * @param ev the new event
      */
     inline void update(const event& ev) {
-        update(ev.x, ev.y, ev.t);
+        update(ev.t, ev.x, ev.y);
     }
 
     /**
@@ -82,14 +82,14 @@ public:
      * This function does not update the time context.
      * 
      * A time surface is considered valid if there is a certain number of relevant events,
-     * determined using an heuristic extended from the on described in the paper.
+     * determined using an heuristic extended from the one described in the paper.
      * 
+     * @param t time of the event
      * @param x horizontal coordinate of the event
      * @param y vertical coordinate of the event
-     * @param t time of the event
      * @return a std::pair with the computed time surface and whether the surface is valid or not
      */
-    std::pair<TimeSurfaceType, bool> compute(uint16_t x, uint16_t y, uint64_t t) const;
+    std::pair<TimeSurfaceType, bool> compute(uint64_t t, uint16_t x, uint16_t y) const;
 
     /**
      * @brief Compute the time surface for an event
@@ -102,21 +102,21 @@ public:
      * @param ev the event
      * @return a std::pair with the computed time surface and whether the surface is valid or not
      */
-    inline std::pair<TimeSurfaceType, bool> compute(const event& ev) {
-        return compute(ev.x, ev.y, ev.t);
+    inline std::pair<TimeSurfaceType, bool> compute(const event& ev) const {
+        return compute(ev.t, ev.x, ev.y);
     }
 
     /**
      * @brief Update the time context and compute the new surface
      * 
+     * @param t time of the event
      * @param x horizontal coordinate of the event
      * @param y vertical coordinate of the event
-     * @param t time of the event
      * @return a std::pair with the computed time surface and whether the surface is valid or not
      */
-    inline std::pair<TimeSurfaceType, bool> updateAndCompute(uint16_t x, uint16_t y, uint64_t t) {
-        update(x, y, t);
-        return compute(x, y, t);
+    inline std::pair<TimeSurfaceType, bool> updateAndCompute(uint64_t t, uint16_t x, uint16_t y) {
+        update(t, x, y);
+        return compute(t, x, y);
     }
 
     /**
@@ -126,8 +126,8 @@ public:
      * @return a std::pair with the computed time surface and whether the surface is valid or not
      */
     inline std::pair<TimeSurfaceType, bool> updateAndCompute(const event& ev) {
-        update(ev.x, ev.y, ev.t);
-        return compute(ev.x, ev.y, ev.t);
+        update(ev.t, ev.x, ev.y);
+        return compute(ev.t, ev.x, ev.y);
     }
 
     /**

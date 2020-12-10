@@ -327,3 +327,24 @@ TEST(TestLayer, WrongPolarity) {
     ASSERT_THROW(layer.process(0, 0, 0, 2), std::invalid_argument);
 
 }
+
+
+TEST(TestLayer, TSAccess) {
+
+    cpphots::Layer layer = cpphots::Layer(32, 32, 2, 2, 1000, 2, 8);
+
+    auto ts1 = layer.getSurface(0).updateAndCompute(10, 2, 2);
+    auto ts2 = layer.computeSurface(10, 2, 2, 0);
+
+    bool v = ts1.first.isApprox(ts2.first);
+
+    ASSERT_TRUE(v);
+
+    ts2 = layer.updateAndComputeSurface(20, 3, 3, 1);
+    ts1 = layer.getSurface(1).updateAndCompute(20, 3, 3);
+
+    v = ts1.first.isApprox(ts2.first);
+
+    ASSERT_TRUE(v);
+
+}

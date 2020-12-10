@@ -47,7 +47,7 @@ TEST(TestSaveLoad, TSProcess) {
         if (ev.p == 0) {
             continue;
         }
-        auto nts = ts.updateAndCompute(ev.x, ev.y, ev.t);
+        auto nts = ts.updateAndCompute(ev.t, ev.x, ev.y);
         float norm = nts.first.matrix().norm();
         normsum += norm;
         if (nts.second) {

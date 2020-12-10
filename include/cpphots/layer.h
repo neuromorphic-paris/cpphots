@@ -73,14 +73,14 @@ public:
      * 
      * If learning is enabled, this function will also update the matching prototype.
      * 
+     * @param t time of the event
      * @param x horizontal coordinate of the event
      * @param y vertical coordinate of the event
-     * @param t time of the event
      * @param p polarity of the event
      * @param skip_check if true consider all events as valid
      * @return the new emitted event, possibly invalid
      */
-    event process(uint16_t x, uint16_t y, uint64_t t, uint16_t p, bool skip_check = false);
+    virtual event process(uint64_t t, uint16_t x, uint16_t y, uint16_t p, bool skip_check = false);
     
     /**
      * @brief Process an event
@@ -98,7 +98,7 @@ public:
      * @return the new emitted event, possibly invalid
      */
     inline event process(const event& ev, bool skip_check = false) {
-        return process(ev.x, ev.y, ev.t, ev.p, skip_check);
+        return process(ev.t, ev.x, ev.y, ev.p, skip_check);
     }
 
     /**
@@ -165,15 +165,74 @@ public:
     /**
      * @brief Access a time surface with boundaries check
      * 
+     * This method will throw an invalid_argument exception if the index of the
+     * surfaces exceeds the number of actual time surfaces.
+     * 
      * @param idx index of the time surface
      * @return reference to the time surface
      */
     inline TimeSurface& getSurface(size_t idx) {
-        if (idx >= surfaces.size()) {
-            throw std::invalid_argument("Polarity index exceeded: " + std::to_string(idx) + ". Layer has only " + std::to_string(surfaces.size()) + " input polarities.");
-        }
+        assert_polarity(idx);
         return surfaces[idx];
     }
+
+    /**
+     * @brief Update and compute surface with boundary check
+     * 
+     * This method access the underlying time surfaces.
+     * 
+     * This method will throw an invalid_argument exception if the polarity of the
+     * event exceeds the number of actual time surfaces.
+     * 
+     * @param ev event
+     * @return a std::pair with the computed time surface and whether the surface is valid or not 
+     */
+    virtual std::pair<TimeSurfaceType, bool> updateAndComputeSurface(const event& ev);
+
+    /**
+     * @brief Update and compute surface with boundary check
+     * 
+     * This method access the underlying time surfaces.
+     * 
+     * This method will throw an invalid_argument exception if the polarity of the
+     * event exceeds the number of actual time surfaces.
+     * 
+     * @param t time of the event
+     * @param x horizontal coordinate of the event
+     * @param y vertical coordinate of the event
+     * @param p polarity of the event
+     * @return a std::pair with the computed time surface and whether the surface is valid or not 
+     */
+    virtual std::pair<TimeSurfaceType, bool> updateAndComputeSurface(uint64_t t, uint16_t x, uint16_t y, uint16_t p);
+
+    /**
+     * @brief Compute surface with boundary check, without updating
+     * 
+     * This method access the underlying time surfaces.
+     * 
+     * This method will throw an invalid_argument exception if the polarity of the
+     * event exceeds the number of actual time surfaces.
+     * 
+     * @param ev event
+     * @return a std::pair with the computed time surface and whether the surface is valid or not 
+     */
+    virtual std::pair<TimeSurfaceType, bool> computeSurface(const event& ev) const;
+
+    /**
+     * @brief Compute surface with boundary check, without updating
+     * 
+     * This method access the underlying time surfaces.
+     * 
+     * This method will throw an invalid_argument exception if the polarity of the
+     * event exceeds the number of actual time surfaces.
+     * 
+     * @param t time of the event
+     * @param x horizontal coordinate of the event
+     * @param y vertical coordinate of the event
+     * @param p polarity of the event
+     * @return a std::pair with the computed time surface and whether the surface is valid or not 
+     */
+    virtual std::pair<TimeSurfaceType, bool> computeSurface(uint64_t t, uint16_t x, uint16_t y, uint16_t p) const;
 
     /**
      * @brief Enable or disable learning
@@ -250,6 +309,8 @@ private:
     std::vector<uint32_t> hist;
     bool learning = true;
     std::string description;
+
+    void assert_polarity(uint16_t p) const;
 
 };
 
