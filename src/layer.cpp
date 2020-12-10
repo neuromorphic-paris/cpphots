@@ -260,8 +260,8 @@ void LayerInitializer::initializePrototypes(Layer& layer, const Events& events, 
     // store all time surfaces
     layer.resetSurfaces();
     std::vector<TimeSurfaceType> time_surfaces;
-    for (size_t i = 0; i < events.size(); i++) {
-        auto surface_good = layer.getSurface(events[i].p).updateAndCompute(events[i]);
+    for (auto& ev : events) {
+        auto surface_good = layer.updateAndComputeSurface(ev);
         if (valid_only && surface_good.second) {
             time_surfaces.push_back(surface_good.first);
         } else if (!valid_only) {
@@ -281,10 +281,10 @@ void LayerInitializer::initializePrototypes(Layer& layer, const std::vector<Even
 
     // store all time surfaces
     std::vector<TimeSurfaceType> time_surfaces;
-    for (size_t st = 0; st < event_streams.size(); st++) {
+    for (auto& stream : event_streams) {
         layer.resetSurfaces();
-        for (size_t i = 0; i < event_streams[st].size(); i++) {
-            auto surface_good = layer.getSurface(event_streams[st][i].p).updateAndCompute(event_streams[st][i]);
+        for (auto& ev : stream) {
+            auto surface_good = layer.updateAndComputeSurface(ev);
             if (valid_only && surface_good.second) {
                 time_surfaces.push_back(surface_good.first);
             } else if (!valid_only) {
