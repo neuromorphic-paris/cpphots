@@ -160,7 +160,7 @@ public:
      * This method resets the time surfaces and the histogram of activations.
      * It should be called before every stream of events.
      */
-    void resetSurfaces();
+    virtual void resetSurfaces();
 
     /**
      * @brief Access a time surface with boundaries check
@@ -172,6 +172,20 @@ public:
      * @return reference to the time surface
      */
     inline TimeSurface& getSurface(size_t idx) {
+        assert_polarity(idx);
+        return surfaces[idx];
+    }
+
+    /**
+     * @brief Access a time surface with boundaries check
+     * 
+     * This method will throw an invalid_argument exception if the index of the
+     * surfaces exceeds the number of actual time surfaces.
+     * 
+     * @param idx index of the time surface
+     * @return reference to the time surface
+     */
+    inline const TimeSurface& getSurface(size_t idx) const {
         assert_polarity(idx);
         return surfaces[idx];
     }

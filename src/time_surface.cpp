@@ -56,6 +56,14 @@ std::pair<TimeSurfaceType, bool> TimeSurface::compute(uint64_t t, uint16_t x, ui
 
 }
 
+TimeSurfaceType TimeSurface::sampleFullContext(uint64_t t) const {
+
+    auto ret = 1. - (t - context) / tau;
+
+    return (ret <= 0.).select(0., ret);
+
+}
+
 void TimeSurface::reset() {
     context = TimeSurfaceType::Zero(height+2*Ry, width+2*Rx) - tau;  // makes sense, but is not in the paper
 }

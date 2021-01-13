@@ -133,13 +133,23 @@ public:
     /**
      * @brief Get the temporal context
      * 
-     * This function returns the full temporal context on which surfaces are computed
+     * This function returns the full temporal context on which surfaces are computed.
      * 
      * @return the temporal context
      */
     inline const TimeSurfaceType& getFullContext() const {
         return context;
     }
+
+    /**
+     * @brief Sample and decay all temporal context
+     * 
+     * This functions applies the decay to the full temporal context and returns it.
+     * 
+     * @param t sample time
+     * @return Decayed temporal context
+     */
+    TimeSurfaceType sampleFullContext(uint64_t t) const;
 
     /**
      * @brief Reset the time context
