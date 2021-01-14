@@ -31,7 +31,7 @@ namespace cpphots {
  * After the initialization of the prototypes, learning is performed by enabling it via the toggleLearning method and processing events using process.
  * To freeze the prototypes and stop learning, simply disable it via toggleLearning.
  */
-class Layer {
+class Layer : public TimeSurfacePool {
 
 public:
 
@@ -39,7 +39,7 @@ public:
      * @brief Construct a new Layer object
      * 
      * This constructor should never be used explicitly,
-     * it is provided only to create containers with Time Surface instances.
+     * it is provided only to create containers with Layer instances.
      */
     Layer();
 
@@ -163,92 +163,6 @@ public:
     virtual void resetSurfaces();
 
     /**
-     * @brief Access a time surface with boundaries check
-     * 
-     * This method will throw an invalid_argument exception if the index of the
-     * surfaces exceeds the number of actual time surfaces.
-     * 
-     * @param idx index of the time surface
-     * @return reference to the time surface
-     */
-    inline TimeSurface& getSurface(size_t idx) {
-        assert_polarity(idx);
-        return surfaces[idx];
-    }
-
-    /**
-     * @brief Access a time surface with boundaries check
-     * 
-     * This method will throw an invalid_argument exception if the index of the
-     * surfaces exceeds the number of actual time surfaces.
-     * 
-     * @param idx index of the time surface
-     * @return reference to the time surface
-     */
-    inline const TimeSurface& getSurface(size_t idx) const {
-        assert_polarity(idx);
-        return surfaces[idx];
-    }
-
-    /**
-     * @brief Update and compute surface with boundary check
-     * 
-     * This method access the underlying time surfaces.
-     * 
-     * This method will throw an invalid_argument exception if the polarity of the
-     * event exceeds the number of actual time surfaces.
-     * 
-     * @param ev event
-     * @return a std::pair with the computed time surface and whether the surface is valid or not 
-     */
-    virtual std::pair<TimeSurfaceType, bool> updateAndComputeSurface(const event& ev);
-
-    /**
-     * @brief Update and compute surface with boundary check
-     * 
-     * This method access the underlying time surfaces.
-     * 
-     * This method will throw an invalid_argument exception if the polarity of the
-     * event exceeds the number of actual time surfaces.
-     * 
-     * @param t time of the event
-     * @param x horizontal coordinate of the event
-     * @param y vertical coordinate of the event
-     * @param p polarity of the event
-     * @return a std::pair with the computed time surface and whether the surface is valid or not 
-     */
-    virtual std::pair<TimeSurfaceType, bool> updateAndComputeSurface(uint64_t t, uint16_t x, uint16_t y, uint16_t p);
-
-    /**
-     * @brief Compute surface with boundary check, without updating
-     * 
-     * This method access the underlying time surfaces.
-     * 
-     * This method will throw an invalid_argument exception if the polarity of the
-     * event exceeds the number of actual time surfaces.
-     * 
-     * @param ev event
-     * @return a std::pair with the computed time surface and whether the surface is valid or not 
-     */
-    virtual std::pair<TimeSurfaceType, bool> computeSurface(const event& ev) const;
-
-    /**
-     * @brief Compute surface with boundary check, without updating
-     * 
-     * This method access the underlying time surfaces.
-     * 
-     * This method will throw an invalid_argument exception if the polarity of the
-     * event exceeds the number of actual time surfaces.
-     * 
-     * @param t time of the event
-     * @param x horizontal coordinate of the event
-     * @param y vertical coordinate of the event
-     * @param p polarity of the event
-     * @return a std::pair with the computed time surface and whether the surface is valid or not 
-     */
-    virtual std::pair<TimeSurfaceType, bool> computeSurface(uint64_t t, uint16_t x, uint16_t y, uint16_t p) const;
-
-    /**
      * @brief Enable or disable learning
      * 
      * This affects whether the prototypes are updated when process is called or not.
@@ -318,13 +232,10 @@ public:
 private:
     std::vector<TimeSurfaceType> prototypes;
     std::vector<uint32_t> prototypes_activations;
-    std::vector<TimeSurface> surfaces;
     uint16_t features;
     std::vector<uint32_t> hist;
     bool learning = true;
     std::string description;
-
-    void assert_polarity(uint16_t p) const;
 
 };
 

@@ -13,11 +13,7 @@ Layer::Layer() {}
 Layer::Layer(uint16_t width, uint16_t height,
              uint16_t Rx,uint16_t Ry, float tau,
              uint16_t polarities, uint16_t features)
-    :features(features) {
-
-    for (uint16_t i = 0; i < polarities; i++) {
-        surfaces.push_back(TimeSurface(width, height, Rx, Ry, tau));
-    }
+    :TimeSurfacePool(width, height, Rx, Ry, tau, polarities), features(features) {
 
     // layer description
     description = "[";
@@ -38,17 +34,13 @@ event Layer::process(uint64_t t, uint16_t x, uint16_t y, uint16_t p, bool skip_c
         throw std::runtime_error("Cannot process event: Layer is not initialized.");
     }
 
-    assert_polarity(p);
-
     // compute the current time surface
-    auto surface_good = updateAndComputeSurface(t, x, y, p);
+    auto [surface, good] = updateAndCompute(t, x, y, p);
 
     // if the surface is not good we say it upstream
-    if (!skip_check && !surface_good.second) {
+    if (!skip_check && !good) {
         return invalid_event;
     }
-
-    TimeSurfaceType surface = surface_good.first;
 
     // find closest kernel
     uint16_t k = -1;
@@ -125,33 +117,11 @@ std::vector<TimeSurfaceType> Layer::getPrototypes() const {
 
 void Layer::resetSurfaces() {
 
-    for (auto& ts : surfaces) {
-        ts.reset();
-    }
+    TimeSurfacePool::reset();
 
     hist.clear();
     hist.resize(features);
 
-}
-
-std::pair<TimeSurfaceType, bool> Layer::updateAndComputeSurface(const event& ev) {
-    assert_polarity(ev.p);
-    return surfaces[ev.p].updateAndCompute(ev);
-}
-
-std::pair<TimeSurfaceType, bool> Layer::updateAndComputeSurface(uint64_t t, uint16_t x, uint16_t y, uint16_t p) {
-    assert_polarity(p);
-    return surfaces[p].updateAndCompute(t, x, y);
-}
-
-std::pair<TimeSurfaceType, bool> Layer::computeSurface(const event& ev) const {
-    assert_polarity(ev.p);
-    return surfaces[ev.p].compute(ev);
-}
-
-inline std::pair<TimeSurfaceType, bool> Layer::computeSurface(uint64_t t, uint16_t x, uint16_t y, uint16_t p) const {
-    assert_polarity(p);
-    return surfaces[p].compute(t, x, y);
 }
 
 bool Layer::toggleLearning(bool enable) {
@@ -186,10 +156,7 @@ std::ostream& operator<<(std::ostream& out, const Layer& layer) {
     out << layer.learning << " ";
 
     // time surfaces
-    out << layer.surfaces.size() << "\n";
-    for (const auto& ts : layer.surfaces) {
-        out << ts << "\n";
-    }
+    out << static_cast<const TimeSurfacePool&>(layer);
 
     // prototypes
     out << layer.prototypes.size() << " ";
@@ -212,17 +179,11 @@ std::istream& operator>>(std::istream& in, Layer& layer) {
     in >> layer.learning;
 
     // surfaces
-    layer.surfaces.clear();
-    size_t n_surfaces;
-    in >> n_surfaces;
-    layer.surfaces.resize(n_surfaces);
-    for (auto& sur : layer.surfaces) {
-        in >> sur;
-    }
+    in >> static_cast<TimeSurfacePool&>(layer);
 
     // prototypes
-    uint16_t wx = layer.surfaces[0].getWx();
-    uint16_t wy = layer.surfaces[0].getWy();
+    uint16_t wx = layer.getSurface(0).getWx();
+    uint16_t wy = layer.getSurface(0).getWy();
     size_t n_prototypes;
     in >> n_prototypes;
     layer.prototypes_activations.clear();
@@ -248,12 +209,6 @@ std::istream& operator>>(std::istream& in, Layer& layer) {
 
 }
 
-void Layer::assert_polarity(uint16_t p) const {
-    if (p >= surfaces.size()) {
-        throw std::invalid_argument("Polarity index exceeded: " + std::to_string(p) + ". Layer has only " + std::to_string(surfaces.size()) + " input polarities.");
-    }
-}
-
 
 void LayerInitializer::initializePrototypes(Layer& layer, const Events& events, bool valid_only) const {
 
@@ -261,7 +216,7 @@ void LayerInitializer::initializePrototypes(Layer& layer, const Events& events, 
     layer.resetSurfaces();
     std::vector<TimeSurfaceType> time_surfaces;
     for (auto& ev : events) {
-        auto surface_good = layer.updateAndComputeSurface(ev);
+        auto surface_good = layer.updateAndCompute(ev);
         if (valid_only && surface_good.second) {
             time_surfaces.push_back(surface_good.first);
         } else if (!valid_only) {
@@ -284,7 +239,7 @@ void LayerInitializer::initializePrototypes(Layer& layer, const std::vector<Even
     for (auto& stream : event_streams) {
         layer.resetSurfaces();
         for (auto& ev : stream) {
-            auto surface_good = layer.updateAndComputeSurface(ev);
+            auto surface_good = layer.updateAndCompute(ev);
             if (valid_only && surface_good.second) {
                 time_surfaces.push_back(surface_good.first);
             } else if (!valid_only) {

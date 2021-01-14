@@ -101,4 +101,62 @@ std::istream& operator>>(std::istream& in, TimeSurface& ts) {
 
 }
 
+
+TimeSurfacePool::TimeSurfacePool() {}
+
+TimeSurfacePool::TimeSurfacePool(uint16_t width, uint16_t height, uint16_t Rx, uint16_t Ry, float tau, uint16_t polarities) {
+
+    for (uint16_t i = 0; i < polarities; i++) {
+        surfaces.push_back(TimeSurface(width, height, Rx, Ry, tau));
+    }
+
+}
+
+void TimeSurfacePool::update(uint64_t t, uint16_t x, uint16_t y, uint16_t p) {
+    assert_polarity(p);
+    surfaces[p].update(t, x, y);
+}
+
+std::pair<TimeSurfaceType, bool> TimeSurfacePool::compute(uint64_t t, uint16_t x, uint16_t y, uint16_t p) const {
+    assert_polarity(p);
+    return surfaces[p].compute(t, x, y);
+}
+
+void TimeSurfacePool::reset() {
+    for (auto& ts : surfaces) {
+        ts.reset();
+    }
+}
+
+void TimeSurfacePool::assert_polarity(uint16_t p) const {
+    if (p >= surfaces.size()) {
+        throw std::invalid_argument("Polarity index exceeded: " + std::to_string(p) + ". Layer has only " + std::to_string(surfaces.size()) + " input polarities.");
+    }
+}
+
+std::ostream& operator<<(std::ostream& out, const TimeSurfacePool& pool) {
+
+    out << pool.surfaces.size() << "\n";
+    for (const auto& ts : pool.surfaces) {
+        out << ts << "\n";
+    }
+
+    return out;
+
+}
+
+std::istream& operator>>(std::istream& in, TimeSurfacePool& pool) {
+
+    pool.surfaces.clear();
+    size_t n_surfaces;
+    in >> n_surfaces;
+    pool.surfaces.resize(n_surfaces);
+    for (auto& sur : pool.surfaces) {
+        in >> sur;
+    }
+
+    return in;
+
+}
+
 }
