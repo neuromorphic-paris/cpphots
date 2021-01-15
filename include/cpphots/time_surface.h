@@ -224,7 +224,8 @@ public:
      * @brief Construct a new pool of TimeSurface
      * 
      * This constructor should never be used explicitly,
-     * it is provided only to create containers with TimeSurfacePool instances.
+     * it is provided only to create containers with TimeSurfacePool instances
+     * or to load a pool from file.
      */
     TimeSurfacePool();
 
@@ -362,7 +363,7 @@ public:
      * Insert parameters of the pool (and of all the timesurfaces included) on the stream.
      * 
      * @param out output stream
-     * @param layer TimeSurfacePool to insert
+     * @param pool TimeSurfacePool to insert
      * @return output stream
      */
     friend std::ostream& operator<<(std::ostream& out, const TimeSurfacePool& pool);
@@ -374,7 +375,7 @@ public:
      * Previous parameters are overwritten.
      * 
      * @param in input stream
-     * @param layer TimeSurfacePool where to extract into
+     * @param pool TimeSurfacePool where to extract into
      * @return input stream
      */
     friend std::istream& operator>>(std::istream& in, TimeSurfacePool& pool);
