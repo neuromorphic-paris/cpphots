@@ -29,7 +29,7 @@ Features process_file(Network& network, const std::string& filename) {
 
 }
 
-void train_oneshot(Network& network, const std::vector<Events>& training_events, const LayerInitializer& initializer, bool use_all) {
+void train_oneshot(Network& network, const std::vector<Events>& training_events, const ClustererInitializerType& initializer, bool use_all) {
 
     // prototypes initialization
     std::vector<Events> init_events = training_events;
@@ -37,9 +37,9 @@ void train_oneshot(Network& network, const std::vector<Events>& training_events,
 
         // learn prototypes for this layer
         if (use_all)
-            initializer.initializePrototypes(network.getLayer(l), training_events);
+            layerInitializePrototypes(initializer, network.getLayer(l), training_events);
         else
-            initializer.initializePrototypes(network.getLayer(l), training_events[0]);
+            layerInitializePrototypes(initializer, network.getLayer(l), training_events[0]);
 
         // generate events for the next layer
         init_events = network.getLayer(l).process(init_events);
@@ -53,7 +53,7 @@ void train_oneshot(Network& network, const std::vector<Events>& training_events,
 
 }
 
-void train_sequential(Network& network, const std::vector<Events>& training_events, const LayerInitializer& initializer, bool use_all) {
+void train_sequential(Network& network, const std::vector<Events>& training_events, const ClustererInitializerType& initializer, bool use_all) {
 
     std::vector<Events> _training_events = training_events;
 
@@ -61,9 +61,9 @@ void train_sequential(Network& network, const std::vector<Events>& training_even
 
         // learn prototypes for this layer
         if (use_all)
-            initializer.initializePrototypes(network.getLayer(l), _training_events);
+            layerInitializePrototypes(initializer, network.getLayer(l), _training_events);
         else
-            initializer.initializePrototypes(network.getLayer(l), _training_events[0]);
+            layerInitializePrototypes(initializer, network.getLayer(l), _training_events[0]);
 
         network.toggleLearningLayer(l, true);
         network.getLayer(l).process(_training_events);
@@ -76,7 +76,7 @@ void train_sequential(Network& network, const std::vector<Events>& training_even
 
 }
 
-void train_oneshot(Network& network, const std::vector<std::string>& training_set, const LayerInitializer& initializer, bool use_all) {
+void train_oneshot(Network& network, const std::vector<std::string>& training_set, const ClustererInitializerType& initializer, bool use_all) {
 
     std::unordered_map<bool, uint16_t> change_polarities{{false, 0}, {true, 1}};
     if (network.getInputPolarities() == 1) {
@@ -94,7 +94,7 @@ void train_oneshot(Network& network, const std::vector<std::string>& training_se
 }
 
 
-void train_sequential(Network& network, const std::vector<std::string>& training_set, const LayerInitializer& initializer, bool use_all) {
+void train_sequential(Network& network, const std::vector<std::string>& training_set, const ClustererInitializerType& initializer, bool use_all) {
 
     std::unordered_map<bool, uint16_t> change_polarities{{false, 0}, {true, 1}};
     if (network.getInputPolarities() == 1) {

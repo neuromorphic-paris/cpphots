@@ -245,44 +245,33 @@ protected:
 
 TEST_F(TestLayerInitialization, Uniform) {
 
-    cpphots::LayerUniformInitializer initializer;
-    initializer.initializePrototypes(layer, events);
+    cpphots::layerInitializePrototypes(cpphots::ClustererUniformInitializer, layer, events);
     ASSERT_TRUE(layer.isInitialized());
 
     layer.clearPrototypes();
-    initializer.initializePrototypes(layer, {events, events});
+    cpphots::layerInitializePrototypes(cpphots::ClustererUniformInitializer, layer, {events, events});
     ASSERT_TRUE(layer.isInitialized());
 
 }
 
 TEST_F(TestLayerInitialization, PlusPLus) {
 
-    cpphots::LayerPlusPlusInitializer initializer;
-    initializer.initializePrototypes(layer, events);
+    cpphots::layerInitializePrototypes(cpphots::ClustererPlusPlusInitializer, layer, events);
     ASSERT_TRUE(layer.isInitialized());
 
     layer.clearPrototypes();
-    initializer.initializePrototypes(layer, {events, events});
+    cpphots::layerInitializePrototypes(cpphots::ClustererPlusPlusInitializer, layer, {events, events});
     ASSERT_TRUE(layer.isInitialized());
 
 }
 
 TEST_F(TestLayerInitialization, Random) {
 
-    cpphots::LayerRandomInitializer initializer;
-    initializer.initializePrototypes(layer, events);
+    cpphots::layerInitializePrototypes(cpphots::ClustererRandomInitializer(5, 5), layer, events);
     ASSERT_TRUE(layer.isInitialized());
 
     layer.clearPrototypes();
-    initializer.initializePrototypes(layer, {events, events});
-    ASSERT_TRUE(layer.isInitialized());
-
-    layer.clearPrototypes();
-    initializer.initializePrototypes(layer, cpphots::Events{});
-    ASSERT_TRUE(layer.isInitialized());
-
-    layer.clearPrototypes();
-    initializer.initializePrototypes(layer, std::vector<cpphots::Events>{});
+    cpphots::layerInitializePrototypes(cpphots::ClustererRandomInitializer(5, 5), layer, {events, events});
     ASSERT_TRUE(layer.isInitialized());
 
 }
@@ -303,8 +292,8 @@ TEST(TestLayer, SkipValidityCheck) {
 
     cpphots::Layer layer = cpphots::Layer(32, 32, 2, 2, 1000, 2, 8);
 
-    cpphots::LayerRandomInitializer initializer;
-    initializer.initializePrototypes(layer, events);
+    auto initializer = cpphots::ClustererRandomInitializer(5, 5);
+    initializer(layer, {});
 
     layer.process(events, true);
     auto hist = layer.getHistogram();
@@ -321,8 +310,8 @@ TEST(TestLayer, WrongPolarity) {
 
     cpphots::Layer layer = cpphots::Layer(32, 32, 2, 2, 1000, 2, 8);
 
-    cpphots::LayerRandomInitializer initializer;
-    initializer.initializePrototypes(layer, cpphots::Events{});
+    auto initializer = cpphots::ClustererRandomInitializer(5, 5);
+    initializer(layer, {});
 
     ASSERT_THROW(layer.process(0, 0, 0, 2), std::invalid_argument);
 

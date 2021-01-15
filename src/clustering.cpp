@@ -1,5 +1,11 @@
 #include "cpphots/clustering.h"
 
+#include <random>
+#include <set>
+#include <ctime>
+#include <functional>
+
+
 namespace cpphots {
 
 Clusterer::Clusterer() {}
@@ -106,7 +112,7 @@ std::ostream& operator<<(std::ostream& out, const Clusterer& clusterer) {
 }
 
 std::istream& operator>>(std::istream& in, Clusterer& clusterer) {
-    
+
     in >> clusterer.clusters;
     in >> clusterer.learning;
 
@@ -136,6 +142,91 @@ std::istream& operator>>(std::istream& in, Clusterer& clusterer) {
     clusterer.hist.resize(clusterer.clusters);
 
     return in;
+
+}
+
+
+void ClustererUniformInitializer(Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces) {
+
+    std::vector<TimeSurfaceType> selected;
+    std::sample(time_surfaces.begin(), time_surfaces.end(), std::back_inserter(selected), clusterer.getNumClusters(), std::mt19937{std::random_device{}()});
+
+    for (auto& p : selected) {
+        clusterer.addPrototype(p);
+    }
+
+}
+
+void ClustererPlusPlusInitializer(Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces) {
+
+    // chosen surfaces
+    std::set<int> chosen;
+
+    // choose first time surface at random
+    std::mt19937 gen{std::random_device{}()};
+    std::uniform_int_distribution<> idist(0, time_surfaces.size());
+    int first = idist(gen);
+    clusterer.addPrototype(time_surfaces[first]);
+    chosen.insert(first);
+
+    std::vector<float> distances(time_surfaces.size());
+    float distsum = 0.0;
+
+    for (size_t k = 1; k < clusterer.getNumClusters(); k++) {
+
+        distsum = 0.0;
+
+        // compute all squared distances
+        for (size_t ts = 0; ts < time_surfaces.size(); ts++) {
+
+            float mindist = std::numeric_limits<float>::max();
+            for (const auto& p : clusterer.getPrototypes()) {
+                float d = (p - time_surfaces[ts]).matrix().norm();
+                d = d * d;
+                if (d < mindist)
+                    mindist = d;
+            }
+
+            distances[ts] = mindist;
+            distsum += mindist;
+
+        }
+
+        // choose random surface, based on distances
+        std::uniform_real_distribution<float> rdist(0.0, distsum);
+        float x = rdist(gen);
+        float currdist = 0.0;
+
+        for (size_t ts = 0; ts < time_surfaces.size(); ts++) {
+            if (x < currdist + distances[ts]) {
+                clusterer.addPrototype(time_surfaces[ts]);
+                chosen.insert(ts);
+                break;
+            }
+            currdist += distances[ts];
+        }
+
+    }
+
+    if (chosen.size() != clusterer.getNumClusters()) {
+        throw std::runtime_error("Something went wrong with the plusplus initialization.");
+    }
+
+}
+
+void ClustererRandomInitializerImpl(Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces, uint16_t width, uint16_t height) {
+
+    std::srand((unsigned int) std::time(0));
+
+    for (uint16_t i = 0; i < clusterer.getNumClusters(); i++) {
+        clusterer.addPrototype(TimeSurfaceType::Random(height, width) + 1.f /2.f);
+    }
+
+}
+
+ClustererInitializerType ClustererRandomInitializer(uint16_t width, uint16_t height) {
+
+    return std::bind(ClustererRandomInitializerImpl, std::placeholders::_1, std::placeholders::_2, width, height);
 
 }
 

@@ -67,8 +67,8 @@ TEST(TestSaveLoad, LSaveLoad) {
 
     cpphots::Layer layer1(32, 32, 1, 2, 1000, 2, 8);
 
-    cpphots::LayerRandomInitializer initializer;
-    initializer.initializePrototypes(layer1, cpphots::Events{});
+    auto initializer = cpphots::ClustererRandomInitializer(3, 5);
+    initializer(layer1, {});
 
     std::stringstream outstream;
     outstream << layer1;
@@ -92,9 +92,11 @@ TEST(TestSaveLoad, LSaveLoad) {
 TEST(TestSaveLoad, NSaveLoad) {
 
     cpphots::Network network1(32, 32, 2, {2, 4, 8}, {1, 2, 3}, {10, 20, 30}, {4, 8, 16});
-    cpphots::LayerRandomInitializer initializer;
     for (size_t i = 0; i < network1.getNumLayers(); i++) {
-        initializer.initializePrototypes(network1.getLayer(i), cpphots::Events{});
+        uint16_t w = network1.getLayer(i).getSurface(0).getWx();
+        uint16_t h = network1.getLayer(i).getSurface(0).getWy();
+        auto initializer = cpphots::ClustererRandomInitializer(w, h);
+        initializer(network1.getLayer(i), {});
     }
 
     std::stringstream outstream;

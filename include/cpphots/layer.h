@@ -61,7 +61,7 @@ public:
     Layer(uint16_t width, uint16_t height,
           uint16_t Rx, uint16_t Ry, float tau,
           uint16_t polarities, uint16_t features);
-    
+
     /**
      * @brief Process an event
      * 
@@ -81,7 +81,7 @@ public:
      * @return the new emitted event, possibly invalid
      */
     virtual event process(uint64_t t, uint16_t x, uint16_t y, uint16_t p, bool skip_check = false);
-    
+
     /**
      * @brief Process an event
      * 
@@ -147,7 +147,7 @@ public:
      * @return a string describing the parameters of the Layer
      */
     std::string getDescription() const;
-    
+
     /**
      * @brief Stream insertion operator for Layer
      * 
@@ -177,122 +177,24 @@ private:
 
 
 /**
- * @brief Interface for classes capable of initializing a Layer
+ * @brief Initialize prototypes from a stream of events
  * 
- * Subclasssed of this should be capable of initializing a Layer for a stream of events or a vector of such streams.
- * 
- * In the default implemetation, the initializePrototypes method only compute the valid time surfaces and pass them to initializationAlgorithm.
+ * @param initializer the initialization algorithm
+ * @param layer the layer to be initialized
+ * @param events the stream of events to be used
+ * @param valid_only use only valid time surfaces for the initialization
  */
-class LayerInitializer {
-
-public:
-
-    /**
-     * @brief Initialize prototypes from a stream of events
-     * 
-     * @param layer the layer to be initialized
-     * @param events the stream of events to be used
-     * @param valid_only use only valid time surfaces for the initialization
-     */
-    virtual void initializePrototypes(Layer& layer, const Events& events, bool valid_only = true) const;
-
-    /**
-     * @brief Initialize prototypes from a vector of streams of events
-     * 
-     * @param layer the layer to be initialized
-     * @param event_streams the vector of streams of events to be used
-     * @param valid_only use only valid time surfaces for the initialization
-     */
-    virtual void initializePrototypes(Layer& layer, const std::vector<Events>& event_streams, bool valid_only = true) const;
-
-protected:
-
-    /**
-     * @brief Actual initialization algorithm
-     * 
-     * This is the method where the algorithm is performed and must be implemented in subclasses.
-     * 
-     * @param layer the layer to be initialized
-     * @param time_surfaces a list of valid time surfaces that can be used for the initialization
-     */
-    virtual void initializationAlgorithm(Layer& layer, const std::vector<TimeSurfaceType>& time_surfaces) const = 0;
-
-};
-
+void layerInitializePrototypes(const ClustererInitializerType& initializer, Layer& layer, const Events& events, bool valid_only = true);
 
 /**
- * @brief Uniformly initialize the layer
+ * @brief Initialize prototypes from a vector of streams of events
  * 
- * This class initialize the prototypes by simply choosing random time surfaces,
- * generated from streams of events, with uniform probabilities.
+ * @param initializer the initialization algorithm
+ * @param layer the layer to be initialized
+ * @param event_streams the vector of streams of events to be used
+ * @param valid_only use only valid time surfaces for the initialization
  */
-class LayerUniformInitializer : public LayerInitializer {
-
-protected:
-    void initializationAlgorithm(Layer& layer, const std::vector<TimeSurfaceType>& time_surfaces) const override;
-
-};
-
-
-/**
- * @brief k-means++ initialization
- * 
- * This class implements the initialization algorithm of k-means++ to choose the prototypes
- * among the time surfaces generated from streams of events.
- */
-class LayerPlusPlusInitializer : public LayerInitializer {
-
-protected:
-    void initializationAlgorithm(Layer& layer, const std::vector<TimeSurfaceType>& time_surfaces) const override;
-
-};
-
-
-/**
- * @brief Random initialization
- * 
- * Initialize the prototypes of the layer with random time surfaces, ignoring the input events.
- * This may be useful for debugging purposes.
- */
-class LayerRandomInitializer : public LayerInitializer {
-
-public:
-
-    /**
-     * @brief Initialize prototypes from a stream of events
-     * 
-     * In this subclass, events are not used.
-     * 
-     * @param layer the layer to be initialized
-     * @param events not used
-     * @param valid_only not used
-     */
-    void initializePrototypes(Layer& layer, const Events& events, bool valid_only = true) const override;
-
-    /**
-     * @brief Initialize prototypes from a vector of streams of events
-     * 
-     * In this subclass, events are not used.
-     * 
-     * @param layer the layer to be initialized
-     * @param event_streams not used
-     * @param valid_only not used
-     */
-    void initializePrototypes(Layer& layer, const std::vector<Events>& event_streams, bool valid_only = true) const override;
-
-protected:
-
-    /**
-     * @brief Actual initialization algorithm
-     * 
-     * This is the method where the algorithm is performed and must be implemented in subclasses.
-     * 
-     * @param layer the layer to be initialized
-     * @param time_surfaces not used
-     */
-    void initializationAlgorithm(Layer& layer, const std::vector<TimeSurfaceType>& time_surfaces) const override;
-
-};
+void layerInitializePrototypes(const ClustererInitializerType& initializer, Layer& layer, const std::vector<Events>& event_streams, bool valid_only = true);
 
 }
 

@@ -116,7 +116,7 @@ std::istream& operator>>(std::istream& in, Layer& layer) {
 }
 
 
-void LayerInitializer::initializePrototypes(Layer& layer, const Events& events, bool valid_only) const {
+void layerInitializePrototypes(const ClustererInitializerType& initializer, Layer& layer, const Events& events, bool valid_only) {
 
     // store all time surfaces
     layer.resetSurfaces();
@@ -134,11 +134,11 @@ void LayerInitializer::initializePrototypes(Layer& layer, const Events& events, 
         throw std::runtime_error("Not enough good events to initialize prototypes.");
     }
 
-    initializationAlgorithm(layer, time_surfaces);
+    initializer(layer, time_surfaces);
 
 }
 
-void LayerInitializer::initializePrototypes(Layer& layer, const std::vector<Events>& event_streams, bool valid_only) const {
+void layerInitializePrototypes(const ClustererInitializerType& initializer, Layer& layer, const std::vector<Events>& event_streams, bool valid_only) {
 
     // store all time surfaces
     std::vector<TimeSurfaceType> time_surfaces;
@@ -158,99 +158,7 @@ void LayerInitializer::initializePrototypes(Layer& layer, const std::vector<Even
         throw std::runtime_error("Not enough good events to initialize prototypes.");
     }
 
-    initializationAlgorithm(layer, time_surfaces);
-
-}
-
-
-void LayerUniformInitializer::initializationAlgorithm(Layer& layer, const std::vector<TimeSurfaceType>& time_surfaces) const {
-
-    std::vector<TimeSurfaceType> selected;
-    std::sample(time_surfaces.begin(), time_surfaces.end(), std::back_inserter(selected), layer.getNumClusters(), std::mt19937{std::random_device{}()});
-
-    for (auto& p : selected) {
-        layer.addPrototype(p);
-    }
-
-}
-
-
-void LayerPlusPlusInitializer::initializationAlgorithm(Layer& layer, const std::vector<TimeSurfaceType>& time_surfaces) const {
-
-    // chosen surfaces
-    std::set<int> chosen;
-
-    // choose first time surface at random
-    std::mt19937 gen{std::random_device{}()};
-    std::uniform_int_distribution<> idist(0, time_surfaces.size());
-    int first = idist(gen);
-    layer.addPrototype(time_surfaces[first]);
-    chosen.insert(first);
-
-    std::vector<float> distances(time_surfaces.size());
-    float distsum = 0.0;
-
-    for (size_t k = 1; k < layer.getNumClusters(); k++) {
-
-        distsum = 0.0;
-
-        // compute all squared distances
-        for (size_t ts = 0; ts < time_surfaces.size(); ts++) {
-
-            float mindist = std::numeric_limits<float>::max();
-            for (const auto& p : layer.getPrototypes()) {
-                float d = (p - time_surfaces[ts]).matrix().norm();
-                d = d * d;
-                if (d < mindist)
-                    mindist = d;
-            }
-
-            distances[ts] = mindist;
-            distsum += mindist;
-
-        }
-
-        // choose random surface, based on distances
-        std::uniform_real_distribution<float> rdist(0.0, distsum);
-        float x = rdist(gen);
-        float currdist = 0.0;
-
-        for (size_t ts = 0; ts < time_surfaces.size(); ts++) {
-            if (x < currdist + distances[ts]) {
-                layer.addPrototype(time_surfaces[ts]);
-                chosen.insert(ts);
-                break;
-            }
-            currdist += distances[ts];
-        }
-
-    }
-
-    if (chosen.size() != layer.getNumClusters()) {
-        throw std::runtime_error("Something went wrong with the plusplus initialization.");
-    }
-
-}
-
-
-void LayerRandomInitializer::initializePrototypes(Layer& layer, const Events& events, bool valid_only) const {
-    initializationAlgorithm(layer, {});
-}
-
-void LayerRandomInitializer::initializePrototypes(Layer& layer, const std::vector<Events>& event_streams, bool valid_only) const {
-    initializationAlgorithm(layer, {});
-}
-
-void LayerRandomInitializer::initializationAlgorithm(Layer& layer, const std::vector<TimeSurfaceType>& time_surfaces) const {
-
-    uint16_t Wx = layer.getSurface(0).getWx();
-    uint16_t Wy = layer.getSurface(0).getWy();
-
-    std::srand((unsigned int) std::time(0));
-
-    for (uint16_t i = 0; i < layer.getNumClusters(); i++) {
-        layer.addPrototype(TimeSurfaceType::Random(Wy, Wx) + 1.f /2.f);
-    }
+    initializer(layer, time_surfaces);
 
 }
 

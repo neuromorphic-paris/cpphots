@@ -138,6 +138,40 @@ private:
 
 };
 
+
+/**
+ * @brief Signature of clustering initialization algorithms
+ */
+using ClustererInitializerType = std::function<void(Clusterer&, const std::vector<TimeSurfaceType>&)>;
+
+/**
+ * @brief k-means++ initialization
+ * 
+ * This class implements the initialization algorithm of k-means++ to choose the prototypes
+ * among the time surfaces provided.
+ */
+void ClustererUniformInitializer(Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces);
+
+/**
+ * @brief Uniformly initialize the layer
+ * 
+ * This class initialize the prototypes by simply choosing random time surfaces,
+ * among those provided, with uniform probabilities.
+ */
+void ClustererPlusPlusInitializer(Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces);
+
+/**
+ * @brief Random clustering initialization
+ * 
+ * Return a function that initializes the prototypes of the layer with random time surfaces.
+ * This may be useful for debugging purposes.
+ * 
+ * @param width width of the prototypes
+ * @param height height of the prototypes
+ * @return the actual initialization function
+ */
+ClustererInitializerType ClustererRandomInitializer(uint16_t width, uint16_t height);
+
 }
 
 #endif
