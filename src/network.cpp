@@ -97,7 +97,7 @@ Layer& Network::getLayer(size_t l) {
 }
 
 std::vector<uint32_t> Network::getLastHistogram() const {
-    return layers[layers.size()-1].getHist();
+    return layers[layers.size()-1].getHistogram();
 }
 
 void Network::resetLayers() {

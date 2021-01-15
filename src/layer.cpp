@@ -13,7 +13,7 @@ Layer::Layer() {}
 Layer::Layer(uint16_t width, uint16_t height,
              uint16_t Rx,uint16_t Ry, float tau,
              uint16_t polarities, uint16_t features)
-    :TimeSurfacePool(width, height, Rx, Ry, tau, polarities), features(features) {
+    :TimeSurfacePool(width, height, Rx, Ry, tau, polarities), Clusterer(features) {
 
     // layer description
     description = "[";
@@ -23,8 +23,6 @@ Layer::Layer(uint16_t width, uint16_t height,
     description += ", pol=" + std::to_string(polarities);
     description += ", N=" + std::to_string(features);
     description += "]";
-
-    hist.resize(features);
 
 }
 
@@ -43,35 +41,7 @@ event Layer::process(uint64_t t, uint16_t x, uint16_t y, uint16_t p, bool skip_c
     }
 
     // find closest kernel
-    uint16_t k = -1;
-    float mindist = std::numeric_limits<float>::max();
-    for (uint i = 0; i < prototypes.size(); i++) {
-        float d = (surface - prototypes[i]).matrix().norm();
-        if (d < mindist) {
-            mindist = d;
-            k = i;
-        }
-    }
-
-    // update histogram
-    hist[k]++;
-
-    if (learning) {
-
-        // increase kernel activation
-        prototypes_activations[k]++;
-
-        // beta
-        float beta = prototypes[k].cwiseProduct(surface).sum() / prototypes[k].matrix().norm() / surface.matrix().norm();
-        // float beta = maxcosine;
-
-        // alpha
-        float alpha = 1. / (1. + prototypes_activations[k]);
-
-        // update kernel
-        prototypes[k] += alpha * beta * (surface - prototypes[k]);
-
-    }
+    uint16_t k = cluster(surface);
 
     // generate new event
     return event{t, x, y, k};
@@ -103,31 +73,12 @@ std::vector<Events> Layer::process(const std::vector<Events>& event_streams, boo
 
 }
 
-uint16_t Layer::getFeatures() const {
-    return features;
-}
-
-std::vector<uint32_t> Layer::getHist() const {
-    return hist;
-}
-
-std::vector<TimeSurfaceType> Layer::getPrototypes() const {
-    return prototypes;
-}
-
 void Layer::resetSurfaces() {
 
     TimeSurfacePool::reset();
 
-    hist.clear();
-    hist.resize(features);
+    Clusterer::reset();
 
-}
-
-bool Layer::toggleLearning(bool enable) {
-    bool prev = learning;
-    learning = enable;
-    return prev;
 }
 
 std::string Layer::getDescription() const{
@@ -135,38 +86,16 @@ std::string Layer::getDescription() const{
     return description;
 }
 
-void Layer::clearPrototypes() {
-    prototypes.clear();
-    prototypes_activations.clear();
-}
-
-void Layer::addPrototype(const TimeSurfaceType& proto) {
-    if (isInitialized()) {
-        throw std::runtime_error("Trying to add a prototype to an already initialized Layer.");
-    }
-    prototypes.push_back(proto);
-    prototypes_activations.push_back(0);
-}
-
 
 std::ostream& operator<<(std::ostream& out, const Layer& layer) {
 
     out << layer.description << "\n";
-    out << layer.features << " ";
-    out << layer.learning << " ";
 
     // time surfaces
     out << static_cast<const TimeSurfacePool&>(layer);
 
     // prototypes
-    out << layer.prototypes.size() << " ";
-    for (const auto& pa : layer.prototypes_activations) {
-        out << pa << " ";
-    }
-    out << "\n";
-    for (const auto& p : layer.prototypes) {
-        out << p << "\n";
-    }
+    out << static_cast<const Clusterer&>(layer);
 
     return out;
 
@@ -175,35 +104,12 @@ std::ostream& operator<<(std::ostream& out, const Layer& layer) {
 std::istream& operator>>(std::istream& in, Layer& layer) {
 
     std::getline(in, layer.description);
-    in >> layer.features;
-    in >> layer.learning;
 
     // surfaces
     in >> static_cast<TimeSurfacePool&>(layer);
 
-    // prototypes
-    uint16_t wx = layer.getSurface(0).getWx();
-    uint16_t wy = layer.getSurface(0).getWy();
-    size_t n_prototypes;
-    in >> n_prototypes;
-    layer.prototypes_activations.clear();
-    layer.prototypes_activations.resize(n_prototypes);
-    for (auto& pa : layer.prototypes_activations) {
-        in >> pa;
-    }
-    layer.prototypes.clear();
-    for (size_t i = 0; i < n_prototypes; i++) {
-        TimeSurfaceType p = TimeSurfaceType::Zero(wy, wx);
-        for (uint16_t y = 0; y < wy; y++) {
-            for (uint16_t x = 0; x < wx; x++) {
-                in >> p(y, x);
-            }
-        }
-        layer.prototypes.push_back(p);
-    }
-
-    layer.hist.clear();
-    layer.hist.resize(layer.features);
+    // clustering
+    in >> static_cast<Clusterer&>(layer);
 
     return in;
 
@@ -224,7 +130,7 @@ void LayerInitializer::initializePrototypes(Layer& layer, const Events& events, 
         }
     }
 
-    if (time_surfaces.size() < layer.getFeatures()) {
+    if (time_surfaces.size() < layer.getNumClusters()) {
         throw std::runtime_error("Not enough good events to initialize prototypes.");
     }
 
@@ -248,7 +154,7 @@ void LayerInitializer::initializePrototypes(Layer& layer, const std::vector<Even
         }
     }
 
-    if (time_surfaces.size() < layer.getFeatures()) {
+    if (time_surfaces.size() < layer.getNumClusters()) {
         throw std::runtime_error("Not enough good events to initialize prototypes.");
     }
 
@@ -260,7 +166,7 @@ void LayerInitializer::initializePrototypes(Layer& layer, const std::vector<Even
 void LayerUniformInitializer::initializationAlgorithm(Layer& layer, const std::vector<TimeSurfaceType>& time_surfaces) const {
 
     std::vector<TimeSurfaceType> selected;
-    std::sample(time_surfaces.begin(), time_surfaces.end(), std::back_inserter(selected), layer.getFeatures(), std::mt19937{std::random_device{}()});
+    std::sample(time_surfaces.begin(), time_surfaces.end(), std::back_inserter(selected), layer.getNumClusters(), std::mt19937{std::random_device{}()});
 
     for (auto& p : selected) {
         layer.addPrototype(p);
@@ -284,7 +190,7 @@ void LayerPlusPlusInitializer::initializationAlgorithm(Layer& layer, const std::
     std::vector<float> distances(time_surfaces.size());
     float distsum = 0.0;
 
-    for (size_t k = 1; k < layer.getFeatures(); k++) {
+    for (size_t k = 1; k < layer.getNumClusters(); k++) {
 
         distsum = 0.0;
 
@@ -320,7 +226,7 @@ void LayerPlusPlusInitializer::initializationAlgorithm(Layer& layer, const std::
 
     }
 
-    if (chosen.size() != layer.getFeatures()) {
+    if (chosen.size() != layer.getNumClusters()) {
         throw std::runtime_error("Something went wrong with the plusplus initialization.");
     }
 
@@ -342,7 +248,7 @@ void LayerRandomInitializer::initializationAlgorithm(Layer& layer, const std::ve
 
     std::srand((unsigned int) std::time(0));
 
-    for (uint16_t i = 0; i < layer.getFeatures(); i++) {
+    for (uint16_t i = 0; i < layer.getNumClusters(); i++) {
         layer.addPrototype(TimeSurfaceType::Random(Wy, Wx) + 1.f /2.f);
     }
 

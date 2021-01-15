@@ -13,7 +13,7 @@
 #include <ostream>
 
 #include "time_surface.h"
-
+#include "clustering.h"
 #include "events_utils.h"
 
 
@@ -31,7 +31,7 @@ namespace cpphots {
  * After the initialization of the prototypes, learning is performed by enabling it via the toggleLearning method and processing events using process.
  * To freeze the prototypes and stop learning, simply disable it via toggleLearning.
  */
-class Layer : public TimeSurfacePool {
+class Layer : public TimeSurfacePool, public Clusterer {
 
 public:
 
@@ -134,27 +134,6 @@ public:
     std::vector<Events> process(const std::vector<Events>& event_streams, bool skip_check = false);
 
     /**
-     * @brief Get the number of output features
-     * 
-     * @return the number of output features
-     */
-    uint16_t getFeatures() const;
-
-    /**
-     * @brief Get the histogram of prototypes activations
-     * 
-     * @return the histogram of activations
-     */
-    std::vector<uint32_t> getHist() const;
-
-    /**
-     * @brief Get the list of prototypes
-     * 
-     * @return the list of prototypes
-     */
-    std::vector<TimeSurfaceType> getPrototypes() const;
-
-    /**
      * @brief Reset the time surfaces
      * 
      * This method resets the time surfaces and the histogram of activations.
@@ -163,49 +142,11 @@ public:
     virtual void resetSurfaces();
 
     /**
-     * @brief Enable or disable learning
-     * 
-     * This affects whether the prototypes are updated when process is called or not.
-     * 
-     * @param enable true if learning should be active, false otherwise
-     * @return the previous learning state
-     */
-    bool toggleLearning(bool enable = true);
-
-    /**
      * @brief Get layer description
      * 
      * @return a string describing the parameters of the Layer
      */
     std::string getDescription() const;
-
-    /**
-     * @brief Check prototype initialization
-     * 
-     * Prototypes are initialized if there is a number of prototypes equal to the number of features.
-     * 
-     * @return true if prototypes are initialized
-     * @return false otherwise
-     */
-    inline bool isInitialized() const {
-        return (prototypes.size() == features) && (prototypes_activations.size() == features);
-    }
-
-    /**
-     * @brief Removes all prototypes
-     */
-    void clearPrototypes();
-
-    /**
-     * @brief Add a new prototype to the layer
-     * 
-     * This function should not be used manually, initialization should be done via a LayerInitializer.
-     * 
-     * If the Layer is already initialized, an exception is raised.
-     * 
-     * @param proto the prototype to add
-     */
-    void addPrototype(const TimeSurfaceType& proto);
     
     /**
      * @brief Stream insertion operator for Layer
@@ -230,11 +171,6 @@ public:
     friend std::istream& operator>>(std::istream& in, Layer& layer);
 
 private:
-    std::vector<TimeSurfaceType> prototypes;
-    std::vector<uint32_t> prototypes_activations;
-    uint16_t features;
-    std::vector<uint32_t> hist;
-    bool learning = true;
     std::string description;
 
 };

@@ -187,7 +187,7 @@ TEST_F(TestLayerProcessing, WithoutLearning) {
     }
 
     cpphots::Features expected{188, 205, 281, 233, 229, 276, 194, 177};
-    EXPECT_EQ(layer.getHist(), expected);
+    EXPECT_EQ(layer.getHistogram(), expected);
 
 }
 
@@ -208,7 +208,7 @@ TEST_F(TestLayerProcessing, WithLearning) {
     }
 
     cpphots::Features expected_learning{233, 167, 187, 207, 326, 278, 271, 114};
-    EXPECT_EQ(layer.getHist(), expected_learning);
+    EXPECT_EQ(layer.getHistogram(), expected_learning);
 
     // post learning
     layer.resetSurfaces();
@@ -224,7 +224,7 @@ TEST_F(TestLayerProcessing, WithLearning) {
 
     // after learning: [206 272 202 277 226 181 310 109] (cosine) or [211 173 197 209 295 293 284 121] (L2)
     cpphots::Features expected_afterlearning{211, 173, 197, 209, 295, 293, 284, 121};
-    EXPECT_EQ(layer.getHist(), expected_afterlearning);
+    EXPECT_EQ(layer.getHistogram(), expected_afterlearning);
 
 }
 
@@ -307,7 +307,7 @@ TEST(TestLayer, SkipValidityCheck) {
     initializer.initializePrototypes(layer, events);
 
     layer.process(events, true);
-    auto hist = layer.getHist();
+    auto hist = layer.getHistogram();
     uint32_t hcount = 0;
     for (auto& h : hist) {
         hcount += h;

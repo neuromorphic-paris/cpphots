@@ -79,7 +79,7 @@ TEST(TestSaveLoad, LSaveLoad) {
     instream >> layer2;
 
     ASSERT_EQ(layer1.getDescription(), layer2.getDescription());
-    ASSERT_EQ(layer1.getFeatures(), layer2.getFeatures());
+    ASSERT_EQ(layer1.getNumClusters(), layer2.getNumClusters());
 
     auto surface = layer2.getSurface(1);
     ASSERT_EQ(surface.getWx(), 3);
