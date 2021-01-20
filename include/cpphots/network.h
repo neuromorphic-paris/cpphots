@@ -18,6 +18,8 @@
 
 namespace cpphots {
 
+using LayerType = Layer<TimeSurfacePool, Clusterer>;
+
 /**
  * @brief A multi-layered HOTS network
  * 
@@ -89,7 +91,7 @@ public:
      * @param p polarity of the event
      * @return the new emitted event, possibly invalid
      */
-    event process(uint64_t t, uint16_t x, uint16_t y, uint16_t p);
+    Events process(uint64_t t, uint16_t x, uint16_t y, uint16_t p);
 
     /**
      * @brief Process an event
@@ -102,9 +104,7 @@ public:
      * @param ev the event
      * @return the new emitted event, possibly invalid
      */
-    inline event process(const event& ev) {
-        return process(ev.t, ev.x, ev.y, ev.p);
-    }
+    Events process(const event& ev);
 
     /**
      * @brief Process a stream of events
@@ -156,7 +156,7 @@ public:
      * @param l index of the Layer to access
      * @return reference to the Layer
      */
-    Layer& getLayer(size_t l);
+    LayerType& getLayer(size_t l);
 
     /**
      * @brief Get the histogram of prototypes activations
@@ -199,7 +199,7 @@ public:
      * 
      * @return a string describing the parameters of the network
      */
-    std::string getDescription() const;
+    // std::string getDescription() const;
 
     /**
      * @brief Stream insertion operator for Network
@@ -224,7 +224,7 @@ public:
     friend std::istream& operator>>(std::istream& in, Network& network);
 
 private:
-    std::vector<Layer> layers;
+    std::vector<LayerType> layers;
     unsigned int inputPolarities;
 
 };

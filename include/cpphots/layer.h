@@ -1,180 +1,121 @@
-/**
- * @file layer.h
- * @brief Implementation of HOTS layers and of layer initialization procedures
- */
-
 #ifndef LAYER_H
 #define LAYER_H
 
-#include <cstdint>
-#include <vector>
-#include <string>
-#include <istream>
-#include <ostream>
+#include <type_traits>
 
-#include "time_surface.h"
-#include "clustering.h"
 #include "events_utils.h"
+#include "clustering.h"
+#include "layer_traits.h"
 
 
 namespace cpphots {
 
-/**
- * @brief A layer of HOTS
- * 
- * This class is capable of processing incoming events and emitting new events with different polarities, by extracting features.
- * The class also keeps track of the number of time a certain prototype has been activated, thus it can output an histogram of activations at any time.
- * 
- * Before processing events, the prototypes must be initialized using a subclass of LayerInitializer.
- * Calling process before having initialized the prototypes raises an exception.
- * 
- * After the initialization of the prototypes, learning is performed by enabling it via the toggleLearning method and processing events using process.
- * To freeze the prototypes and stop learning, simply disable it via toggleLearning.
- */
-class Layer : public TimeSurfacePool, public Clusterer {
+
+class LayerBase {
 
 public:
+    virtual Events process(uint64_t t, uint16_t x, uint16_t y, uint16_t p, bool skip_check = false) = 0;
 
-    /**
-     * @brief Construct a new Layer object
-     * 
-     * This constructor should never be used explicitly,
-     * it is provided only to create containers with Layer instances.
-     */
-    Layer();
+    virtual Events process(const event& ev, bool skip_check = false) = 0;
 
-    /**
-     * @brief Construct a new Layer object
-     * 
-     * This constructor will setup a number of time surfaces equal to the input polarities.
-     * 
-     * The constructor will not initialize the prototypes.
-     * 
-     * @param width width of the full time context for the surfaces
-     * @param height height of the full time context for the surfaces
-     * @param Rx horizontal size of the window on which surfaces are computed
-     * @param Ry vertical size of the window on which surfaces are computed
-     * @param tau time constant of the surfaces
-     * @param polarities number of input polarities
-     * @param features number of features extracted (equal to the number of output polarities)
-     */
-    Layer(uint16_t width, uint16_t height,
-          uint16_t Rx, uint16_t Ry, float tau,
-          uint16_t polarities, uint16_t features);
-
-    /**
-     * @brief Process an event
-     * 
-     * Process an event and emit a new event, depending on the closest prototype.
-     * If the input event does not produce a valid time surface, then the output event is also not valid,
-     * unless validity checks are skipped.
-     * 
-     * The closest prototype is choosen based on L2 distance.
-     * 
-     * If learning is enabled, this function will also update the matching prototype.
-     * 
-     * @param t time of the event
-     * @param x horizontal coordinate of the event
-     * @param y vertical coordinate of the event
-     * @param p polarity of the event
-     * @param skip_check if true consider all events as valid
-     * @return the new emitted event, possibly invalid
-     */
-    virtual event process(uint64_t t, uint16_t x, uint16_t y, uint16_t p, bool skip_check = false);
-
-    /**
-     * @brief Process an event
-     * 
-     * Process an event and emit a new event, depending on the closest prototype.
-     * If the input event does not produce a valid time surface, then the output event is also not valid,
-     * unless validity checks are skipped.
-     * 
-     * The closest prototype is choosen based on L2 distance.
-     * 
-     * If learning is enabled, this function will also update the matching prototype.
-     * 
-     * @param ev the event
-     * @param skip_check if true consider all events as valid
-     * @return the new emitted event, possibly invalid
-     */
-    inline event process(const event& ev, bool skip_check = false) {
-        return process(ev.t, ev.x, ev.y, ev.p, skip_check);
-    }
-
-    /**
-     * @brief Process a stream of events
-     * 
-     * Process a stream of events and emit a new stream of events.
-     * Only valid events are emitted, if otherwise specified.
-     * 
-     * This method resets the time surfaces before processing the events.
-     *
-     * If learning is enabled, this function will also update matching prototypes.
-     * 
-     * @param events a stream of events
-     * @param skip_check if true consider all events as valid
-     * @return a new stream of valid events
-     */
-    Events process(const Events& events, bool skip_check = false);
-
-    /**
-     * @brief Process a vector of stream of events
-     * 
-     * Process each stream of events and emit a new stream of events for every one of the input streams.
-     * Only valid events are emitted, if otherwise specified.
-     * 
-     * This method resets the time surfaces before processing every stream of events.
-     *
-     * If learning is enabled, this function will also update matching prototypes.
-     * 
-     * @param event_streams a vector of stream of events
-     * @param skip_check if true consider all events as valid
-     * @return a new vector of streams of valid events
-     */
-    std::vector<Events> process(const std::vector<Events>& event_streams, bool skip_check = false);
-
-    /**
-     * @brief Reset the time surfaces
-     * 
-     * This method resets the time surfaces and the histogram of activations.
-     * It should be called before every stream of events.
-     */
-    virtual void resetSurfaces();
-
-    /**
-     * @brief Get layer description
-     * 
-     * @return a string describing the parameters of the Layer
-     */
-    std::string getDescription() const;
-
-    /**
-     * @brief Stream insertion operator for Layer
-     * 
-     * Insert parameters of the layer and prototypes on the stream.
-     * 
-     * @param out output stream
-     * @param layer Layer to insert
-     * @return output stream
-     */
-    friend std::ostream& operator<<(std::ostream& out, const Layer& layer);
-
-    /**
-     * @brief Stream extraction operator for Layer
-     * 
-     * Reads parameters and prototypes for the Layer. Previous parameters are overwritten.
-     * 
-     * @param in input stream
-     * @param layer Layer where to extract into
-     * @return input stream
-     */
-    friend std::istream& operator>>(std::istream& in, Layer& layer);
-
-private:
-    std::string description;
+    virtual void reset() = 0;
 
 };
 
+
+// TODO: change name
+struct ArrayLayer {};
+
+
+template <typename... T>
+class Layer : public LayerBase, public T... {
+
+public:
+
+    Layer() {}
+
+    template < typename... U >
+    Layer(U &&... v) : T(std::forward < U >(v))... {}
+
+    Events process(uint64_t t, uint16_t x, uint16_t y, uint16_t p, bool skip_check = false) override {
+
+        // NOTE: time surfaces are required
+        // compute the current time surface
+        auto [surface, good] = this->updateAndCompute(t, x, y, p);
+
+        // if the surface is not good we say it upstream
+        if (!skip_check && !good) {
+            return Events{};
+        }
+
+        // if there is clustering algorithm we can use it
+        if constexpr (std::is_base_of_v<ClustererBase, Layer>) {
+            auto k = this->cluster(surface);
+
+            if constexpr (std::is_base_of_v<ArrayLayer, Layer>) {
+                return {event{t, k, y, 0}};
+            }
+
+            return {event{t, x, y, k}};
+        }
+
+        return Events{event{t, x, y, p}};
+
+    }
+
+    Events process(const event& ev, bool skip_check = false) override {
+        return process(ev.t, ev.x, ev.y, ev.p, skip_check);
+    }
+
+    void reset() override {
+
+        ([this]() {
+            if constexpr (is_resettable_v<T>) {
+                T::reset();
+            }
+        }(), ...);
+
+    }
+
+    template <typename... TT>
+    friend std::ostream& operator<<(std::ostream& out, const Layer<TT...>& layer);
+
+    template <typename... TT>
+    friend std::istream& operator>>(std::istream& in, Layer<TT...>& layer);
+
+};
+
+template <typename... T>
+std::ostream& operator<<(std::ostream& out, const Layer<T...>& layer) {
+
+    ([&]() {
+    if constexpr (is_to_stream_writable_v<T>) {
+        out << static_cast<const T&>(layer) << std::endl;
+    }
+    }(), ...);
+
+    return out;
+
+}
+
+template <typename... T>
+std::istream& operator>>(std::istream& in, Layer<T...>& layer) {
+
+    ([&]() {
+    if constexpr (is_from_stream_readable_v<T>) {
+        in >> static_cast<T&>(layer);
+    }
+    }(), ...);
+
+    return in;
+
+}
+
+
+template <typename... T>
+Layer<std::decay_t<T>...> create_layer(T&&... v) {
+    return Layer<std::decay_t<T>...>{v...};
+}
 
 /**
  * @brief Initialize prototypes from a stream of events
@@ -184,7 +125,28 @@ private:
  * @param events the stream of events to be used
  * @param valid_only use only valid time surfaces for the initialization
  */
-void layerInitializePrototypes(const ClustererInitializerType& initializer, Layer& layer, const Events& events, bool valid_only = true);
+template <typename... T>
+void layerInitializePrototypes(const ClustererInitializerType& initializer, Layer<T...>& layer, const Events& events, bool valid_only = true) {
+
+    // store all time surfaces
+    layer.reset();
+    std::vector<TimeSurfaceType> time_surfaces;
+    for (auto& ev : events) {
+        auto surface_good = layer.updateAndCompute(ev);
+        if (valid_only && surface_good.second) {
+            time_surfaces.push_back(surface_good.first);
+        } else if (!valid_only) {
+            time_surfaces.push_back(surface_good.first);
+        }
+    }
+
+    if (time_surfaces.size() < layer.getNumClusters()) {
+        throw std::runtime_error("Not enough good events to initialize prototypes.");
+    }
+
+    initializer(layer, time_surfaces);
+
+}
 
 /**
  * @brief Initialize prototypes from a vector of streams of events
@@ -194,7 +156,30 @@ void layerInitializePrototypes(const ClustererInitializerType& initializer, Laye
  * @param event_streams the vector of streams of events to be used
  * @param valid_only use only valid time surfaces for the initialization
  */
-void layerInitializePrototypes(const ClustererInitializerType& initializer, Layer& layer, const std::vector<Events>& event_streams, bool valid_only = true);
+template <typename... T>
+void layerInitializePrototypes(const ClustererInitializerType& initializer, Layer<T...>& layer, const std::vector<Events>& event_streams, bool valid_only = true) {
+
+    // store all time surfaces
+    std::vector<TimeSurfaceType> time_surfaces;
+    for (auto& stream : event_streams) {
+        layer.reset();
+        for (auto& ev : stream) {
+            auto surface_good = layer.updateAndCompute(ev);
+            if (valid_only && surface_good.second) {
+                time_surfaces.push_back(surface_good.first);
+            } else if (!valid_only) {
+                time_surfaces.push_back(surface_good.first);
+            }
+        }
+    }
+
+    if (time_surfaces.size() < layer.getNumClusters()) {
+        throw std::runtime_error("Not enough good events to initialize prototypes.");
+    }
+
+    initializer(layer, time_surfaces);
+
+}
 
 }
 

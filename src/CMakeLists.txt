@@ -2,7 +2,6 @@
 set(CPPHOTS_SOURCES
     classification.cpp
     events_utils.cpp
-    layer.cpp
     network.cpp
     run.cpp
     time_surface.cpp

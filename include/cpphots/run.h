@@ -12,6 +12,35 @@
 
 namespace cpphots {
 
+
+template<typename P>
+Events process(P& processor, const Events& events) {
+
+    processor.reset();
+
+    Events ret;
+    for (const auto& ev : events) {
+        Events nev = processor.process(ev);
+        ret.insert(ret.end(), nev.begin(), nev.end());
+    }
+
+    return ret;
+
+}
+
+template<typename P>
+std::vector<Events> process(P& processor, const std::vector<Events>& events) {
+
+    std::vector<Events> ret;
+
+    for (const auto& evts : events) {
+        ret.push_back(process(processor, evts));
+    }
+
+    return ret;
+
+}
+
 Features process_file(Network& network, const std::string& filename);
 
 // training

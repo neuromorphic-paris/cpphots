@@ -42,7 +42,7 @@ void train_oneshot(Network& network, const std::vector<Events>& training_events,
             layerInitializePrototypes(initializer, network.getLayer(l), training_events[0]);
 
         // generate events for the next layer
-        init_events = network.getLayer(l).process(init_events);
+        init_events = process(network.getLayer(l), init_events);
 
     }
 
@@ -66,11 +66,11 @@ void train_sequential(Network& network, const std::vector<Events>& training_even
             layerInitializePrototypes(initializer, network.getLayer(l), _training_events[0]);
 
         network.toggleLearningLayer(l, true);
-        network.getLayer(l).process(_training_events);
+        process(network.getLayer(l), _training_events);
 
         // genereate events for the next layer
         network.toggleLearningAll(false);
-        _training_events = network.getLayer(l).process(_training_events);
+        _training_events = process(network.getLayer(l), _training_events);
 
     }
 

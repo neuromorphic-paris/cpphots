@@ -19,6 +19,10 @@ Clusterer::Clusterer(uint16_t clusters)
 
 uint16_t Clusterer::cluster(const TimeSurfaceType& surface) {
 
+    if (!isInitialized()) {
+        throw std::runtime_error("Cannot process event: Clusterer is not initialized.");
+    }
+
     // find closest kernel
     uint16_t k = -1;
     float mindist = std::numeric_limits<float>::max();

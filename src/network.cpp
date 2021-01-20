@@ -18,7 +18,9 @@ Network::Network(uint16_t width, uint16_t height, uint16_t polarities,
     uint16_t N = N1;
 
     for (uint16_t l = 0; l < num_layers; l++) {
-        layers.push_back(Layer(width, height, Rx, Ry, tau, polarities, N));
+        auto layer = cpphots::create_layer(TimeSurfacePool(width, height, Rx, Ry, tau, polarities),
+                                               Clusterer(N));
+        layers.push_back(layer);
         Rx *= K_R;
         Ry *= K_R;
         tau *= K_tau;
@@ -42,44 +44,64 @@ Network::Network(uint16_t width, uint16_t height, uint16_t polarities,
     }
 
     for (uint16_t l = 0; l < num_layers; l++) {
-        layers.push_back(Layer(width, height, Rx[l], Ry[l], tau[l], polarities, N[l]));
+        auto layer = cpphots::create_layer(TimeSurfacePool(width, height, Rx[l], Ry[l], tau[l], polarities),
+                                           Clusterer(N[l]));
+        layers.push_back(layer);
         polarities = N[l];
     }
 
 }
 
-event Network::process(uint64_t t, uint16_t x, uint16_t y, uint16_t p) {
+Events Network::process(uint64_t t, uint16_t x, uint16_t y, uint16_t p) {
 
-    for (size_t l = 0; l < layers.size(); l++) {
-        event ev = layers[l].process(t, x, y, p);
-        if (ev == invalid_event)
-            return invalid_event;
-        t = ev.t;
-        x = ev.x;
-        y = ev.y;
-        p = ev.p;
+    return process({t, x, y, p});
+
+}
+
+Events Network::process(const event& ev) {
+
+    Events evs{ev};
+    for (auto& layer : layers) {
+        
+        Events next_evs;
+
+        for (auto& nev : evs) {
+            Events pevs = layer.process(nev);
+            next_evs.insert(next_evs.end(), pevs.begin(), pevs.end());
+        }
+        
+        if (next_evs.empty())
+            return next_evs;
+        
+        evs = next_evs;
+
     }
 
-    return {t, x, y, p};
+    return evs;
 
 }
 
 Events Network::process(const Events& events) {
 
-    Events retevents = events;
-    for (auto& layer : layers) {
-        retevents = layer.process(retevents);
+    Events retevents;
+
+    for (const auto& ev : events) {
+        auto evs = process(ev);
+        retevents.insert(retevents.begin(), evs.begin(), evs.end());
     }
+
     return retevents;
 
 }
 
 std::vector<Events> Network::process(const std::vector<Events>& event_streams) {
 
-    std::vector<Events> reststreams = event_streams;
-    for (auto& layer : layers) {
-        reststreams = layer.process(reststreams);
+    std::vector<Events> reststreams;
+
+    for (const auto& stream : event_streams) {
+        reststreams.push_back(process(stream));
     }
+
     return reststreams;
 
 }
@@ -92,7 +114,7 @@ unsigned int Network::getInputPolarities() const {
     return inputPolarities;
 }
 
-Layer& Network::getLayer(size_t l) {
+LayerType& Network::getLayer(size_t l) {
     return layers[l];
 }
 
@@ -102,7 +124,7 @@ std::vector<uint32_t> Network::getLastHistogram() const {
 
 void Network::resetLayers() {
     for (auto& l : layers) {
-        l.resetSurfaces();
+        l.reset();
     }
 }
 
@@ -121,23 +143,23 @@ void Network::toggleLearningLayer(size_t l, bool enable) {
     }
 }
 
-std::string Network::getDescription() const {
+// std::string Network::getDescription() const {
 
-    std::string ret = "[";
+//     std::string ret = "[";
 
-    for (size_t i = 0; i < layers.size(); i++) {
-        if (i > 0)
-            ret += " ";
-        ret += "l" + std::to_string(i) + "=" + layers[i].getDescription();
-        if (i < layers.size()-1)
-            ret += "\n";
-    }
+//     for (size_t i = 0; i < layers.size(); i++) {
+//         if (i > 0)
+//             ret += " ";
+//         ret += "l" + std::to_string(i) + "=" + layers[i].getDescription();
+//         if (i < layers.size()-1)
+//             ret += "\n";
+//     }
 
-    ret += "]";
+//     ret += "]";
 
-    return ret;
+//     return ret;
 
-}
+// }
 
 
 std::ostream& operator<<(std::ostream& out, const Network& network) {
@@ -163,7 +185,7 @@ std::istream& operator>>(std::istream& in, Network& network) {
     for (size_t i = 0; i < n_layers; i++) {
         std::string tmp;
         std::getline(in, tmp);
-        Layer l;
+        LayerType l;
         in >> l;
         network.layers.push_back(l);
     }
