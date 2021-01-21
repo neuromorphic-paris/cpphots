@@ -91,30 +91,3 @@ TEST(TestSaveLoad, LSaveLoad) {
     ASSERT_TRUE(layer2.isInitialized());
 
 }
-
-// TEST(TestSaveLoad, NSaveLoad) {
-
-//     cpphots::Network network1(32, 32, 2, {2, 4, 8}, {1, 2, 3}, {10, 20, 30}, {4, 8, 16});
-//     for (size_t i = 0; i < network1.getNumLayers(); i++) {
-//         uint16_t w = network1.getLayer(i).getSurface(0).getWx();
-//         uint16_t h = network1.getLayer(i).getSurface(0).getWy();
-//         auto initializer = cpphots::ClustererRandomInitializer(w, h);
-//         initializer(network1.getLayer(i), {});
-//     }
-
-//     std::stringstream outstream;
-//     outstream << network1;
-
-//     cpphots::Network network2;
-
-//     std::stringstream instream(outstream.str());
-//     instream >> network2;
-
-//     ASSERT_EQ(network1.getInputPolarities(), network2.getInputPolarities());
-//     // ASSERT_EQ(network1.getDescription(), network2.getDescription());
-
-//     for (size_t i = 0; i < network1.getNumLayers(); i++) {
-//         ASSERT_EQ(network1.getLayer(i).getNumClusters(), network2.getLayer(i).getNumClusters());
-//     }
-
-// }

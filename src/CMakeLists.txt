@@ -11,6 +11,8 @@ set(CPPHOTS_HEADERS
     "../include/cpphots/classification.h"
     "../include/cpphots/events_utils.h"
     "../include/cpphots/layer.h"
+    "../include/cpphots/layer_traits.h"
+    "../include/cpphots/layer_modifiers.h"
     "../include/cpphots/network.h"
     "../include/cpphots/run.h"
     "../include/cpphots/time_surface.h"

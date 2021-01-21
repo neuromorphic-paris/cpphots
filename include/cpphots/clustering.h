@@ -1,18 +1,37 @@
+/**
+ * @file clustering.h
+ * @brief Classes and functions for time surface clustering
+ */
 #ifndef CLUSTERING_H
 #define CLUSTERING_H
 
 #include "time_surface.h"
 
+
 namespace cpphots {
 
+/**
+ * @brief Interface for time surface clustering
+ */
 class ClustererBase {
 
 public:
+    /**
+     * @brief Performs clustering
+     * 
+     * @param surface the timesurface to cluster
+     * @return id of the cluster
+     */
     virtual uint16_t cluster(const TimeSurfaceType& surface) = 0;
 
 };
 
 
+/**
+ * @brief HOST basic clusterer
+ * 
+ * Clusters time surface according to the HOTS formulation.
+ */
 class Clusterer : public ClustererBase {
 
 public:
@@ -36,10 +55,9 @@ public:
     Clusterer(uint16_t clusters);
 
     /**
-     * @brief Performs clustering
+     * @copydoc ClustererBase::cluster
      * 
-     * @param surface the timesurface to cluster
-     * @return id of the cluster
+     * If learning is enabled, this will update the prototypes.
      */
     uint16_t cluster(const TimeSurfaceType& surface) override;
 

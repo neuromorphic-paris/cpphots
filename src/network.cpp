@@ -19,17 +19,17 @@ Events Network::process(const event& ev, bool skip_check) {
 
     Events evs{ev};
     for (auto& layer : layers) {
-        
+
         Events next_evs;
 
         for (auto& nev : evs) {
             Events pevs = layer.get().process(nev, skip_check);
             next_evs.insert(next_evs.end(), pevs.begin(), pevs.end());
         }
-        
+
         if (next_evs.empty())
             return next_evs;
-        
+
         evs = next_evs;
 
     }
@@ -41,14 +41,6 @@ Events Network::process(const event& ev, bool skip_check) {
 size_t Network::getNumLayers() const {
     return layers.size();
 }
-
-// LayerBase& Network::getLayer(size_t pos) {
-//     return layers[pos];
-// }
-
-// const LayerBase& Network::getLayer(size_t pos) const {
-//     return layers[pos].get();
-// }
 
 LayerBase& Network::operator[](size_t pos) {
     return layers[pos].get();

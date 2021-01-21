@@ -1,3 +1,7 @@
+/**
+ * @file layer_traits.h
+ * @brief Helper functions to check traits of Layer components
+ */
 #ifndef LAYER_TRAITS_H
 #define LAYER_TRAITS_H
 

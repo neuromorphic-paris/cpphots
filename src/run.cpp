@@ -72,7 +72,7 @@ void train_sequential(Network& network, const std::vector<Events>& training_even
                 layerInitializePrototypes(initializer, *network_tspools[l], *network_clusterers[l], _training_events);
             else
                 layerInitializePrototypes(initializer, *network_tspools[l], *network_clusterers[l], _training_events[0]);
-            
+
             // train
             network_clusterers[l]->toggleLearning(true);
             process(network.getLayer(l), _training_events);

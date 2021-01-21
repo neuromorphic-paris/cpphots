@@ -37,8 +37,9 @@ public:
     /**
      * @brief Construct a new Time Surface object
      * 
-     * This constructor should never be used explicitly,
-     * it is provided only to create containers with Time Surface instances or to load Time Surfaces from files.
+     * This constructor is provided only to create containers
+     * with TimeSurface instances or to load a time surface from file.
+     * It should not be used to create an usable TimeSurface object.
      */
     TimeSurface();
 
@@ -66,7 +67,7 @@ public:
      * @param y vertical coordinate of the event
      */
     void update(uint64_t t, uint16_t x, uint16_t y);
-    
+
     /**
      * @brief Update the time context with a new event
      * 
@@ -223,9 +224,9 @@ public:
     /**
      * @brief Construct a new pool of TimeSurface
      * 
-     * This constructor should never be used explicitly,
-     * it is provided only to create containers with TimeSurfacePool instances
-     * or to load a pool from file.
+     * This constructor is provided only to create containers
+     * with TimeSurfacePool instances or to load a pool from file.
+     * It should not be used to create an usable pool.
      */
     TimeSurfacePool();
 
