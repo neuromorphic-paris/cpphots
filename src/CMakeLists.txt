@@ -2,18 +2,21 @@
 set(CPPHOTS_SOURCES
     classification.cpp
     events_utils.cpp
-    layer.cpp
     network.cpp
     run.cpp
-    time_surface.cpp)
+    time_surface.cpp
+    clustering.cpp)
 
 set(CPPHOTS_HEADERS
     "../include/cpphots/classification.h"
     "../include/cpphots/events_utils.h"
     "../include/cpphots/layer.h"
+    "../include/cpphots/layer_traits.h"
+    "../include/cpphots/layer_modifiers.h"
     "../include/cpphots/network.h"
     "../include/cpphots/run.h"
-    "../include/cpphots/time_surface.h")
+    "../include/cpphots/time_surface.h"
+    "../include/cpphots/clustering.h")
 
 if (BUILD_PLOTS)
     file(READ ../python/tsplot.py PYTHON_PLOT_CODE)

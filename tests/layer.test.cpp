@@ -16,7 +16,7 @@ bool operator==(const cpphots::Features& f1, const cpphots::Features& f2) {
 }
 
 
-void set_prototypes_nolearning(cpphots::Layer& layer) {
+void set_prototypes_nolearning(cpphots::Clusterer& layer) {
 
     layer.clearPrototypes();
 
@@ -87,7 +87,7 @@ void set_prototypes_nolearning(cpphots::Layer& layer) {
 }
 
 
-void set_prototpes_learning(cpphots::Layer& layer) {
+void set_prototpes_learning(cpphots::Clusterer& layer) {
 
     layer.clearPrototypes();
 
@@ -164,11 +164,13 @@ protected:
 
     void SetUp() override {
         events = cpphots::loadFromFile("data/trcl0.es");
-        layer = cpphots::Layer(32, 32, 2, 2, 1000, 1, 8);
+        layer = cpphots::create_layer(cpphots::TimeSurfacePool(32, 32, 2, 2, 1000, 1),
+                                      cpphots::Clusterer(8));
     }
 
     cpphots::Events events;
-    cpphots::Layer layer;
+    cpphots::Layer<cpphots::TimeSurfacePool,
+                   cpphots::Clusterer> layer;
 
 };
 
@@ -187,7 +189,7 @@ TEST_F(TestLayerProcessing, WithoutLearning) {
     }
 
     cpphots::Features expected{188, 205, 281, 233, 229, 276, 194, 177};
-    EXPECT_EQ(layer.getHist(), expected);
+    EXPECT_EQ(layer.getHistogram(), expected);
 
 }
 
@@ -196,7 +198,7 @@ TEST_F(TestLayerProcessing, WithLearning) {
     set_prototpes_learning(layer);
 
     // learn
-    layer.resetSurfaces();
+    layer.reset();
     layer.toggleLearning(true);
     for (auto& ev : events) {
         if (ev.p == 0) {
@@ -208,10 +210,10 @@ TEST_F(TestLayerProcessing, WithLearning) {
     }
 
     cpphots::Features expected_learning{233, 167, 187, 207, 326, 278, 271, 114};
-    EXPECT_EQ(layer.getHist(), expected_learning);
+    EXPECT_EQ(layer.getHistogram(), expected_learning);
 
     // post learning
-    layer.resetSurfaces();
+    layer.reset();
     layer.toggleLearning(false);
     for (auto& ev : events) {
         if (ev.p == 0) {
@@ -224,7 +226,7 @@ TEST_F(TestLayerProcessing, WithLearning) {
 
     // after learning: [206 272 202 277 226 181 310 109] (cosine) or [211 173 197 209 295 293 284 121] (L2)
     cpphots::Features expected_afterlearning{211, 173, 197, 209, 295, 293, 284, 121};
-    EXPECT_EQ(layer.getHist(), expected_afterlearning);
+    EXPECT_EQ(layer.getHistogram(), expected_afterlearning);
 
 }
 
@@ -235,54 +237,45 @@ protected:
 
     void SetUp() override {
         events = cpphots::loadFromFile("data/trcl0.es");
-        layer = cpphots::Layer(32, 32, 2, 2, 1000, 2, 8);
+        layer = cpphots::create_layer(cpphots::TimeSurfacePool(32, 32, 2, 2, 1000, 2),
+                                      cpphots::Clusterer(8));
     }
 
     cpphots::Events events;
-    cpphots::Layer layer;
+    cpphots::Layer<cpphots::TimeSurfacePool,
+                   cpphots::Clusterer> layer;
 
 };
 
 TEST_F(TestLayerInitialization, Uniform) {
 
-    cpphots::LayerUniformInitializer initializer;
-    initializer.initializePrototypes(layer, events);
+    cpphots::layerInitializePrototypes(cpphots::ClustererUniformInitializer, layer, layer, events);
     ASSERT_TRUE(layer.isInitialized());
 
     layer.clearPrototypes();
-    initializer.initializePrototypes(layer, {events, events});
+    cpphots::layerInitializePrototypes(cpphots::ClustererUniformInitializer, layer, layer, {events, events});
     ASSERT_TRUE(layer.isInitialized());
 
 }
 
 TEST_F(TestLayerInitialization, PlusPLus) {
 
-    cpphots::LayerPlusPlusInitializer initializer;
-    initializer.initializePrototypes(layer, events);
+    cpphots::layerInitializePrototypes(cpphots::ClustererPlusPlusInitializer, layer, layer, events);
     ASSERT_TRUE(layer.isInitialized());
 
     layer.clearPrototypes();
-    initializer.initializePrototypes(layer, {events, events});
+    cpphots::layerInitializePrototypes(cpphots::ClustererPlusPlusInitializer, layer, layer, {events, events});
     ASSERT_TRUE(layer.isInitialized());
 
 }
 
 TEST_F(TestLayerInitialization, Random) {
 
-    cpphots::LayerRandomInitializer initializer;
-    initializer.initializePrototypes(layer, events);
+    cpphots::layerInitializePrototypes(cpphots::ClustererRandomInitializer(5, 5), layer, layer, events);
     ASSERT_TRUE(layer.isInitialized());
 
     layer.clearPrototypes();
-    initializer.initializePrototypes(layer, {events, events});
-    ASSERT_TRUE(layer.isInitialized());
-
-    layer.clearPrototypes();
-    initializer.initializePrototypes(layer, cpphots::Events{});
-    ASSERT_TRUE(layer.isInitialized());
-
-    layer.clearPrototypes();
-    initializer.initializePrototypes(layer, std::vector<cpphots::Events>{});
+    cpphots::layerInitializePrototypes(cpphots::ClustererRandomInitializer(5, 5), layer, layer, {events, events});
     ASSERT_TRUE(layer.isInitialized());
 
 }
@@ -290,9 +283,10 @@ TEST_F(TestLayerInitialization, Random) {
 
 TEST(TestLayer, NoInitialization) {
 
-    cpphots::Layer layer = cpphots::Layer(32, 32, 2, 2, 1000, 2, 8);
+    auto layer = cpphots::create_layer(cpphots::TimeSurfacePool(32, 32, 2, 2, 1000, 2),
+                                       cpphots::Clusterer(8));
 
-    ASSERT_THROW(layer.process(0, 0, 0, 0), std::runtime_error);
+    ASSERT_THROW(layer.process({0, 0, 0, 0}, true), std::runtime_error);
 
 }
 
@@ -301,13 +295,16 @@ TEST(TestLayer, SkipValidityCheck) {
 
     cpphots::Events events = cpphots::loadFromFile("data/trcl0.es");
 
-    cpphots::Layer layer = cpphots::Layer(32, 32, 2, 2, 1000, 2, 8);
+    auto layer = cpphots::create_layer(cpphots::TimeSurfacePool(32, 32, 2, 2, 1000, 2),
+                                       cpphots::Clusterer(8));
 
-    cpphots::LayerRandomInitializer initializer;
-    initializer.initializePrototypes(layer, events);
+    auto initializer = cpphots::ClustererRandomInitializer(5, 5);
+    initializer(layer, {});
 
-    layer.process(events, true);
-    auto hist = layer.getHist();
+    for (auto& ev : events) {
+        layer.process(ev, true);
+    }
+    auto hist = layer.getHistogram();
     uint32_t hcount = 0;
     for (auto& h : hist) {
         hcount += h;
@@ -319,28 +316,30 @@ TEST(TestLayer, SkipValidityCheck) {
 
 TEST(TestLayer, WrongPolarity) {
 
-    cpphots::Layer layer = cpphots::Layer(32, 32, 2, 2, 1000, 2, 8);
+    auto layer = cpphots::create_layer(cpphots::TimeSurfacePool(32, 32, 2, 2, 1000, 2),
+                                       cpphots::Clusterer(8));
 
-    cpphots::LayerRandomInitializer initializer;
-    initializer.initializePrototypes(layer, cpphots::Events{});
+    auto initializer = cpphots::ClustererRandomInitializer(5, 5);
+    initializer(layer, {});
 
-    ASSERT_THROW(layer.process(0, 0, 0, 2), std::invalid_argument);
+    ASSERT_THROW(layer.process({0, 0, 0, 2}), std::invalid_argument);
 
 }
 
 
 TEST(TestLayer, TSAccess) {
 
-    cpphots::Layer layer = cpphots::Layer(32, 32, 2, 2, 1000, 2, 8);
+    auto layer = cpphots::create_layer(cpphots::TimeSurfacePool(32, 32, 2, 2, 1000, 2),
+                                       cpphots::Clusterer(8));
 
     auto ts1 = layer.getSurface(0).updateAndCompute(10, 2, 2);
-    auto ts2 = layer.computeSurface(10, 2, 2, 0);
+    auto ts2 = layer.compute(10, 2, 2, 0);
 
     bool v = ts1.first.isApprox(ts2.first);
 
     ASSERT_TRUE(v);
 
-    ts2 = layer.updateAndComputeSurface(20, 3, 3, 1);
+    ts2 = layer.updateAndCompute(20, 3, 3, 1);
     ts1 = layer.getSurface(1).updateAndCompute(20, 3, 3);
 
     v = ts1.first.isApprox(ts2.first);

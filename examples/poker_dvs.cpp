@@ -75,13 +75,15 @@ std::vector<std::pair<std::string, std::string>> poker_dvs_all(const std::string
 }
 
 
-std::tuple<double, double, double> test_training(const std::string& folder, bool sequential, bool multi, const cpphots::LayerInitializer& initializer) {
+std::tuple<double, double, double> test_training(const std::string& folder, bool sequential, bool multi, const cpphots::ClustererInitializerType& initializer) {
 
-    cpphots::Network network(32, 32, 2,
-                        2,
-                        2, 2, 2,
-                        1000, 5,
-                        16, 2);
+    cpphots::Network network;
+    auto l1 = cpphots::create_layer(cpphots::TimeSurfacePool(32, 32, 2, 2, 1000, 2),
+                                    cpphots::Clusterer(16));
+    auto l2 = cpphots::create_layer(cpphots::TimeSurfacePool(32, 32, 4, 4, 5000, 16),
+                                    cpphots::Clusterer(32));
+    network.addLayer(l1);
+    network.addLayer(l2);
 
     auto train_set = poker_dvs_trainset(folder);
 
@@ -104,7 +106,9 @@ std::tuple<double, double, double> test_training(const std::string& folder, bool
                                multi);
     }
 
-    network.toggleLearningAll(false);
+    for (auto cl : network.view<cpphots::Clusterer>()) {
+        cl->toggleLearning(false);
+    }
 
     // prepare classifiers
     cpphots::StandardClassifier classifier1({"club", "diamond", "heart", "spade"});
@@ -139,13 +143,18 @@ int main(int argc, char* argv[]) {
     if (argc > 2 && std::string(argv[2]) == "--stats") {
 
         // run training some times
-        int n_trainings = 100;
+        int n_trainings;
+        if (argc > 3) {
+            n_trainings = std::atoi(argv[3]);
+        } else {
+            n_trainings = 100;
+        }
 
         std::ofstream unif_sequential_file("unif_sequential.csv");
         unif_sequential_file << "acc1,acc2,acc3" << std::endl;
         for (int i = 0; i < n_trainings; i++) {
             std::cout << "training (seq) " << i+1 << "/" << n_trainings << std::endl;
-            auto res = test_training(datafolder, true, false, cpphots::LayerUniformInitializer{});
+            auto res = test_training(datafolder, true, false, cpphots::ClustererUniformInitializer);
             unif_sequential_file << std::get<0>(res) << "," << std::get<1>(res) << "," << std::get<2>(res) << std::endl;
         }
         unif_sequential_file.close();
@@ -154,7 +163,7 @@ int main(int argc, char* argv[]) {
         unif_sequentialmulti_file << "acc1,acc2,acc3" << std::endl;
         for (int i = 0; i < n_trainings; i++) {
             std::cout << "training (seq-multi) " << i+1 << "/" << n_trainings << std::endl;
-            auto res = test_training(datafolder, true, true, cpphots::LayerUniformInitializer{});
+            auto res = test_training(datafolder, true, true, cpphots::ClustererUniformInitializer);
             unif_sequentialmulti_file << std::get<0>(res) << "," << std::get<1>(res) << "," << std::get<2>(res) << std::endl;
         }
         unif_sequentialmulti_file.close();
@@ -163,7 +172,7 @@ int main(int argc, char* argv[]) {
         unif_oneshot_file << "acc1,acc2,acc3" << std::endl;
         for (int i = 0; i < n_trainings; i++) {
             std::cout << "training (one) " << i+1 << "/" << n_trainings << std::endl;
-            auto res = test_training(datafolder, false, false, cpphots::LayerUniformInitializer{});
+            auto res = test_training(datafolder, false, false, cpphots::ClustererUniformInitializer);
             unif_oneshot_file << std::get<0>(res) << "," << std::get<1>(res) << "," << std::get<2>(res) << std::endl;
         }
         unif_oneshot_file.close();
@@ -172,7 +181,7 @@ int main(int argc, char* argv[]) {
         unif_oneshotmulti_file << "acc1,acc2,acc3" << std::endl;
         for (int i = 0; i < n_trainings; i++) {
             std::cout << "training (one-multi) " << i+1 << "/" << n_trainings << std::endl;
-            auto res = test_training(datafolder, false, true, cpphots::LayerUniformInitializer{});
+            auto res = test_training(datafolder, false, true, cpphots::ClustererUniformInitializer);
             unif_oneshotmulti_file << std::get<0>(res) << "," << std::get<1>(res) << "," << std::get<2>(res) << std::endl;
         }
         unif_oneshotmulti_file.close();
@@ -182,7 +191,7 @@ int main(int argc, char* argv[]) {
         pp_sequential_file << "acc1,acc2,acc3" << std::endl;
         for (int i = 0; i < n_trainings; i++) {
             std::cout << "training (seq) " << i+1 << "/" << n_trainings << std::endl;
-            auto res = test_training(datafolder, true, false, cpphots::LayerPlusPlusInitializer{});
+            auto res = test_training(datafolder, true, false, cpphots::ClustererPlusPlusInitializer);
             pp_sequential_file << std::get<0>(res) << "," << std::get<1>(res) << "," << std::get<2>(res) << std::endl;
         }
         pp_sequential_file.close();
@@ -191,7 +200,7 @@ int main(int argc, char* argv[]) {
         pp_sequentialmulti_file << "acc1,acc2,acc3" << std::endl;
         for (int i = 0; i < n_trainings; i++) {
             std::cout << "training (seq-multi) " << i+1 << "/" << n_trainings << std::endl;
-            auto res = test_training(datafolder, true, true, cpphots::LayerPlusPlusInitializer{});
+            auto res = test_training(datafolder, true, true, cpphots::ClustererPlusPlusInitializer);
             pp_sequentialmulti_file << std::get<0>(res) << "," << std::get<1>(res) << "," << std::get<2>(res) << std::endl;
         }
         pp_sequentialmulti_file.close();
@@ -200,7 +209,7 @@ int main(int argc, char* argv[]) {
         pp_oneshot_file << "acc1,acc2,acc3" << std::endl;
         for (int i = 0; i < n_trainings; i++) {
             std::cout << "training (one) " << i+1 << "/" << n_trainings << std::endl;
-            auto res = test_training(datafolder, false, false, cpphots::LayerPlusPlusInitializer{});
+            auto res = test_training(datafolder, false, false, cpphots::ClustererPlusPlusInitializer);
             pp_oneshot_file << std::get<0>(res) << "," << std::get<1>(res) << "," << std::get<2>(res) << std::endl;
         }
         pp_oneshot_file.close();
@@ -209,14 +218,14 @@ int main(int argc, char* argv[]) {
         pp_oneshotmulti_file << "acc1,acc2,acc3" << std::endl;
         for (int i = 0; i < n_trainings; i++) {
             std::cout << "training (one-multi) " << i+1 << "/" << n_trainings << std::endl;
-            auto res = test_training(datafolder, false, true, cpphots::LayerPlusPlusInitializer{});
+            auto res = test_training(datafolder, false, true, cpphots::ClustererPlusPlusInitializer);
             pp_oneshotmulti_file << std::get<0>(res) << "," << std::get<1>(res) << "," << std::get<2>(res) << std::endl;
         }
         pp_oneshotmulti_file.close();
 
     } else {
 
-        auto res = test_training(datafolder, true, true, cpphots::LayerPlusPlusInitializer{});
+        auto res = test_training(datafolder, false, true, cpphots::ClustererPlusPlusInitializer);
         std::cout << "acc1 = " << std::get<0>(res) << ", acc2 = " << std::get<1>(res) << ", acc3 = " << std::get<2>(res) << std::endl;
 
     }

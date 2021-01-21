@@ -65,51 +65,29 @@ TEST(TestSaveLoad, TSProcess) {
 
 TEST(TestSaveLoad, LSaveLoad) {
 
-    cpphots::Layer layer1(32, 32, 1, 2, 1000, 2, 8);
+    // cpphots::Layer layer1(32, 32, 1, 2, 1000, 2, 8);
+    auto layer1 = cpphots::create_layer(cpphots::TimeSurfacePool(32, 32, 1, 2, 1000, 2),
+                                        cpphots::Clusterer(8));
 
-    cpphots::LayerRandomInitializer initializer;
-    initializer.initializePrototypes(layer1, cpphots::Events{});
+    auto initializer = cpphots::ClustererRandomInitializer(3, 5);
+    initializer(layer1, {});
 
     std::stringstream outstream;
     outstream << layer1;
 
-    cpphots::Layer layer2;
+    cpphots::Layer<cpphots::TimeSurfacePool,
+                   cpphots::Clusterer> layer2;
 
     std::stringstream instream(outstream.str());
     instream >> layer2;
 
-    ASSERT_EQ(layer1.getDescription(), layer2.getDescription());
-    ASSERT_EQ(layer1.getFeatures(), layer2.getFeatures());
+    // ASSERT_EQ(layer1.getDescription(), layer2.getDescription());
+    ASSERT_EQ(layer1.getNumClusters(), layer2.getNumClusters());
 
     auto surface = layer2.getSurface(1);
     ASSERT_EQ(surface.getWx(), 3);
     ASSERT_EQ(surface.getWy(), 5);
 
     ASSERT_TRUE(layer2.isInitialized());
-
-}
-
-TEST(TestSaveLoad, NSaveLoad) {
-
-    cpphots::Network network1(32, 32, 2, {2, 4, 8}, {1, 2, 3}, {10, 20, 30}, {4, 8, 16});
-    cpphots::LayerRandomInitializer initializer;
-    for (size_t i = 0; i < network1.getNumLayers(); i++) {
-        initializer.initializePrototypes(network1.getLayer(i), cpphots::Events{});
-    }
-
-    std::stringstream outstream;
-    outstream << network1;
-
-    cpphots::Network network2;
-
-    std::stringstream instream(outstream.str());
-    instream >> network2;
-
-    ASSERT_EQ(network1.getInputPolarities(), network2.getInputPolarities());
-    ASSERT_EQ(network1.getDescription(), network2.getDescription());
-
-    for (size_t i = 0; i < network1.getNumLayers(); i++) {
-        ASSERT_EQ(network1.getLayer(i).getDescription(), network2.getLayer(i).getDescription());
-    }
 
 }

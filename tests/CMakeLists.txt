@@ -29,6 +29,7 @@ endfunction()
 add_new_test(test_classification classification.test.cpp)
 add_new_test(test_timesurface timesurface.test.cpp)
 add_new_test(test_layer layer.test.cpp)
+add_new_test(test_network network.test.cpp)
 add_new_test(test_saveload saveload.test.cpp)
 
 # python test for plotting functions

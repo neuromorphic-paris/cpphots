@@ -12,14 +12,43 @@
 
 namespace cpphots {
 
+
+template<typename P>
+Events process(P& processor, const Events& events) {
+
+    processor.reset();
+
+    Events ret;
+    for (const auto& ev : events) {
+        Events nev = processor.process(ev);
+        ret.insert(ret.end(), nev.begin(), nev.end());
+    }
+
+    return ret;
+
+}
+
+template<typename P>
+std::vector<Events> process(P& processor, const std::vector<Events>& events) {
+
+    std::vector<Events> ret;
+
+    for (const auto& evts : events) {
+        ret.push_back(process(processor, evts));
+    }
+
+    return ret;
+
+}
+
 Features process_file(Network& network, const std::string& filename);
 
 // training
-void train_oneshot(Network& network, const std::vector<Events>& training_events, const LayerInitializer& initializer, bool use_all = true);
-void train_sequential(Network& network, const std::vector<Events>& training_events, const LayerInitializer& initializer, bool use_all = true);
+void train_oneshot(Network& network, const std::vector<Events>& training_events, const ClustererInitializerType& initializer, bool use_all = true);
+void train_sequential(Network& network, const std::vector<Events>& training_events, const ClustererInitializerType& initializer, bool use_all = true);
 
-void train_oneshot(Network& network, const std::vector<std::string>& training_set, const LayerInitializer& initializer, bool use_all = true);
-void train_sequential(Network& network, const std::vector<std::string>& training_set, const LayerInitializer& initializer, bool use_all = true);
+void train_oneshot(Network& network, const std::vector<std::string>& training_set, const ClustererInitializerType& initializer, bool use_all = true);
+void train_sequential(Network& network, const std::vector<std::string>& training_set, const ClustererInitializerType& initializer, bool use_all = true);
 
 // test suite
 // takes a trained network, a trained classifier and a test set (vector<filename, label>)
