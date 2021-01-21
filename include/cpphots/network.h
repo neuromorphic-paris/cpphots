@@ -11,14 +11,13 @@
 #include <string>
 #include <ostream>
 #include <istream>
+#include <functional>
 
 #include "layer.h"
 #include "events_utils.h"
 
 
 namespace cpphots {
-
-using LayerType = Layer<TimeSurfacePool, Clusterer>;
 
 /**
  * @brief A multi-layered HOTS network
@@ -35,47 +34,7 @@ public:
 
     Network();
 
-    /**
-     * @brief Construct a new Network object
-     * 
-     * This constructor builds a hierarchy of layers as described in (Lagorce et al., 2017),
-     * that is, every layer uses the same parameters of the previous one, multiplied by a growth factor.
-     * 
-     * @param width width of the full time context for the surfaces
-     * @param height height of the full time context for the surfaces
-     * @param polarities number of input polarities
-     * @param num_layers
-     * @param Rx1 horizontal size of the window on which surfaces are computed for the first layer
-     * @param Ry1 vertical size of the window on which surfaces are computed for the first layer
-     * @param K_R growth factor for the windows
-     * @param tau1 time constant of the surfaces for the first layer
-     * @param K_tau growth factor for the time constant
-     * @param N1 number of features for the first layer
-     * @param K_N growth factor for the number of features
-     */
-    Network(uint16_t width, uint16_t height, uint16_t polarities,
-            uint16_t num_layers,
-            uint16_t Rx1, uint16_t Ry1, uint16_t K_R,
-            float tau1, float K_tau,
-            uint16_t N1, uint16_t K_N);
-
-    /**
-     * @brief Construct a new Network object
-     * 
-     * This constructor builds a sequence of layers with completely customizable parameters.
-     * 
-     * @param width width of the full time context for the surfaces
-     * @param height height of the full time context for the surfaces
-     * @param polarities number of input polarities
-     * @param Rx horizontal sizes of the windows on which surfaces are computed for each layer
-     * @param Ry vertical sizes of the windows on which surfaces are computed for each layer
-     * @param tau time constants of the surfaces for each layer
-     * @param N numbers of features for each layer
-     */
-    Network(uint16_t width, uint16_t height, uint16_t polarities,
-            const std::vector<uint16_t>& Rx, const std::vector<uint16_t>& Ry,
-            const std::vector<float> tau,
-            const std::vector<uint16_t> N);
+    void addLayer(LayerBase& layer);
 
     /**
      * @brief Process an event
@@ -91,7 +50,7 @@ public:
      * @param p polarity of the event
      * @return the new emitted event, possibly invalid
      */
-    Events process(uint64_t t, uint16_t x, uint16_t y, uint16_t p);
+    Events process(uint64_t t, uint16_t x, uint16_t y, uint16_t p, bool skip_check = false);
 
     /**
      * @brief Process an event
@@ -104,37 +63,7 @@ public:
      * @param ev the event
      * @return the new emitted event, possibly invalid
      */
-    Events process(const event& ev);
-
-    /**
-     * @brief Process a stream of events
-     * 
-     * Process a stream of events through all the layers and emit a the stream of events produced by the last layer.
-     * Only valid events are emitted.
-     * 
-     * This method resets the time surfaces before processing the events.
-     *
-     * If learning is enabled in some layer, this function will also update matching prototypes.
-     * 
-     * @param events a stream of events
-     * @return a new stream of valid events
-     */
-    Events process(const Events& events);
-
-    /**
-     * @brief Process a vector of stream of events
-     * 
-     * Process each stream of events through all the layers and emit a stream of events, as produced by the last layer, for every one of the input streams.
-     * Only valid events are emitted.
-     * 
-     * This method resets the time surfaces before processing the events.
-     *
-     * If learning is enabled in some layer, this function will also update matching prototypes.
-     * 
-     * @param event_streams a vector of stream of events
-     * @return a new vector of streams of valid events
-     */
-    std::vector<Events> process(const std::vector<Events>& event_streams);
+    Events process(const event& ev, bool skip_check = false);
 
     /**
      * @brief Get the number of layers in the network
@@ -144,88 +73,72 @@ public:
     size_t getNumLayers() const;
 
     /**
-     * @brief Get the number of input polarities
+     * @brief Access a Layer
      * 
-     * @return the number of input polarities
+     * @param pos index of the Layer to access
+     * @return reference to the Layer
      */
-    unsigned int getInputPolarities() const;
+    template <typename T = LayerBase>
+    T& getLayer(size_t pos) {
+        return dynamic_cast<T&>(layers[pos].get());
+    }
 
     /**
      * @brief Access a Layer
      * 
-     * @param l index of the Layer to access
+     * @param pos index of the Layer to access
      * @return reference to the Layer
      */
-    LayerType& getLayer(size_t l);
+    template <typename T = LayerBase>
+    const T& getLayer(size_t pos) const {
+        return dynamic_cast<const T&>(layers[pos].get());
+    }
 
-    /**
-     * @brief Get the histogram of prototypes activations
-     * 
-     * This method returns the histogram of prototypes activations as computed by the last layer.
-     * 
-     * @return the histogram of activations
-     */
-    std::vector<uint32_t> getLastHistogram() const;
+    LayerBase& operator[](size_t pos);
+
+    const LayerBase& operator[](size_t pos) const;
+
+    template <typename T = LayerBase>
+    T& back() {
+        return *(view<T>().back());
+    }
+
+    template <typename T = LayerBase>
+    const T& back() const {
+        return *(view<T>().back());
+    }
+
+    template <typename T>
+    std::vector<T*> view() {
+        std::vector<T*> ret;
+        for (auto& l : layers) {
+            T* lp = dynamic_cast<T*>(&(l.get()));
+            if (lp) {
+                ret.push_back(lp);
+            }
+        }
+        return ret;
+    }
+
+    template <typename T>
+    std::vector<T*> viewFull() {
+        std::vector<T*> ret;
+        for (auto& l : layers) {
+            ret.push_back(dynamic_cast<T*>(&(l.get())));
+        }
+        return ret;
+    }
+
 
     /**
      * @brief Reset the network
      * 
      * Reset the time surfaces and histogram of activations in every Layer.
      */
-    void resetLayers();
-
-    /**
-     * @brief Enable or disable learning
-     * 
-     * This affects whether the prototypes are updated when process is called or not, for all layers.
-     * 
-     * @param enable true if learning should be active, false otherwise
-     */
-    void toggleLearningAll(bool enable = true);
-
-    /**
-     * @brief Enable or disable learning
-     * 
-     * This affects whether the prototypes are updated when process is called or not, for a specific layer.
-     * All other layers will be set to the opposite learning mode.
-     * 
-     * @param l index of the layer
-     * @param enable true if learning should be active, false otherwise
-     */
-    void toggleLearningLayer(size_t l, bool enable = true);
-
-    /**
-     * @brief Get network description
-     * 
-     * @return a string describing the parameters of the network
-     */
-    // std::string getDescription() const;
-
-    /**
-     * @brief Stream insertion operator for Network
-     * 
-     * Recursively insert layers into the stream
-     * 
-     * @param out output stream
-     * @param network Network to insert
-     * @return output stream
-     */
-    friend std::ostream& operator<<(std::ostream& out, const Network& network);
-
-    /**
-     * @brief Stream extraction operator for Network
-     * 
-     * Recursively extract network layers. Previous layers are overwritten.
-     * 
-     * @param in input stream
-     * @param network Network where to extract into
-     * @return input stream
-     */
-    friend std::istream& operator>>(std::istream& in, Network& network);
+    void reset();
 
 private:
-    std::vector<LayerType> layers;
-    unsigned int inputPolarities;
+    std::vector<std::reference_wrapper<LayerBase>> layers;
 
 };
 

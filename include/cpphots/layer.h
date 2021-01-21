@@ -48,7 +48,7 @@ public:
             return Events{};
         }
 
-        // if there is clustering algorithm we can use it
+        // if there is a clustering algorithm we can use it
         if constexpr (std::is_base_of_v<ClustererBase, Layer>) {
             auto k = this->cluster(surface);
 
@@ -125,14 +125,15 @@ Layer<std::decay_t<T>...> create_layer(T&&... v) {
  * @param events the stream of events to be used
  * @param valid_only use only valid time surfaces for the initialization
  */
-template <typename... T>
-void layerInitializePrototypes(const ClustererInitializerType& initializer, Layer<T...>& layer, const Events& events, bool valid_only = true) {
+template <typename TSP,
+          typename C>
+void layerInitializePrototypes(const ClustererInitializerType& initializer, TSP& ts_processer, C& clusterer, const Events& events, bool valid_only = true) {
 
     // store all time surfaces
-    layer.reset();
+    ts_processer.reset();
     std::vector<TimeSurfaceType> time_surfaces;
     for (auto& ev : events) {
-        auto surface_good = layer.updateAndCompute(ev);
+        auto surface_good = ts_processer.updateAndCompute(ev);
         if (valid_only && surface_good.second) {
             time_surfaces.push_back(surface_good.first);
         } else if (!valid_only) {
@@ -140,11 +141,11 @@ void layerInitializePrototypes(const ClustererInitializerType& initializer, Laye
         }
     }
 
-    if (time_surfaces.size() < layer.getNumClusters()) {
+    if (time_surfaces.size() < clusterer.getNumClusters()) {
         throw std::runtime_error("Not enough good events to initialize prototypes.");
     }
 
-    initializer(layer, time_surfaces);
+    initializer(clusterer, time_surfaces);
 
 }
 
@@ -156,15 +157,16 @@ void layerInitializePrototypes(const ClustererInitializerType& initializer, Laye
  * @param event_streams the vector of streams of events to be used
  * @param valid_only use only valid time surfaces for the initialization
  */
-template <typename... T>
-void layerInitializePrototypes(const ClustererInitializerType& initializer, Layer<T...>& layer, const std::vector<Events>& event_streams, bool valid_only = true) {
+template <typename TSP,
+          typename C>
+void layerInitializePrototypes(const ClustererInitializerType& initializer, TSP& ts_processer, C& clusterer, const std::vector<Events>& event_streams, bool valid_only = true) {
 
     // store all time surfaces
     std::vector<TimeSurfaceType> time_surfaces;
     for (auto& stream : event_streams) {
-        layer.reset();
+        ts_processer.reset();
         for (auto& ev : stream) {
-            auto surface_good = layer.updateAndCompute(ev);
+            auto surface_good = ts_processer.updateAndCompute(ev);
             if (valid_only && surface_good.second) {
                 time_surfaces.push_back(surface_good.first);
             } else if (!valid_only) {
@@ -173,11 +175,11 @@ void layerInitializePrototypes(const ClustererInitializerType& initializer, Laye
         }
     }
 
-    if (time_surfaces.size() < layer.getNumClusters()) {
+    if (time_surfaces.size() < clusterer.getNumClusters()) {
         throw std::runtime_error("Not enough good events to initialize prototypes.");
     }
 
-    initializer(layer, time_surfaces);
+    initializer(clusterer, time_surfaces);
 
 }
 

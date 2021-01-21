@@ -249,33 +249,33 @@ protected:
 
 TEST_F(TestLayerInitialization, Uniform) {
 
-    cpphots::layerInitializePrototypes(cpphots::ClustererUniformInitializer, layer, events);
+    cpphots::layerInitializePrototypes(cpphots::ClustererUniformInitializer, layer, layer, events);
     ASSERT_TRUE(layer.isInitialized());
 
     layer.clearPrototypes();
-    cpphots::layerInitializePrototypes(cpphots::ClustererUniformInitializer, layer, {events, events});
+    cpphots::layerInitializePrototypes(cpphots::ClustererUniformInitializer, layer, layer, {events, events});
     ASSERT_TRUE(layer.isInitialized());
 
 }
 
 TEST_F(TestLayerInitialization, PlusPLus) {
 
-    cpphots::layerInitializePrototypes(cpphots::ClustererPlusPlusInitializer, layer, events);
+    cpphots::layerInitializePrototypes(cpphots::ClustererPlusPlusInitializer, layer, layer, events);
     ASSERT_TRUE(layer.isInitialized());
 
     layer.clearPrototypes();
-    cpphots::layerInitializePrototypes(cpphots::ClustererPlusPlusInitializer, layer, {events, events});
+    cpphots::layerInitializePrototypes(cpphots::ClustererPlusPlusInitializer, layer, layer, {events, events});
     ASSERT_TRUE(layer.isInitialized());
 
 }
 
 TEST_F(TestLayerInitialization, Random) {
 
-    cpphots::layerInitializePrototypes(cpphots::ClustererRandomInitializer(5, 5), layer, events);
+    cpphots::layerInitializePrototypes(cpphots::ClustererRandomInitializer(5, 5), layer, layer, events);
     ASSERT_TRUE(layer.isInitialized());
 
     layer.clearPrototypes();
-    cpphots::layerInitializePrototypes(cpphots::ClustererRandomInitializer(5, 5), layer, {events, events});
+    cpphots::layerInitializePrototypes(cpphots::ClustererRandomInitializer(5, 5), layer, layer, {events, events});
     ASSERT_TRUE(layer.isInitialized());
 
 }
