@@ -15,6 +15,8 @@ Features process_file(Network& network, const std::string& filename) {
     // run network
     network.reset();
     for (const auto& ev : events) {
+        if (ev.x >= 32 || ev.y >= 32)
+            continue;
         network.process(ev);
     }
 

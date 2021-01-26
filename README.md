@@ -4,7 +4,7 @@ An implementation of [HOTS](https://www.neuromorphic-vision.com/public/publicati
 
 ## Install
 
-The library depends on [Eigen](http://eigen.tuxfamily.org) and [Sepia](https://github.com/neuromorphic-paris/sepia) (which is included automatically).
+The library depends on [Blaze](https://bitbucket.org/blaze-lib/blaze/) and [Sepia](https://github.com/neuromorphic-paris/sepia) (which is included automatically).
 For the optional plotting utility, the library depends on Python >= 3, with its development files, and the packages listed in `requirements.txt`. This can be disable by passing `-DBUILD_PLOTS=OFF` to `cmake`.
 `cpphots` can be built with `cmake` using the normal pipeline of commands:
 

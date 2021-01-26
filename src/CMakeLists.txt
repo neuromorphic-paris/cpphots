@@ -35,7 +35,7 @@ target_include_directories(cpphots PUBLIC
 
 target_include_directories(cpphots PRIVATE "${sepia_SOURCE_DIR}/source")
 
-target_link_libraries(cpphots pthread Eigen3::Eigen)
+target_link_libraries(cpphots pthread blaze::blaze)
 
 if (BUILD_PLOTS)
     target_include_directories(cpphots PRIVATE ${Python3_INCLUDE_DIRS})

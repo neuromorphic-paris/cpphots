@@ -56,8 +56,8 @@ if(NOT sepia_POPULATED)
   FetchContent_Populate(sepia)
 endif()
 
-# Eigen
-find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+# Blaze
+find_package(blaze REQUIRED)
 
 # python
 if (BUILD_PLOTS)

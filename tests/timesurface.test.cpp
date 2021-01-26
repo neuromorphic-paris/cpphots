@@ -47,7 +47,7 @@ TEST(TestTimeSurface, Processing) {
             continue;
         }
         auto nts = ts.updateAndCompute(ev.t, ev.x, ev.y);
-        float norm = nts.first.matrix().norm();
+        float norm = blaze::norm(nts.first);
         normsum += norm;
         if (nts.second) {
             goodsum += norm;
@@ -81,7 +81,7 @@ TEST(TestTimeSurfaceComputer, Processing) {
             continue;
         }
         auto nts = ts.updateAndCompute(ev.t, ev.x, ev.y, ev.p);
-        float norm = nts.first.matrix().norm();
+        float norm = blaze::norm(nts.first);
         normsum += norm;
         if (nts.second) {
             goodsum += norm;

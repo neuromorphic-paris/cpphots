@@ -16,7 +16,7 @@ TEST(TestSaveLoad, SimpleTSLoad) {
     instream >> ts;
 
     auto context = ts.getFullContext();
-    EXPECT_EQ(context.cols(), 9);
+    EXPECT_EQ(context.columns(), 9);
     EXPECT_EQ(context.rows(), 9);
 
     std::stringstream outstream;
@@ -48,7 +48,7 @@ TEST(TestSaveLoad, TSProcess) {
             continue;
         }
         auto nts = ts.updateAndCompute(ev.t, ev.x, ev.y);
-        float norm = nts.first.matrix().norm();
+        float norm = blaze::norm(nts.first);
         normsum += norm;
         if (nts.second) {
             goodsum += norm;

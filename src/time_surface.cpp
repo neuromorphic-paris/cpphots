@@ -46,13 +46,13 @@ std::pair<TimeSurfaceType, bool> TimeSurface::compute(uint64_t t, uint16_t x, ui
     if (Ry == 0)
         y = 0;
 
-    TimeSurfaceType retmat = context.block(y, x, Wy, Wx);  // should be (x-Rx, y-Ry), but the context is padded
+    auto retmat = blaze::submatrix(context, y, x, Wy, Wx);  // should be (x-Rx, y-Ry), but the context is padded
 
     auto ret = 1. - (t - retmat) / tau;
 
-    bool good = (ret > 0.).count() >= min_events;
+    bool good = blaze::sum(blaze::map(ret, [](auto x) {return x > 0 ? 1 : 0;})) >= min_events;
 
-    return std::make_pair((ret <= 0.).select(0., ret), good);
+    return std::make_pair(blaze::map(ret, [](auto x) {return x <= 0 ? 0.: x;}), good);
 
 }
 
@@ -60,12 +60,12 @@ TimeSurfaceType TimeSurface::sampleFullContext(uint64_t t) const {
 
     auto ret = 1. - (t - context) / tau;
 
-    return (ret <= 0.).select(0., ret);
+    return blaze::map(ret, [](auto x) {return x <= 0 ? 0.: x;});
 
 }
 
 void TimeSurface::reset() {
-    context = TimeSurfaceType::Zero(height+2*Ry, width+2*Rx) - tau;  // makes sense, but is not in the paper
+    context = TimeSurfaceType(height+2*Ry, width+2*Rx, 0.0) - tau;  // makes sense, but is not in the paper
 }
 
 

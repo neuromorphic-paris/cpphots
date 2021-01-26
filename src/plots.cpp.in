@@ -44,7 +44,7 @@ std::string convert_ts_to_numpystr(const TimeSurfaceType& ts) {
 
     for (size_t r = 0; r < ts.rows(); r++) {
         npstring += "[";
-        for (size_t c = 0; c < ts.cols(); c++) {
+        for (size_t c = 0; c < ts.columns(); c++) {
             npstring += std::to_string(ts(r, c));
             npstring += ", ";
         }

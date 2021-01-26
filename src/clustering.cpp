@@ -27,7 +27,7 @@ uint16_t Clusterer::cluster(const TimeSurfaceType& surface) {
     uint16_t k = -1;
     float mindist = std::numeric_limits<float>::max();
     for (uint i = 0; i < prototypes.size(); i++) {
-        float d = (surface - prototypes[i]).matrix().norm();
+        float d = blaze::norm(surface - prototypes[i]);
         if (d < mindist) {
             mindist = d;
             k = i;
@@ -43,8 +43,7 @@ uint16_t Clusterer::cluster(const TimeSurfaceType& surface) {
         prototypes_activations[k]++;
 
         // beta
-        float beta = prototypes[k].cwiseProduct(surface).sum() / prototypes[k].matrix().norm() / surface.matrix().norm();
-        // float beta = maxcosine;
+        float beta = blaze::sum(prototypes[k] % surface) / blaze::norm(prototypes[k]) / blaze::norm(surface);
 
         // alpha
         float alpha = 1. / (1. + prototypes_activations[k]);
@@ -101,7 +100,7 @@ std::ostream& operator<<(std::ostream& out, const Clusterer& clusterer) {
 
     out << clusterer.prototypes.size() << " ";
     out << clusterer.prototypes[0].rows() << " ";
-    out << clusterer.prototypes[0].cols() << " ";
+    out << clusterer.prototypes[0].columns() << " ";
 
     for (const auto& pa : clusterer.prototypes_activations) {
         out << pa << " ";
@@ -133,7 +132,7 @@ std::istream& operator>>(std::istream& in, Clusterer& clusterer) {
     }
     clusterer.prototypes.clear();
     for (size_t i = 0; i < n_prototypes; i++) {
-        TimeSurfaceType p = TimeSurfaceType::Zero(wy, wx);
+        TimeSurfaceType p = TimeSurfaceType(wy, wx);
         for (uint16_t y = 0; y < wy; y++) {
             for (uint16_t x = 0; x < wx; x++) {
                 in >> p(y, x);
@@ -185,7 +184,7 @@ void ClustererPlusPlusInitializer(Clusterer& clusterer, const std::vector<TimeSu
 
             float mindist = std::numeric_limits<float>::max();
             for (const auto& p : clusterer.getPrototypes()) {
-                float d = (p - time_surfaces[ts]).matrix().norm();
+                float d = blaze::norm(p - time_surfaces[ts]);
                 d = d * d;
                 if (d < mindist)
                     mindist = d;
@@ -220,10 +219,11 @@ void ClustererPlusPlusInitializer(Clusterer& clusterer, const std::vector<TimeSu
 
 void ClustererRandomInitializerImpl(Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces, uint16_t width, uint16_t height) {
 
-    std::srand((unsigned int) std::time(0));
+    std::mt19937 gen{std::random_device{}()};
+    std::uniform_real_distribution<float> fdist(0, 1);
 
     for (uint16_t i = 0; i < clusterer.getNumClusters(); i++) {
-        clusterer.addPrototype(TimeSurfaceType::Random(height, width) + 1.f /2.f);
+        clusterer.addPrototype(blaze::generate(height, width, [&gen, &fdist](size_t i, size_t j){return fdist(gen);}));
     }
 
 }

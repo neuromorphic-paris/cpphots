@@ -8,7 +8,7 @@
 
 #include <ostream>
 #include <istream>
-#include <Eigen/Dense>
+#include <blaze/Math.h>
 #include "events_utils.h"
 
 
@@ -17,7 +17,7 @@ namespace cpphots {
 /**
  * @brief Alias type for a time surface
  */
-using TimeSurfaceType = Eigen::ArrayXXf;  // using float instead of uint64_t for the initialization to -tau
+using TimeSurfaceType = blaze::DynamicMatrix<float>;  // using float instead of uint64_t for the initialization to -tau
 
 
 /**
@@ -28,7 +28,7 @@ using TimeSurfaceType = Eigen::ArrayXXf;  // using float instead of uint64_t for
  * 
  * The time surface has a linear activation as described in (Maro et al., 2020).
  * 
- * The time context and time surfaces are represented with Eigen Arrays.
+ * The time context and time surfaces are represented with Blaze DynamicMatrix.
  */
 class TimeSurface {
 
