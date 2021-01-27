@@ -269,6 +269,17 @@ TEST_F(TestLayerInitialization, PlusPLus) {
 
 }
 
+TEST_F(TestLayerInitialization, AFKMC2) {
+
+    cpphots::layerInitializePrototypes(cpphots::ClustererAFKMC2Initializer(5), layer, layer, events);
+    ASSERT_TRUE(layer.isInitialized());
+
+    layer.clearPrototypes();
+    cpphots::layerInitializePrototypes(cpphots::ClustererAFKMC2Initializer(5), layer, layer, {events, events});
+    ASSERT_TRUE(layer.isInitialized());
+
+}
+
 TEST_F(TestLayerInitialization, Random) {
 
     cpphots::layerInitializePrototypes(cpphots::ClustererRandomInitializer(5, 5), layer, layer, events);

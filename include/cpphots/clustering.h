@@ -28,7 +28,7 @@ public:
 
 
 /**
- * @brief HOST basic clusterer
+ * @brief HOTS basic clusterer
  * 
  * Clusters time surface according to the HOTS formulation.
  */
@@ -163,20 +163,31 @@ private:
 using ClustererInitializerType = std::function<void(Clusterer&, const std::vector<TimeSurfaceType>&)>;
 
 /**
- * @brief k-means++ initialization
+ * @brief Uniformly initialize the layer
  * 
- * This class implements the initialization algorithm of k-means++ to choose the prototypes
- * among the time surfaces provided.
+ * Initializes the prototypes by simply choosing random time surfaces,
+ * among those provided, with uniform probabilities.
  */
 void ClustererUniformInitializer(Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces);
 
 /**
- * @brief Uniformly initialize the layer
+ * @brief k-means++ initialization
  * 
- * This class initialize the prototypes by simply choosing random time surfaces,
- * among those provided, with uniform probabilities.
+ * This function implements the initialization algorithm of k-means++ to choose the prototypes
+ * among the time surfaces provided.
  */
 void ClustererPlusPlusInitializer(Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces);
+
+/**
+ * @brief AFK-MC2 clustering initialization
+ * 
+ * Return a function implementing AFK-MC2 clustering initialization as described in 
+ * O. Bachem, M. Lucic, H. Hassani, and A. Krause. Fast and provably good seedings for k-means. In Proc. Advances in Neural Information Processing Systems, pages 55–63, 2016a
+ * 
+ * @param chain length of the Markov chain
+ * @return the actual initialization function
+ */
+ClustererInitializerType ClustererAFKMC2Initializer(uint16_t chain);
 
 /**
  * @brief Random clustering initialization

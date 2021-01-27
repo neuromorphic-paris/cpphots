@@ -218,6 +218,89 @@ void ClustererPlusPlusInitializer(Clusterer& clusterer, const std::vector<TimeSu
 
 }
 
+void ClustererAFKMC2InitializerImpl(Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces, uint16_t chain) {
+
+    std::mt19937 mt{std::random_device{}()};
+
+    int N = time_surfaces.size();
+    int M = clusterer.getNumClusters();
+
+    std::vector<cpphots::TimeSurfaceType> centroids(M);
+
+    // draw first cluster
+    std::uniform_int_distribution<int> initial(0, N-1);
+    int first_cluster = initial(mt);
+    centroids[0] = time_surfaces[first_cluster];
+
+    // compute proposal distribution
+    std::vector<float> q(N);
+
+    for (int n = 0; n < N; n++) {
+        q[n] = (time_surfaces[n] - centroids[0]).matrix().squaredNorm();
+    }
+
+    float dsum = std::accumulate(q.begin(), q.end(), 0.0);
+    float wsum = 1.0 * N;
+
+    for (int n = 0; n < N; n++) {
+        q[n] = 0.5 * (q[n] / dsum + 1.0 / wsum);
+    }
+
+    std::discrete_distribution<int> draw_q(q.begin(), q.end());
+    std::uniform_real_distribution<float> uniform(0.0, 1.0);
+
+    for (int h = 0; h < M; h++) {
+
+        // initialize a new Markov chain
+        int data_idx = draw_q(mt);
+
+        // compute distance to closest cluster
+        float dist = std::numeric_limits<float>::max();
+        for (int _h = 0; _h < h; _h++) {
+            dist = std::min(dist, (time_surfaces[data_idx] - centroids[_h]).matrix().squaredNorm());
+        }
+        float data_key = dist;
+
+        // Markov chain
+        for (int i = 1; i < chain; i++) {
+
+            // draw new potential cluster center from proposal distribution
+            int y_idx = draw_q(mt);
+
+            // compute distance to closest cluster
+            float dist = std::numeric_limits<float>::max();
+            for (int _h = 0; _h < h; _h++) {
+                dist = std::min(dist, (time_surfaces[y_idx] - centroids[_h]).matrix().squaredNorm());
+            }
+            float y_key = dist;
+            
+            // determine the probability to accept the new sample y_idx
+            float y_prob = y_key / q[y_idx];
+            float data_prob = data_key / q[data_idx];
+
+            if (((y_prob / data_prob) > uniform(mt)) || (data_prob == 0)) {
+                data_idx = y_idx;
+                data_key = y_key;
+            }
+
+        }
+
+        centroids[h] = time_surfaces[data_idx];
+
+    }
+
+    for (auto& c : centroids) {
+        clusterer.addPrototype(c);
+    }
+
+}
+
+ClustererInitializerType ClustererAFKMC2Initializer(uint16_t chain) {
+
+    return std::bind(ClustererAFKMC2InitializerImpl, std::placeholders::_1, std::placeholders::_2, chain);
+
+}
+
 void ClustererRandomInitializerImpl(Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces, uint16_t width, uint16_t height) {
 
     std::srand((unsigned int) std::time(0));

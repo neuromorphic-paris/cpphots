@@ -150,78 +150,36 @@ int main(int argc, char* argv[]) {
             n_trainings = 100;
         }
 
-        std::ofstream unif_sequential_file("unif_sequential.csv");
-        unif_sequential_file << "acc1,acc2,acc3" << std::endl;
-        for (int i = 0; i < n_trainings; i++) {
-            std::cout << "training (seq) " << i+1 << "/" << n_trainings << std::endl;
-            auto res = test_training(datafolder, true, false, cpphots::ClustererUniformInitializer);
-            unif_sequential_file << std::get<0>(res) << "," << std::get<1>(res) << "," << std::get<2>(res) << std::endl;
-        }
-        unif_sequential_file.close();
+        const std::vector<std::tuple<std::string, std::string, bool, bool, cpphots::ClustererInitializerType>> test_cases{
+        
+            {"afkmc2_sequential.csv", "seq", true, false, cpphots::ClustererAFKMC2Initializer(5)},
+            {"afkmc2_sequential_multi.csv", "seq-multi", true, true, cpphots::ClustererAFKMC2Initializer(5)},
+            {"afkmc2_oneshot.csv", "one", false, false, cpphots::ClustererAFKMC2Initializer(5)},
+            {"afkmc2_oneshot_multi.csv", "one-multi", false, true, cpphots::ClustererAFKMC2Initializer(5)},
 
-        std::ofstream unif_sequentialmulti_file("unif_sequential_multi.csv");
-        unif_sequentialmulti_file << "acc1,acc2,acc3" << std::endl;
-        for (int i = 0; i < n_trainings; i++) {
-            std::cout << "training (seq-multi) " << i+1 << "/" << n_trainings << std::endl;
-            auto res = test_training(datafolder, true, true, cpphots::ClustererUniformInitializer);
-            unif_sequentialmulti_file << std::get<0>(res) << "," << std::get<1>(res) << "," << std::get<2>(res) << std::endl;
-        }
-        unif_sequentialmulti_file.close();
+            {"unif_sequential.csv", "seq", true, false, cpphots::ClustererUniformInitializer},
+            {"unif_sequential_multi.csv", "seq-multi", true, true, cpphots::ClustererUniformInitializer},
+            {"unif_oneshot.csv", "one", false, false, cpphots::ClustererUniformInitializer},
+            {"unif_oneshot_multi.csv", "one-multi", false, true, cpphots::ClustererUniformInitializer},
+        
+            {"pp_sequential.csv", "seq", true, false, cpphots::ClustererPlusPlusInitializer},
+            {"pp_sequential_multi.csv", "seq-multi", true, true, cpphots::ClustererPlusPlusInitializer},
+            {"pp_oneshot.csv", "one", false, false, cpphots::ClustererPlusPlusInitializer},
+            {"pp_oneshot_multi.csv", "one-multi", false, true, cpphots::ClustererPlusPlusInitializer}
+        
+        };
+ 
+        for (auto& tcase : test_cases) {
 
-        std::ofstream unif_oneshot_file("unif_oneshot.csv");
-        unif_oneshot_file << "acc1,acc2,acc3" << std::endl;
-        for (int i = 0; i < n_trainings; i++) {
-            std::cout << "training (one) " << i+1 << "/" << n_trainings << std::endl;
-            auto res = test_training(datafolder, false, false, cpphots::ClustererUniformInitializer);
-            unif_oneshot_file << std::get<0>(res) << "," << std::get<1>(res) << "," << std::get<2>(res) << std::endl;
+            std::ofstream file(std::get<0>(tcase));
+            file << "acc1,acc2,acc3" << std::endl;
+            for (int i = 0; i < n_trainings; i++) {
+                std::cout << "training (" << std::get<1>(tcase) << ") " << i+1 << "/" << n_trainings << std::endl;
+                auto res = test_training(datafolder, std::get<2>(tcase), std::get<3>(tcase), std::get<4>(tcase));
+                file << std::get<0>(res) << "," << std::get<1>(res) << "," << std::get<2>(res) << std::endl;
+            }
+            file.close();
         }
-        unif_oneshot_file.close();
-
-        std::ofstream unif_oneshotmulti_file("unif_oneshot_multi.csv");
-        unif_oneshotmulti_file << "acc1,acc2,acc3" << std::endl;
-        for (int i = 0; i < n_trainings; i++) {
-            std::cout << "training (one-multi) " << i+1 << "/" << n_trainings << std::endl;
-            auto res = test_training(datafolder, false, true, cpphots::ClustererUniformInitializer);
-            unif_oneshotmulti_file << std::get<0>(res) << "," << std::get<1>(res) << "," << std::get<2>(res) << std::endl;
-        }
-        unif_oneshotmulti_file.close();
-
-
-        std::ofstream pp_sequential_file("pp_sequential.csv");
-        pp_sequential_file << "acc1,acc2,acc3" << std::endl;
-        for (int i = 0; i < n_trainings; i++) {
-            std::cout << "training (seq) " << i+1 << "/" << n_trainings << std::endl;
-            auto res = test_training(datafolder, true, false, cpphots::ClustererPlusPlusInitializer);
-            pp_sequential_file << std::get<0>(res) << "," << std::get<1>(res) << "," << std::get<2>(res) << std::endl;
-        }
-        pp_sequential_file.close();
-
-        std::ofstream pp_sequentialmulti_file("pp_sequential_multi.csv");
-        pp_sequentialmulti_file << "acc1,acc2,acc3" << std::endl;
-        for (int i = 0; i < n_trainings; i++) {
-            std::cout << "training (seq-multi) " << i+1 << "/" << n_trainings << std::endl;
-            auto res = test_training(datafolder, true, true, cpphots::ClustererPlusPlusInitializer);
-            pp_sequentialmulti_file << std::get<0>(res) << "," << std::get<1>(res) << "," << std::get<2>(res) << std::endl;
-        }
-        pp_sequentialmulti_file.close();
-
-        std::ofstream pp_oneshot_file("pp_oneshot.csv");
-        pp_oneshot_file << "acc1,acc2,acc3" << std::endl;
-        for (int i = 0; i < n_trainings; i++) {
-            std::cout << "training (one) " << i+1 << "/" << n_trainings << std::endl;
-            auto res = test_training(datafolder, false, false, cpphots::ClustererPlusPlusInitializer);
-            pp_oneshot_file << std::get<0>(res) << "," << std::get<1>(res) << "," << std::get<2>(res) << std::endl;
-        }
-        pp_oneshot_file.close();
-
-        std::ofstream pp_oneshotmulti_file("pp_oneshot_multi.csv");
-        pp_oneshotmulti_file << "acc1,acc2,acc3" << std::endl;
-        for (int i = 0; i < n_trainings; i++) {
-            std::cout << "training (one-multi) " << i+1 << "/" << n_trainings << std::endl;
-            auto res = test_training(datafolder, false, true, cpphots::ClustererPlusPlusInitializer);
-            pp_oneshotmulti_file << std::get<0>(res) << "," << std::get<1>(res) << "," << std::get<2>(res) << std::endl;
-        }
-        pp_oneshotmulti_file.close();
 
     } else {
 
