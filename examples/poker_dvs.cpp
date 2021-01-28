@@ -106,7 +106,7 @@ std::tuple<double, double, double> test_training(const std::string& folder, bool
                                multi);
     }
 
-    for (auto cl : network.view<cpphots::HOTSClusterer>()) {
+    for (auto cl : network.view<cpphots::ClustererBase>()) {
         cl->toggleLearning(false);
     }
 
