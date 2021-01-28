@@ -18,7 +18,7 @@ Features process_file(Network& network, const std::string& filename) {
         network.process(ev);
     }
 
-    auto feats = network.back<Clusterer>().getHistogram();
+    auto feats = network.back<HOTSClusterer>().getHistogram();
 
     return feats;
 
@@ -26,7 +26,7 @@ Features process_file(Network& network, const std::string& filename) {
 
 void train_oneshot(Network& network, const std::vector<Events>& training_events, const ClustererInitializerType& initializer, bool use_all) {
 
-    auto network_clusterers = network.viewFull<Clusterer>();
+    auto network_clusterers = network.viewFull<HOTSClusterer>();
     auto network_tspools = network.viewFull<TimeSurfacePool>();
 
     // prototypes initialization
@@ -47,11 +47,11 @@ void train_oneshot(Network& network, const std::vector<Events>& training_events,
     }
 
     // learning
-    for (auto cl : network.view<Clusterer>()) {
+    for (auto cl : network.view<HOTSClusterer>()) {
         cl->toggleLearning(true);
     }
     cpphots::process(network, training_events);
-    for (auto cl : network.view<Clusterer>()) {
+    for (auto cl : network.view<HOTSClusterer>()) {
         cl->toggleLearning(false);
     }
 
@@ -59,7 +59,7 @@ void train_oneshot(Network& network, const std::vector<Events>& training_events,
 
 void train_sequential(Network& network, const std::vector<Events>& training_events, const ClustererInitializerType& initializer, bool use_all) {
 
-    auto network_clusterers = network.viewFull<Clusterer>();
+    auto network_clusterers = network.viewFull<HOTSClusterer>();
     auto network_tspools = network.viewFull<TimeSurfacePool>();
 
     std::vector<Events> _training_events = training_events;
@@ -113,7 +113,7 @@ void train_sequential(Network& network, const std::vector<std::string>& training
 
 double compute_accuracy(Network& network, const Classifier& classifier, const std::vector<std::pair<std::string, std::string>>& test_set) {
 
-    for (auto cl : network.view<Clusterer>()) {
+    for (auto cl : network.view<HOTSClusterer>()) {
         cl->toggleLearning(false);
     }
 
@@ -136,7 +136,7 @@ double compute_accuracy(Network& network, const Classifier& classifier, const st
 
 std::vector<double> compute_accuracy(Network& network, const std::vector<Classifier*>& classifiers, const std::vector<std::pair<std::string, std::string>>& test_set) {
 
-    for (auto cl : network.view<Clusterer>()) {
+    for (auto cl : network.view<HOTSClusterer>()) {
         cl->toggleLearning(false);
     }
 

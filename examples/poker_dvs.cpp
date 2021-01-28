@@ -79,9 +79,9 @@ std::tuple<double, double, double> test_training(const std::string& folder, bool
 
     cpphots::Network network;
     auto l1 = cpphots::create_layer(cpphots::TimeSurfacePool(32, 32, 2, 2, 1000, 2),
-                                    cpphots::Clusterer(16));
+                                    cpphots::HOTSClusterer(16));
     auto l2 = cpphots::create_layer(cpphots::TimeSurfacePool(32, 32, 4, 4, 5000, 16),
-                                    cpphots::Clusterer(32));
+                                    cpphots::HOTSClusterer(32));
     network.addLayer(l1);
     network.addLayer(l2);
 
@@ -106,7 +106,7 @@ std::tuple<double, double, double> test_training(const std::string& folder, bool
                                multi);
     }
 
-    for (auto cl : network.view<cpphots::Clusterer>()) {
+    for (auto cl : network.view<cpphots::HOTSClusterer>()) {
         cl->toggleLearning(false);
     }
 

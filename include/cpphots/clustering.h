@@ -36,7 +36,7 @@ public:
      * 
      * This function should not be used manually, initialization should be done via a ClustererInitialize function.
      * 
-     * If the Clusterer is already initialized, an exception is raised.
+     * If the HOTSClusterer is already initialized, an exception is raised.
      * 
      * @param proto the prototype to add
      */
@@ -85,27 +85,27 @@ public:
  * 
  * Clusters time surface according to the HOTS formulation (cosine rule).
  */
-class Clusterer : public ClustererBase {
+class HOTSClusterer : public ClustererBase {
 
 public:
 
     /**
-     * @brief Construct a new Clusterer
+     * @brief Construct a new HOTSClusterer
      * 
      * This constructor should never be used to create a new object,
      * it is provided only to create containers with Clustere instances
      * or to read parameters from a file.
      */
-    Clusterer();
+    HOTSClusterer();
 
     /**
-     * @brief Construct a new Clusterer
+     * @brief Construct a new HOTSClusterer
      * 
      * The constructor will not initialize the prototypes.
      * 
      * @param clusters number of clusters
      */
-    Clusterer(uint16_t clusters);
+    HOTSClusterer(uint16_t clusters);
 
     /**
      * @copydoc ClustererBase::cluster
@@ -146,26 +146,26 @@ public:
     void reset();
 
     /**
-     * @brief Stream insertion operator for Clusterer
+     * @brief Stream insertion operator for HOTSClusterer
      * 
      * Insert parameters of the clusterer and prototypes on the stream.
      * 
      * @param out output stream
-     * @param clusterer clusterer to insert
+     * @param clusterer HOTSClusterer to insert
      * @return output stream
      */
-    friend std::ostream& operator<<(std::ostream& out, const Clusterer& clusterer);
+    friend std::ostream& operator<<(std::ostream& out, const HOTSClusterer& clusterer);
 
     /**
-     * @brief Stream extraction operator for Clusterer
+     * @brief Stream extraction operator for HOTSClusterer
      * 
-     * Reads parameters and prototypes for the Clusterer. Previous parameters are overwritten.
+     * Reads parameters and prototypes for the HOTSClusterer. Previous parameters are overwritten.
      * 
      * @param in input stream
-     * @param clusterer Clusterer where to extract into
+     * @param clusterer HOTSClusterer where to extract into
      * @return input stream
      */
-    friend std::istream& operator>>(std::istream& in, Clusterer& clusterer);
+    friend std::istream& operator>>(std::istream& in, HOTSClusterer& clusterer);
 
 private:
     std::vector<TimeSurfaceType> prototypes;

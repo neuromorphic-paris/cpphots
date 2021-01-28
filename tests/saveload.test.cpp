@@ -67,7 +67,7 @@ TEST(TestSaveLoad, LSaveLoad) {
 
     // cpphots::Layer layer1(32, 32, 1, 2, 1000, 2, 8);
     auto layer1 = cpphots::create_layer(cpphots::TimeSurfacePool(32, 32, 1, 2, 1000, 2),
-                                        cpphots::Clusterer(8));
+                                        cpphots::HOTSClusterer(8));
 
     auto initializer = cpphots::ClustererRandomInitializer(3, 5);
     initializer(layer1, {});
@@ -76,7 +76,7 @@ TEST(TestSaveLoad, LSaveLoad) {
     outstream << layer1;
 
     cpphots::Layer<cpphots::TimeSurfacePool,
-                   cpphots::Clusterer> layer2;
+                   cpphots::HOTSClusterer> layer2;
 
     std::stringstream instream(outstream.str());
     instream >> layer2;

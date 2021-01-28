@@ -8,19 +8,19 @@
 
 namespace cpphots {
 
-Clusterer::Clusterer() {}
+HOTSClusterer::HOTSClusterer() {}
 
-Clusterer::Clusterer(uint16_t clusters)
+HOTSClusterer::HOTSClusterer(uint16_t clusters)
     :clusters(clusters) {
 
     hist.resize(clusters);
 
 }
 
-uint16_t Clusterer::cluster(const TimeSurfaceType& surface) {
+uint16_t HOTSClusterer::cluster(const TimeSurfaceType& surface) {
 
     if (!isInitialized()) {
-        throw std::runtime_error("Cannot process event: Clusterer is not initialized.");
+        throw std::runtime_error("Cannot process event: HOTSClusterer is not initialized.");
     }
 
     // find closest kernel
@@ -58,26 +58,26 @@ uint16_t Clusterer::cluster(const TimeSurfaceType& surface) {
 
 }
 
-uint16_t Clusterer::getNumClusters() const {
+uint16_t HOTSClusterer::getNumClusters() const {
     return clusters;
 }
 
-std::vector<TimeSurfaceType> Clusterer::getPrototypes() const {
+std::vector<TimeSurfaceType> HOTSClusterer::getPrototypes() const {
     return prototypes;
 }
 
-bool Clusterer::toggleLearning(bool enable) {
+bool HOTSClusterer::toggleLearning(bool enable) {
     bool prev = learning;
     learning = enable;
     return prev;
 }
 
-void Clusterer::clearPrototypes() {
+void HOTSClusterer::clearPrototypes() {
     prototypes.clear();
     prototypes_activations.clear();
 }
 
-void Clusterer::addPrototype(const TimeSurfaceType& proto) {
+void HOTSClusterer::addPrototype(const TimeSurfaceType& proto) {
     if (isInitialized()) {
         throw std::runtime_error("Trying to add a prototype to an already initialized Layer.");
     }
@@ -85,20 +85,20 @@ void Clusterer::addPrototype(const TimeSurfaceType& proto) {
     prototypes_activations.push_back(0);
 }
 
-bool Clusterer::isInitialized() const {
+bool HOTSClusterer::isInitialized() const {
     return (prototypes.size() == clusters) && (prototypes_activations.size() == clusters);
 }
 
-std::vector<uint32_t> Clusterer::getHistogram() const {
+std::vector<uint32_t> HOTSClusterer::getHistogram() const {
     return hist;
 }
 
-void Clusterer::reset() {
+void HOTSClusterer::reset() {
     hist.clear();
     hist.resize(clusters);
 }
 
-std::ostream& operator<<(std::ostream& out, const Clusterer& clusterer) {
+std::ostream& operator<<(std::ostream& out, const HOTSClusterer& clusterer) {
 
     out << clusterer.clusters << " ";
     out << clusterer.learning << " ";
@@ -119,7 +119,7 @@ std::ostream& operator<<(std::ostream& out, const Clusterer& clusterer) {
 
 }
 
-std::istream& operator>>(std::istream& in, Clusterer& clusterer) {
+std::istream& operator>>(std::istream& in, HOTSClusterer& clusterer) {
 
     in >> clusterer.clusters;
     in >> clusterer.learning;

@@ -16,7 +16,7 @@ bool operator==(const cpphots::Features& f1, const cpphots::Features& f2) {
 }
 
 
-void set_prototypes_nolearning(cpphots::Clusterer& layer) {
+void set_prototypes_nolearning(cpphots::HOTSClusterer& layer) {
 
     layer.clearPrototypes();
 
@@ -87,7 +87,7 @@ void set_prototypes_nolearning(cpphots::Clusterer& layer) {
 }
 
 
-void set_prototpes_learning(cpphots::Clusterer& layer) {
+void set_prototpes_learning(cpphots::HOTSClusterer& layer) {
 
     layer.clearPrototypes();
 
@@ -165,12 +165,12 @@ protected:
     void SetUp() override {
         events = cpphots::loadFromFile("data/trcl0.es");
         layer = cpphots::create_layer(cpphots::TimeSurfacePool(32, 32, 2, 2, 1000, 1),
-                                      cpphots::Clusterer(8));
+                                      cpphots::HOTSClusterer(8));
     }
 
     cpphots::Events events;
     cpphots::Layer<cpphots::TimeSurfacePool,
-                   cpphots::Clusterer> layer;
+                   cpphots::HOTSClusterer> layer;
 
 };
 
@@ -238,12 +238,12 @@ protected:
     void SetUp() override {
         events = cpphots::loadFromFile("data/trcl0.es");
         layer = cpphots::create_layer(cpphots::TimeSurfacePool(32, 32, 2, 2, 1000, 2),
-                                      cpphots::Clusterer(8));
+                                      cpphots::HOTSClusterer(8));
     }
 
     cpphots::Events events;
     cpphots::Layer<cpphots::TimeSurfacePool,
-                   cpphots::Clusterer> layer;
+                   cpphots::HOTSClusterer> layer;
 
 };
 
@@ -295,7 +295,7 @@ TEST_F(TestLayerInitialization, Random) {
 TEST(TestLayer, NoInitialization) {
 
     auto layer = cpphots::create_layer(cpphots::TimeSurfacePool(32, 32, 2, 2, 1000, 2),
-                                       cpphots::Clusterer(8));
+                                       cpphots::HOTSClusterer(8));
 
     ASSERT_THROW(layer.process({0, 0, 0, 0}, true), std::runtime_error);
 
@@ -307,7 +307,7 @@ TEST(TestLayer, SkipValidityCheck) {
     cpphots::Events events = cpphots::loadFromFile("data/trcl0.es");
 
     auto layer = cpphots::create_layer(cpphots::TimeSurfacePool(32, 32, 2, 2, 1000, 2),
-                                       cpphots::Clusterer(8));
+                                       cpphots::HOTSClusterer(8));
 
     auto initializer = cpphots::ClustererRandomInitializer(5, 5);
     initializer(layer, {});
@@ -328,7 +328,7 @@ TEST(TestLayer, SkipValidityCheck) {
 TEST(TestLayer, WrongPolarity) {
 
     auto layer = cpphots::create_layer(cpphots::TimeSurfacePool(32, 32, 2, 2, 1000, 2),
-                                       cpphots::Clusterer(8));
+                                       cpphots::HOTSClusterer(8));
 
     auto initializer = cpphots::ClustererRandomInitializer(5, 5);
     initializer(layer, {});
@@ -341,7 +341,7 @@ TEST(TestLayer, WrongPolarity) {
 TEST(TestLayer, TSAccess) {
 
     auto layer = cpphots::create_layer(cpphots::TimeSurfacePool(32, 32, 2, 2, 1000, 2),
-                                       cpphots::Clusterer(8));
+                                       cpphots::HOTSClusterer(8));
 
     auto ts1 = layer.getSurface(0).updateAndCompute(10, 2, 2);
     auto ts2 = layer.compute(10, 2, 2, 0);
