@@ -8,12 +8,26 @@
 
 namespace cpphots {
 
+std::vector<uint32_t> ClustererBase::getHistogram() const {
+    return hist;
+}
+
+void ClustererBase::reset() {
+    hist.clear();
+    hist.resize(getNumClusters());
+}
+
+void ClustererBase::updateHistogram(uint16_t k) {
+    hist[k]++;
+}
+
+
 HOTSClusterer::HOTSClusterer() {}
 
 HOTSClusterer::HOTSClusterer(uint16_t clusters)
     :clusters(clusters) {
 
-    hist.resize(clusters);
+    reset();
 
 }
 
@@ -35,7 +49,7 @@ uint16_t HOTSClusterer::cluster(const TimeSurfaceType& surface) {
     }
 
     // update histogram
-    hist[k]++;
+    updateHistogram(k);
 
     if (learning) {
 
@@ -88,15 +102,6 @@ bool HOTSClusterer::isInitialized() const {
     return (prototypes.size() == clusters) && (prototypes_activations.size() == clusters);
 }
 
-std::vector<uint32_t> HOTSClusterer::getHistogram() const {
-    return hist;
-}
-
-void HOTSClusterer::reset() {
-    hist.clear();
-    hist.resize(clusters);
-}
-
 std::ostream& operator<<(std::ostream& out, const HOTSClusterer& clusterer) {
 
     out << clusterer.clusters << " ";
@@ -145,8 +150,7 @@ std::istream& operator>>(std::istream& in, HOTSClusterer& clusterer) {
         clusterer.prototypes.push_back(p);
     }
 
-    clusterer.hist.clear();
-    clusterer.hist.resize(clusterer.clusters);
+    clusterer.reset();
 
     return in;
 

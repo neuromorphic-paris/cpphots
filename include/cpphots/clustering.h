@@ -77,6 +77,32 @@ public:
      */
     virtual bool toggleLearning(bool enable = true) = 0;
 
+    /**
+     * @brief Get the histogram of prototypes activations
+     * 
+     * @return the histogram of activations
+     */
+    std::vector<uint32_t> getHistogram() const;
+
+    /**
+     * @brief Reset the histogram of activations
+     */
+    void reset();
+
+protected:
+    /**
+     * @brief Updated the histogram of activations
+     * 
+     * This function should be called by subclasses in their cluster implementation.
+     * 
+     * @param k the latest cluster id emitted
+     */
+    void updateHistogram(uint16_t k);
+
+private:
+
+    std::vector<uint32_t> hist;
+
 };
 
 
@@ -134,18 +160,6 @@ public:
     bool toggleLearning(bool enable = true) override;
 
     /**
-     * @brief Get the histogram of prototypes activations
-     * 
-     * @return the histogram of activations
-     */
-    std::vector<uint32_t> getHistogram() const;
-
-    /**
-     * @brief Reset the histogram of activations
-     */
-    void reset();
-
-    /**
      * @brief Stream insertion operator for HOTSClusterer
      * 
      * Insert parameters of the clusterer and prototypes on the stream.
@@ -171,7 +185,6 @@ private:
     std::vector<TimeSurfaceType> prototypes;
     std::vector<uint32_t> prototypes_activations;
     uint16_t clusters;
-    std::vector<uint32_t> hist;
     bool learning = true;
 
 };
