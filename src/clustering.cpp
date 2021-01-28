@@ -85,6 +85,10 @@ void Clusterer::addPrototype(const TimeSurfaceType& proto) {
     prototypes_activations.push_back(0);
 }
 
+bool Clusterer::isInitialized() const {
+    return (prototypes.size() == clusters) && (prototypes_activations.size() == clusters);
+}
+
 std::vector<uint32_t> Clusterer::getHistogram() const {
     return hist;
 }
@@ -150,7 +154,7 @@ std::istream& operator>>(std::istream& in, Clusterer& clusterer) {
 }
 
 
-void ClustererUniformInitializer(Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces) {
+void ClustererUniformInitializer(ClustererBase& clusterer, const std::vector<TimeSurfaceType>& time_surfaces) {
 
     std::vector<TimeSurfaceType> selected;
     std::sample(time_surfaces.begin(), time_surfaces.end(), std::back_inserter(selected), clusterer.getNumClusters(), std::mt19937{std::random_device{}()});
@@ -161,16 +165,17 @@ void ClustererUniformInitializer(Clusterer& clusterer, const std::vector<TimeSur
 
 }
 
-void ClustererPlusPlusInitializer(Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces) {
+void ClustererPlusPlusInitializer(ClustererBase& clusterer, const std::vector<TimeSurfaceType>& time_surfaces) {
 
     // chosen surfaces
     std::set<int> chosen;
+    std::vector<TimeSurfaceType> prototypes;
 
     // choose first time surface at random
     std::mt19937 gen{std::random_device{}()};
-    std::uniform_int_distribution<> idist(0, time_surfaces.size());
+    std::uniform_int_distribution<> idist(0, time_surfaces.size()-1);
     int first = idist(gen);
-    clusterer.addPrototype(time_surfaces[first]);
+    prototypes.push_back(time_surfaces[first]);
     chosen.insert(first);
 
     std::vector<float> distances(time_surfaces.size());
@@ -184,9 +189,8 @@ void ClustererPlusPlusInitializer(Clusterer& clusterer, const std::vector<TimeSu
         for (size_t ts = 0; ts < time_surfaces.size(); ts++) {
 
             float mindist = std::numeric_limits<float>::max();
-            for (const auto& p : clusterer.getPrototypes()) {
-                float d = (p - time_surfaces[ts]).matrix().norm();
-                d = d * d;
+            for (const auto& p : prototypes) {
+                float d = (p - time_surfaces[ts]).matrix().squaredNorm();
                 if (d < mindist)
                     mindist = d;
             }
@@ -203,7 +207,7 @@ void ClustererPlusPlusInitializer(Clusterer& clusterer, const std::vector<TimeSu
 
         for (size_t ts = 0; ts < time_surfaces.size(); ts++) {
             if (x < currdist + distances[ts]) {
-                clusterer.addPrototype(time_surfaces[ts]);
+                prototypes.push_back(time_surfaces[ts]);
                 chosen.insert(ts);
                 break;
             }
@@ -216,9 +220,13 @@ void ClustererPlusPlusInitializer(Clusterer& clusterer, const std::vector<TimeSu
         throw std::runtime_error("Something went wrong with the plusplus initialization.");
     }
 
+    for (const auto& p : prototypes) {
+        clusterer.addPrototype(p);
+    }
+
 }
 
-void ClustererAFKMC2InitializerImpl(Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces, uint16_t chain) {
+void ClustererAFKMC2InitializerImpl(ClustererBase& clusterer, const std::vector<TimeSurfaceType>& time_surfaces, uint16_t chain) {
 
     std::mt19937 mt{std::random_device{}()};
 
@@ -301,7 +309,7 @@ ClustererInitializerType ClustererAFKMC2Initializer(uint16_t chain) {
 
 }
 
-void ClustererRandomInitializerImpl(Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces, uint16_t width, uint16_t height) {
+void ClustererRandomInitializerImpl(ClustererBase& clusterer, const std::vector<TimeSurfaceType>& time_surfaces, uint16_t width, uint16_t height) {
 
     std::srand((unsigned int) std::time(0));
 

@@ -24,13 +24,66 @@ public:
      */
     virtual uint16_t cluster(const TimeSurfaceType& surface) = 0;
 
+    /**
+     * @brief Get the number of clusters
+     * 
+     * @return the number of clusters
+     */
+    virtual uint16_t getNumClusters() const = 0;
+
+    /**
+     * @brief Add a new prototype to the layer
+     * 
+     * This function should not be used manually, initialization should be done via a ClustererInitialize function.
+     * 
+     * If the Clusterer is already initialized, an exception is raised.
+     * 
+     * @param proto the prototype to add
+     */
+    virtual void addPrototype(const TimeSurfaceType& proto) = 0;
+
+    /**
+     * @brief Get the list of prototypes
+     * 
+     * @return the list of prototypes
+     */
+    virtual std::vector<TimeSurfaceType> getPrototypes() const = 0;
+
+    /**
+     * @brief Removes all prototypes
+     */
+    virtual void clearPrototypes() = 0;
+
+    /**
+     * @brief Check prototype initialization
+     * 
+     * Prototypes are initialized if there is a number of prototypes equal to the number of clusters.
+     * 
+     * @return true if prototypes are initialized
+     * @return false otherwise
+     */
+    virtual bool isInitialized() const = 0;
+
+    /**
+     * @brief Enable or disable learning
+     * 
+     * This affects whether the prototypes are updated when ClustererBase::cluster is called or not.
+     * 
+     * During the learning phase, output of ClustererBase::cluster may be undefined, depending
+     * on the implementaton.
+     * 
+     * @param enable true if learning should be active, false otherwise
+     * @return the previous learning state
+     */
+    virtual bool toggleLearning(bool enable = true) = 0;
+
 };
 
 
 /**
  * @brief HOTS basic clusterer
  * 
- * Clusters time surface according to the HOTS formulation.
+ * Clusters time surface according to the HOTS formulation (cosine rule).
  */
 class Clusterer : public ClustererBase {
 
@@ -61,57 +114,24 @@ public:
      */
     uint16_t cluster(const TimeSurfaceType& surface) override;
 
-    /**
-     * @brief Get the number of clusters
-     * 
-     * @return the number of clusters
-     */
-    uint16_t getNumClusters() const;
+    // inherited methods
+    uint16_t getNumClusters() const override;
+
+    void addPrototype(const TimeSurfaceType& proto) override;
+
+    std::vector<TimeSurfaceType> getPrototypes() const override;
+
+    void clearPrototypes() override;
+
+    bool isInitialized() const override;
 
     /**
-     * @brief Get the list of prototypes
+     * @copydoc ClustererBase::toggleLearning
      * 
-     * @return the list of prototypes
+     * If learning is enabled prototypes will be updatad online until
+     * learning is disabled.
      */
-    std::vector<TimeSurfaceType> getPrototypes() const;
-
-    /**
-     * @brief Enable or disable learning
-     * 
-     * This affects whether the prototypes are updated when cluster is called or not.
-     * 
-     * @param enable true if learning should be active, false otherwise
-     * @return the previous learning state
-     */
-    bool toggleLearning(bool enable = true);
-
-    /**
-     * @brief Check prototype initialization
-     * 
-     * Prototypes are initialized if there is a number of prototypes equal to the number of clusters.
-     * 
-     * @return true if prototypes are initialized
-     * @return false otherwise
-     */
-    inline bool isInitialized() const {
-        return (prototypes.size() == clusters) && (prototypes_activations.size() == clusters);
-    }
-
-    /**
-     * @brief Removes all prototypes
-     */
-    void clearPrototypes();
-
-    /**
-     * @brief Add a new prototype to the layer
-     * 
-     * This function should not be used manually, initialization should be done via a LayerInitializer.
-     * 
-     * If the Clusterer is already initialized, an exception is raised.
-     * 
-     * @param proto the prototype to add
-     */
-    void addPrototype(const TimeSurfaceType& proto);
+    bool toggleLearning(bool enable = true) override;
 
     /**
      * @brief Get the histogram of prototypes activations
@@ -160,7 +180,7 @@ private:
 /**
  * @brief Signature of clustering initialization algorithms
  */
-using ClustererInitializerType = std::function<void(Clusterer&, const std::vector<TimeSurfaceType>&)>;
+using ClustererInitializerType = std::function<void(ClustererBase&, const std::vector<TimeSurfaceType>&)>;
 
 /**
  * @brief Uniformly initialize the layer
@@ -168,7 +188,7 @@ using ClustererInitializerType = std::function<void(Clusterer&, const std::vecto
  * Initializes the prototypes by simply choosing random time surfaces,
  * among those provided, with uniform probabilities.
  */
-void ClustererUniformInitializer(Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces);
+void ClustererUniformInitializer(ClustererBase& clusterer, const std::vector<TimeSurfaceType>& time_surfaces);
 
 /**
  * @brief k-means++ initialization
@@ -176,7 +196,7 @@ void ClustererUniformInitializer(Clusterer& clusterer, const std::vector<TimeSur
  * This function implements the initialization algorithm of k-means++ to choose the prototypes
  * among the time surfaces provided.
  */
-void ClustererPlusPlusInitializer(Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces);
+void ClustererPlusPlusInitializer(ClustererBase& clusterer, const std::vector<TimeSurfaceType>& time_surfaces);
 
 /**
  * @brief AFK-MC2 clustering initialization

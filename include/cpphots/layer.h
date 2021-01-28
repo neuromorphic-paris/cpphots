@@ -249,9 +249,8 @@ void layerInitializePrototypes(const ClustererInitializerType& initializer, TSP&
  * @param event_streams the vector of streams of events to be used
  * @param valid_only use only valid time surfaces for the initialization
  */
-template <typename TSP,
-          typename C>
-void layerInitializePrototypes(const ClustererInitializerType& initializer, TSP& ts_processer, C& clusterer, const std::vector<Events>& event_streams, bool valid_only = true) {
+template <typename TSP>
+void layerInitializePrototypes(const ClustererInitializerType& initializer, TSP& ts_processer, ClustererBase& clusterer, const std::vector<Events>& event_streams, bool valid_only = true) {
 
     // store all time surfaces
     std::vector<TimeSurfaceType> time_surfaces;
