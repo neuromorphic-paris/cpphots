@@ -4,4 +4,5 @@ PROJECT_NAME            = cpphots
 ENABLE_PREPROCESSING   = YES
 MACRO_EXPANSION        = YES
 EXPAND_ONLY_PREDEF     = YES
-PREDEFINED             = __attribute__(x)=
+PREDEFINED             = __attribute__(x)= \
+                         @CPPHOTS_DOXYGEN_DOUBLE_PRECISION@

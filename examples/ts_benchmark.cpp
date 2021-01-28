@@ -29,7 +29,7 @@ std::function<cpphots::event()> getRandomEventGenerator(uint16_t w, uint16_t h, 
 
 }
 
-void perform_test(uint16_t sz, uint16_t r, float tau, unsigned int repetitions = 5) {
+void perform_test(uint16_t sz, uint16_t r, cpphots::TimeSurfaceScalarType tau, unsigned int repetitions = 5) {
 
     double time = 0.0;
 

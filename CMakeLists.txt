@@ -43,6 +43,9 @@ endforeach()
 # option for time surface plots
 option(BUILD_PLOTS "Build plots utilities" ON)
 
+# option for precision
+option(DOUBLE_PRECISION "Enable double precision" OFF)
+
 # dependencies
 
 # sepia
@@ -116,6 +119,11 @@ if (DOXYGEN_FOUND AND BUILD_DOC)
     # set input and output files
     set(DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile.in)
     set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+
+    # correct macros
+    if (DOUBLE_PRECISION)
+      set(CPPHOTS_DOXYGEN_DOUBLE_PRECISION CPPHOTS_DOUBLE_PRECISION)
+    endif()
 
     # request to configure the file
     configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)

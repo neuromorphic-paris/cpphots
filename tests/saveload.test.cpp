@@ -38,8 +38,8 @@ TEST(TestSaveLoad, TSProcess) {
     std::stringstream instream("32 32 2 2 5 5 1000.0 4");
     instream >> ts;
 
-    float normsum = 0.;
-    float goodsum = 0.;
+    cpphots::TimeSurfaceScalarType normsum = 0.;
+    cpphots::TimeSurfaceScalarType goodsum = 0.;
 
     unsigned int processed = 0;
     unsigned int goodevents = 0;
@@ -48,7 +48,7 @@ TEST(TestSaveLoad, TSProcess) {
             continue;
         }
         auto nts = ts.updateAndCompute(ev.t, ev.x, ev.y);
-        float norm = nts.first.matrix().norm();
+        cpphots::TimeSurfaceScalarType norm = nts.first.matrix().norm();
         normsum += norm;
         if (nts.second) {
             goodsum += norm;

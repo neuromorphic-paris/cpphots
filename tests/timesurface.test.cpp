@@ -37,8 +37,8 @@ TEST(TestTimeSurface, Processing) {
     // create time surface
     cpphots::TimeSurface ts(32, 32, 2, 2, 1000);
 
-    float normsum = 0.;
-    float goodsum = 0.;
+    cpphots::TimeSurfaceScalarType normsum = 0.;
+    cpphots::TimeSurfaceScalarType goodsum = 0.;
 
     unsigned int processed = 0;
     unsigned int goodevents = 0;
@@ -47,7 +47,7 @@ TEST(TestTimeSurface, Processing) {
             continue;
         }
         auto nts = ts.updateAndCompute(ev.t, ev.x, ev.y);
-        float norm = nts.first.matrix().norm();
+        cpphots::TimeSurfaceScalarType norm = nts.first.matrix().norm();
         normsum += norm;
         if (nts.second) {
             goodsum += norm;
@@ -71,8 +71,8 @@ TEST(TestTimeSurfaceComputer, Processing) {
     // create time surface
     cpphots::TimeSurfacePool ts(32, 32, 2, 2, 1000, 2);
 
-    float normsum = 0.;
-    float goodsum = 0.;
+    cpphots::TimeSurfaceScalarType normsum = 0.;
+    cpphots::TimeSurfaceScalarType goodsum = 0.;
 
     unsigned int processed = 0;
     unsigned int goodevents = 0;
@@ -81,7 +81,7 @@ TEST(TestTimeSurfaceComputer, Processing) {
             continue;
         }
         auto nts = ts.updateAndCompute(ev.t, ev.x, ev.y, ev.p);
-        float norm = nts.first.matrix().norm();
+        cpphots::TimeSurfaceScalarType norm = nts.first.matrix().norm();
         normsum += norm;
         if (nts.second) {
             goodsum += norm;

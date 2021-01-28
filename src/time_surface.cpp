@@ -5,7 +5,7 @@ namespace cpphots {
 
 TimeSurface::TimeSurface() {}
 
-TimeSurface::TimeSurface(uint16_t width, uint16_t height, uint16_t Rx, uint16_t Ry, float tau)
+TimeSurface::TimeSurface(uint16_t width, uint16_t height, uint16_t Rx, uint16_t Ry, TimeSurfaceScalarType tau)
     :width(width), height(height), Rx(Rx), Ry(Ry), tau(tau) {
 
     reset();
@@ -104,7 +104,7 @@ std::istream& operator>>(std::istream& in, TimeSurface& ts) {
 
 TimeSurfacePool::TimeSurfacePool() {}
 
-TimeSurfacePool::TimeSurfacePool(uint16_t width, uint16_t height, uint16_t Rx, uint16_t Ry, float tau, uint16_t polarities) {
+TimeSurfacePool::TimeSurfacePool(uint16_t width, uint16_t height, uint16_t Rx, uint16_t Ry, TimeSurfaceScalarType tau, uint16_t polarities) {
 
     for (uint16_t i = 0; i < polarities; i++) {
         surfaces.push_back(TimeSurface(width, height, Rx, Ry, tau));

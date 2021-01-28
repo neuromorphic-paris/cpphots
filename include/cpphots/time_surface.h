@@ -17,7 +17,16 @@ namespace cpphots {
 /**
  * @brief Alias type for a time surface
  */
-using TimeSurfaceType = Eigen::ArrayXXf;  // using float instead of uint64_t for the initialization to -tau
+#ifdef CPPHOTS_DOUBLE_PRECISION
+using TimeSurfaceType = Eigen::ArrayXXd;  // using floating point instead of uint64_t for the initialization to -tau
+#else
+using TimeSurfaceType = Eigen::ArrayXXf;  // using floating point instead of uint64_t for the initialization to -tau
+#endif
+
+/**
+ * @brief Alias type for time surface floating point type
+ */
+using TimeSurfaceScalarType = TimeSurfaceType::Scalar;
 
 
 /**
@@ -57,7 +66,7 @@ public:
      * @param Ry vertical radius of the window on which surfaces are computed (0 to use the full height)
      * @param tau time constant of the surface
      */
-    TimeSurface(uint16_t width, uint16_t height, uint16_t Rx, uint16_t Ry, float tau);
+    TimeSurface(uint16_t width, uint16_t height, uint16_t Rx, uint16_t Ry, TimeSurfaceScalarType tau);
 
     /**
      * @brief Update the time context with a new event
@@ -205,7 +214,7 @@ private:
     uint16_t width, height;
     uint16_t Rx, Ry;
     uint16_t Wx, Wy;
-    float tau;
+    TimeSurfaceScalarType tau;
     uint16_t min_events;
 
 };
@@ -243,7 +252,7 @@ public:
      * @param tau time constant of the surface
      * @param polarities numer of polarities (size of the pool)
      */
-    TimeSurfacePool(uint16_t width, uint16_t height, uint16_t Rx, uint16_t Ry, float tau, uint16_t polarities);
+    TimeSurfacePool(uint16_t width, uint16_t height, uint16_t Rx, uint16_t Ry, TimeSurfaceScalarType tau, uint16_t polarities);
 
     /**
      * @brief Update the time context with a new event

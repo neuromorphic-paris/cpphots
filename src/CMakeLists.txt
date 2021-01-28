@@ -37,6 +37,10 @@ target_include_directories(cpphots PRIVATE "${sepia_SOURCE_DIR}/source")
 
 target_link_libraries(cpphots pthread Eigen3::Eigen)
 
+if (DOUBLE_PRECISION)
+    target_compile_definitions(cpphots PUBLIC CPPHOTS_DOUBLE_PRECISION)
+endif()
+
 if (BUILD_PLOTS)
     target_include_directories(cpphots PRIVATE ${Python3_INCLUDE_DIRS})
     target_link_libraries(cpphots ${Python3_LIBRARIES})

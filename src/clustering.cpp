@@ -25,9 +25,9 @@ uint16_t HOTSClusterer::cluster(const TimeSurfaceType& surface) {
 
     // find closest kernel
     uint16_t k = -1;
-    float mindist = std::numeric_limits<float>::max();
+    TimeSurfaceScalarType mindist = std::numeric_limits<TimeSurfaceScalarType>::max();
     for (uint i = 0; i < prototypes.size(); i++) {
-        float d = (surface - prototypes[i]).matrix().norm();
+        TimeSurfaceScalarType d = (surface - prototypes[i]).matrix().norm();
         if (d < mindist) {
             mindist = d;
             k = i;
@@ -43,11 +43,10 @@ uint16_t HOTSClusterer::cluster(const TimeSurfaceType& surface) {
         prototypes_activations[k]++;
 
         // beta
-        float beta = prototypes[k].cwiseProduct(surface).sum() / prototypes[k].matrix().norm() / surface.matrix().norm();
-        // float beta = maxcosine;
+        TimeSurfaceScalarType beta = prototypes[k].cwiseProduct(surface).sum() / prototypes[k].matrix().norm() / surface.matrix().norm();
 
         // alpha
-        float alpha = 1. / (1. + prototypes_activations[k]);
+        TimeSurfaceScalarType alpha = 1. / (1. + prototypes_activations[k]);
 
         // update kernel
         prototypes[k] += alpha * beta * (surface - prototypes[k]);
@@ -178,8 +177,8 @@ void ClustererPlusPlusInitializer(ClustererBase& clusterer, const std::vector<Ti
     prototypes.push_back(time_surfaces[first]);
     chosen.insert(first);
 
-    std::vector<float> distances(time_surfaces.size());
-    float distsum = 0.0;
+    std::vector<TimeSurfaceScalarType> distances(time_surfaces.size());
+    TimeSurfaceScalarType distsum = 0.0;
 
     for (size_t k = 1; k < clusterer.getNumClusters(); k++) {
 
@@ -188,9 +187,9 @@ void ClustererPlusPlusInitializer(ClustererBase& clusterer, const std::vector<Ti
         // compute all squared distances
         for (size_t ts = 0; ts < time_surfaces.size(); ts++) {
 
-            float mindist = std::numeric_limits<float>::max();
+            TimeSurfaceScalarType mindist = std::numeric_limits<TimeSurfaceScalarType>::max();
             for (const auto& p : prototypes) {
-                float d = (p - time_surfaces[ts]).matrix().squaredNorm();
+                TimeSurfaceScalarType d = (p - time_surfaces[ts]).matrix().squaredNorm();
                 if (d < mindist)
                     mindist = d;
             }
@@ -201,9 +200,9 @@ void ClustererPlusPlusInitializer(ClustererBase& clusterer, const std::vector<Ti
         }
 
         // choose random surface, based on distances
-        std::uniform_real_distribution<float> rdist(0.0, distsum);
-        float x = rdist(gen);
-        float currdist = 0.0;
+        std::uniform_real_distribution<TimeSurfaceScalarType> rdist(0.0, distsum);
+        TimeSurfaceScalarType x = rdist(gen);
+        TimeSurfaceScalarType currdist = 0.0;
 
         for (size_t ts = 0; ts < time_surfaces.size(); ts++) {
             if (x < currdist + distances[ts]) {
@@ -241,21 +240,21 @@ void ClustererAFKMC2InitializerImpl(ClustererBase& clusterer, const std::vector<
     centroids[0] = time_surfaces[first_cluster];
 
     // compute proposal distribution
-    std::vector<float> q(N);
+    std::vector<TimeSurfaceScalarType> q(N);
 
     for (int n = 0; n < N; n++) {
         q[n] = (time_surfaces[n] - centroids[0]).matrix().squaredNorm();
     }
 
-    float dsum = std::accumulate(q.begin(), q.end(), 0.0);
-    float wsum = 1.0 * N;
+    TimeSurfaceScalarType dsum = std::accumulate(q.begin(), q.end(), 0.0);
+    TimeSurfaceScalarType wsum = 1.0 * N;
 
     for (int n = 0; n < N; n++) {
         q[n] = 0.5 * (q[n] / dsum + 1.0 / wsum);
     }
 
     std::discrete_distribution<int> draw_q(q.begin(), q.end());
-    std::uniform_real_distribution<float> uniform(0.0, 1.0);
+    std::uniform_real_distribution<TimeSurfaceScalarType> uniform(0.0, 1.0);
 
     for (int h = 0; h < M; h++) {
 
@@ -263,11 +262,11 @@ void ClustererAFKMC2InitializerImpl(ClustererBase& clusterer, const std::vector<
         int data_idx = draw_q(mt);
 
         // compute distance to closest cluster
-        float dist = std::numeric_limits<float>::max();
+        TimeSurfaceScalarType dist = std::numeric_limits<TimeSurfaceScalarType>::max();
         for (int _h = 0; _h < h; _h++) {
             dist = std::min(dist, (time_surfaces[data_idx] - centroids[_h]).matrix().squaredNorm());
         }
-        float data_key = dist;
+        TimeSurfaceScalarType data_key = dist;
 
         // Markov chain
         for (int i = 1; i < chain; i++) {
@@ -276,15 +275,15 @@ void ClustererAFKMC2InitializerImpl(ClustererBase& clusterer, const std::vector<
             int y_idx = draw_q(mt);
 
             // compute distance to closest cluster
-            float dist = std::numeric_limits<float>::max();
+            TimeSurfaceScalarType dist = std::numeric_limits<TimeSurfaceScalarType>::max();
             for (int _h = 0; _h < h; _h++) {
                 dist = std::min(dist, (time_surfaces[y_idx] - centroids[_h]).matrix().squaredNorm());
             }
-            float y_key = dist;
+            TimeSurfaceScalarType y_key = dist;
             
             // determine the probability to accept the new sample y_idx
-            float y_prob = y_key / q[y_idx];
-            float data_prob = data_key / q[data_idx];
+            TimeSurfaceScalarType y_prob = y_key / q[y_idx];
+            TimeSurfaceScalarType data_prob = data_key / q[data_idx];
 
             if (((y_prob / data_prob) > uniform(mt)) || (data_prob == 0)) {
                 data_idx = y_idx;
