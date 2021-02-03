@@ -120,7 +120,7 @@ public:
      * @brief Construct a new HOTSClusterer
      * 
      * This constructor should never be used to create a new object,
-     * it is provided only to create containers with Clustere instances
+     * it is provided only to create containers with Clusterer instances
      * or to read parameters from a file.
      */
     HOTSClusterer();

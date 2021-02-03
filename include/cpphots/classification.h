@@ -32,6 +32,17 @@ std::ostream& operator<<(std::ostream& out, const cpphots::Features& feats);
 
 
 /**
+ * @brief Computes a measure of quality on features
+ * 
+ * Quality = (number of features != 0) / (number of features)
+ * 
+ * @param feats features
+ * @return quality
+ */
+double features_quality(const Features& feats);
+
+
+/**
  * @brief An interface for a generic distance-based classification method
  * 
  * Given a new features this classifier will search the stored set of feature to find the closest one.

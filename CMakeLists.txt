@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.11...3.18)
 
-project(cpphots VERSION 0.4.0
+project(cpphots VERSION 0.4.1
                 LANGUAGES CXX)
 
 # C++ version
@@ -46,9 +46,13 @@ option(BUILD_PLOTS "Build plots utilities" ON)
 # option for precision
 option(DOUBLE_PRECISION "Enable double precision" OFF)
 
+# option for peregrine
+option(WITH_PEREGRINE "Enable GMM support" OFF)
+
 # dependencies
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
+set(CPPHOTS_OPTIONAL_DEPS "")
 
 # sepia
 include(FetchContent)
@@ -65,6 +69,28 @@ endif()
 
 # Eigen
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+
+# Peregrine dependencies
+if (WITH_PEREGRINE)
+  find_package(blaze REQUIRED)
+  find_package(TBB REQUIRED)
+  find_package(LAPACK REQUIRED)
+  
+  string(APPEND CPPHOTS_OPTIONAL_DEPS "find_dependency(blaze REQUIRED)\n")
+  string(APPEND CPPHOTS_OPTIONAL_DEPS "set(CMAKE_MODULE_PATH \${CMAKE_MODULE_PATH} \"\${CMAKE_CURRENT_LIST_DIR}/modules/\")\nfind_dependency(TBB REQUIRED)\n")
+  string(APPEND CPPHOTS_OPTIONAL_DEPS "find_dependency(LAPACK REQUIRED)\n")
+
+  FetchContent_Declare(
+    peregrine
+    GIT_REPOSITORY git@github.com:OOub/peregrine.git
+    GIT_TAG        master)
+
+  FetchContent_GetProperties(peregrine)
+  if(NOT peregrine_POPULATED)
+      FetchContent_Populate(peregrine)
+  endif()
+
+endif()
 
 # python
 if (BUILD_PLOTS)
@@ -98,6 +124,13 @@ install(EXPORT cpphotsTargets
         FILE cpphotsTargets.cmake
         DESTINATION lib/cmake/cpphots)
 
+# install peregrine dependencies finders
+if (WITH_PEREGRINE)
+    install(FILES
+              cmake/FindTBB.cmake
+            DESTINATION
+              "${INSTALL_CMAKE_DIR}/modules")
+endif()
 
 # tests
 option(BUILD_TEST "Build tests" OFF)

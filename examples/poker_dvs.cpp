@@ -8,11 +8,13 @@
 
 #include <iostream>
 #include <fstream>
+#include <chrono>
 
 #include <cpphots/network.h>
 #include <cpphots/events_utils.h>
 #include <cpphots/classification.h>
 #include <cpphots/run.h>
+#include <cpphots/gmm_clustering.h>
 
 
 cpphots::Features process_file(cpphots::Network& network, const std::string& filename) {
@@ -166,9 +168,17 @@ std::tuple<double, double, double> test_training(const std::string& folder, bool
 
     cpphots::Network network;
     network.addLayer(cpphots::create_pool<cpphots::LinearTimeSurface>(2, 32, 32, 2, 2, 1000),
+#ifdef CPPHOTS_WITH_PEREGRINE
+                     cpphots::GMMClusterer(cpphots::GMMClusterer::S_GMM, 16, 5, 10, 20));
+#else
                      cpphots::HOTSClusterer(16));
+#endif
     network.addLayer(cpphots::create_pool<cpphots::LinearTimeSurface>(16, 32, 32, 4, 4, 5000),
+#ifdef CPPHOTS_WITH_PEREGRINE
+                     cpphots::GMMClusterer(cpphots::GMMClusterer::S_GMM, 32, 5, 12, 20));
+#else
                      cpphots::HOTSClusterer(32));
+#endif
 
     auto train_set = poker_dvs_trainset(folder);
 
@@ -180,10 +190,6 @@ std::tuple<double, double, double> test_training(const std::string& folder, bool
            train_set[3].first},
           initializer,
           multi);
-
-    for (auto cl : network.view<cpphots::ClustererBase>()) {
-        cl->toggleLearning(false);
-    }
 
     // prepare classifiers
     cpphots::StandardClassifier classifier1({"club", "diamond", "heart", "spade"});
@@ -237,10 +243,10 @@ int main(int argc, char* argv[]) {
             {"pp_sequential_multi.csv", "seq-multi", true, cpphots::ClustererPlusPlusInitializer},
         
         };
- 
+
         for (auto& tcase : test_cases) {
 
-            std::ofstream file(std::get<0>(tcase));
+            std::ofstream file("results/" + std::get<0>(tcase));
             file << "acc1,acc2,acc3" << std::endl;
             for (int i = 0; i < n_trainings; i++) {
                 std::cout << "training (" << std::get<1>(tcase) << ") " << i+1 << "/" << n_trainings << std::endl;

@@ -4,6 +4,10 @@
 
 #include "cpphots/interfaces.h"
 
+#ifdef CPPHOTS_WITH_PEREGRINE
+#include "cpphots/gmm_clustering.h"
+#endif
+
 
 namespace cpphots {
 
@@ -69,7 +73,7 @@ LayerPtr loadLayerFromStream(std::istream& in, const std::tuple<T...>& component
     if (cmd == "HOTSCLUSTERER") {
 
         if constexpr (is_one_of<ClustererBase, T...>) {
-            throw std::runtime_error("Component HOTSClusterer is present twice");
+            throw std::runtime_error("Component ClustererBase is present twice");
         } else {
             HOTSClusterer comp;
             comp.fromStream(in);
@@ -78,11 +82,25 @@ LayerPtr loadLayerFromStream(std::istream& in, const std::tuple<T...>& component
 
     }
 
+    #ifdef CPPHOTS_WITH_PEREGRINE
+    if (cmd == "GMMCLUSTERER") {
+
+        if constexpr (is_one_of<ClustererBase, T...>) {
+            throw std::runtime_error("Component ClustererBase is present twice");
+        } else {
+            GMMClusterer comp;
+            comp.fromStream(in);
+            return loadLayerFromStream(in, std::tuple_cat(components, std::tie(comp)));
+        }
+
+    }
+    #endif
+
     // modifiers
     if (cmd == "ARRAYLAYER") {
 
         if constexpr (is_one_of<EventRemapper, T...>) {
-            throw std::runtime_error("Component ArrayLayer is present twice");
+            throw std::runtime_error("Component EventRemapper is present twice");
         } else {
             ArrayLayer comp;
             comp.fromStream(in);
@@ -94,7 +112,7 @@ LayerPtr loadLayerFromStream(std::istream& in, const std::tuple<T...>& component
     if (cmd == "SERIALIZINGLAYER") {
 
         if constexpr (is_one_of<EventRemapper, T...>) {
-            throw std::runtime_error("Component SerializingLayer is present twice");
+            throw std::runtime_error("Component EventRemapper is present twice");
         } else {
             SerializingLayer comp;
             comp.fromStream(in);
@@ -118,7 +136,7 @@ LayerPtr loadLayerFromStream(std::istream& in, const std::tuple<T...>& component
     if (cmd == "SUPERCELLAVERAGE") {
 
         if constexpr (is_one_of<SuperCell, T...>) {
-            throw std::runtime_error("Component SuperCellAverage is present twice");
+            throw std::runtime_error("Component SuperCell is present twice");
         } else {
             SuperCellAverage comp;
             comp.fromStream(in);

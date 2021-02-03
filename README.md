@@ -17,14 +17,15 @@ cmake --build build --target install
 ```
 
 ### Main configuration options:
-| Option             | default | description                            | dependencies                      |
-|:-------------------|:-------:|:---------------------------------------|:----------------------------------|
-| `DOUBLE_PRECISION` | `OFF`   | use double precision for time surfaces |                                   |
-| `BUILD_PLOTS`      | `ON`    | build plotting utilities               | Python 3 (`requirements.txt`)     |
-| `BUILD_EXAMPLES`   | `OFF`   | build examples executables             |                                   |
-| `BUILD_TEST`       | `OFF`   | build test suite                       |                                   |
-| `BUILD_DOCS`       | `OFF`   | configure for building documentation   | [doxygen](https://www.doxygen.nl) |
-| `WITH_SPHINX`      | `OFF`   | build documentation with sphynx        | Python 3 (`docs/requirements.txt`)|
+ Option             | default | description                            | dependencies
+:-------------------|:-------:|:---------------------------------------|:------------
+ `DOUBLE_PRECISION` | `OFF`   | use double precision for time surfaces | 
+ `WITH_PEREGRINE`   | `OFF`   | include GMM clustering from Peregrine  | [blaze](https://bitbucket.org/blaze-lib/blaze), [TBB](https://github.com/oneapi-src/oneTBB)
+ `BUILD_PLOTS`      | `ON`    | build plotting utilities               | Python 3 (`requirements.txt`)
+ `BUILD_EXAMPLES`   | `OFF`   | build examples executables             | 
+ `BUILD_TEST`       | `OFF`   | build test suite                       | 
+ `BUILD_DOCS`       | `ON`    | configure for building documentation   | [doxygen](https://www.doxygen.nl)
+ `WITH_SPHINX`      | `OFF`   | build documentation with sphynx        | Python 3 (`docs/requirements.txt`)
 
 
 ## Usage

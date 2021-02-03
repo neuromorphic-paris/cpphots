@@ -30,6 +30,11 @@ if (BUILD_PLOTS)
     list(APPEND CPPHOTS_HEADERS "../include/cpphots/plots.h")
 endif()
 
+if (WITH_PEREGRINE)
+    list(APPEND CPPHOTS_SOURCES gmm_clustering.cpp)
+    list(APPEND CPPHOTS_HEADERS "../include/cpphots/gmm_clustering.h")
+endif()
+
 # add library and link to libraries
 add_library(cpphots
             ${CPPHOTS_SOURCES})
@@ -49,6 +54,16 @@ endif()
 if (BUILD_PLOTS)
     target_include_directories(cpphots PRIVATE ${Python3_INCLUDE_DIRS})
     target_link_libraries(cpphots ${Python3_LIBRARIES})
+endif()
+
+if (WITH_PEREGRINE)
+    target_compile_definitions(cpphots PUBLIC CPPHOTS_WITH_PEREGRINE)
+    target_include_directories(cpphots PRIVATE ${peregrine_SOURCE_DIR}/source )
+    if(${CMAKE_VERSION} VERSION_LESS "3.18.0")
+        target_link_libraries(cpphots blaze::blaze TBB::tbb ${LAPACK_LIBRARIES})
+    else()
+        target_link_libraries(cpphots blaze::blaze TBB::tbb LAPACK::LAPACK)
+    endif()
 endif()
 
 # installing

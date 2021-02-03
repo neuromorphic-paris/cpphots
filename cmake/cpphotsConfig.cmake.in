@@ -18,3 +18,4 @@ set(CPPHOTS_LIBRARIES cpphots)
 # Dependencies
 include(CMakeFindDependencyMacro)
 find_dependency(Eigen3 3.3 REQUIRED NO_MODULE)
+@CPPHOTS_OPTIONAL_DEPS@

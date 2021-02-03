@@ -30,6 +30,19 @@ std::ostream& operator<<(std::ostream& out, const cpphots::Features& feats) {
 }
 
 
+double features_quality(const Features& feats) {
+
+    double q = 0;
+    for (auto& f : feats) {
+        if (f > 0)
+            q++;
+    }
+
+    return q / feats.size();
+
+}
+
+
 Classifier::Classifier(size_t n_classes) {
 
     class_feats.resize(n_classes);

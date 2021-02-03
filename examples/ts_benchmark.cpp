@@ -1,5 +1,3 @@
-#include <random>
-#include <functional>
 #include <iostream>
 #include <chrono>
 
@@ -8,28 +6,8 @@
 #include <cpphots/layer.h>
 #include <cpphots/network.h>
 
+#include "commons.h"
 
-std::function<cpphots::event()> getRandomEventGenerator(uint16_t w, uint16_t h, uint16_t seed = 0) {
-
-    std::mt19937 gen(seed);
-
-    uint64_t lastt = 0;
-
-    std::uniform_int_distribution<uint16_t> distx(0, w);
-    std::uniform_int_distribution<uint16_t> disty(0, h);
-    std::uniform_int_distribution<uint64_t> distt(1, 10);
-
-    return [gen, lastt, distx, disty, distt] () mutable {
-        cpphots::event ev;
-        lastt += distt(gen);
-        ev.t = lastt;
-        ev.x = distx(gen);
-        ev.y = disty(gen);
-        ev.p = 0;
-        return ev;
-    };
-
-}
 
 void perform_test_ts(uint16_t sz, uint16_t r, cpphots::TimeSurfaceScalarType tau, unsigned int repetitions = 5) {
 

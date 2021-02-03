@@ -35,6 +35,10 @@ add_new_test(test_network network.test.cpp)
 add_new_test(test_saveload saveload.test.cpp)
 add_new_test(test_layer_modifiers layer_modifiers.test.cpp)
 
+if(WITH_PEREGRINE)
+    add_new_test(test_gmm gmm.test.cpp)
+endif()
+
 # python test for plotting functions
 if (BUILD_PLOTS)
     add_test(NAME test_plots_py COMMAND Python3::Interpreter -m unittest tsplot_test.py WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/python)

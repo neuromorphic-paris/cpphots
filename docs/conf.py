@@ -30,7 +30,7 @@ copyright = '2021, Lorenzo Vannucci'
 author = 'Lorenzo Vannucci'
 
 # project version
-release = '0.4.0'
+release = '0.4.1'
 
 
 # -- General configuration ---------------------------------------------------
