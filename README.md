@@ -5,7 +5,6 @@ An implementation of [HOTS](https://www.neuromorphic-vision.com/public/publicati
 ## Install
 
 The library depends on [Eigen](http://eigen.tuxfamily.org) and [Sepia](https://github.com/neuromorphic-paris/sepia) (which is included automatically).
-For the optional plotting utility, the library depends on Python >= 3, with its development files, and the packages listed in `requirements.txt`. This can be disabled by passing `-DBUILD_PLOTS=OFF` to `cmake`.
 `cpphots` can be built with `cmake` using the normal pipeline of commands:
 
 ```
@@ -13,6 +12,16 @@ cmake -S . -B build
 cmake --build build
 cmake --build build --target install
 ```
+
+### Main configuration options:
+| Option             | default | description                            | dependencies                      |
+|:-------------------|:-------:|:---------------------------------------|:----------------------------------|
+| `DOUBLE_PRECISION` | `OFF`   | use double precision for time surfaces |                                   |
+| `BUILD_PLOTS`      | `ON`    | build plotting utilities               | Python 3 (`requirements.txt`)     |
+| `BUILD_DOC`        | `ON`    | configure for building documentation   | [doxygen](https://www.doxygen.nl) |
+| `BUILD_EXAMPLES`   | `OFF`   | build examples executables             |                                   |
+| `BUILD_TEST`       | `OFF`   | build test suite                       |                                   |
+
 
 ## Usage
 
