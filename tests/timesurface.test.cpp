@@ -56,14 +56,32 @@ TEST(TestTimeSurface, Processing) {
         processed++;
     }
 
-    ASSERT_NEAR(normsum, 4740.313427652784, 0.1);
-    ASSERT_NEAR(goodsum, 4562.696117657931, 0.1);
+    EXPECT_NEAR(normsum, 4740.313427652784, 0.1);
+    EXPECT_NEAR(goodsum, 4562.696117657931, 0.1);
     EXPECT_EQ(goodevents, 1783);
 
 }
 
+TEST(TestTimeSurface, FullContext) {
 
-TEST(TestTimeSurfaceComputer, Processing) {
+    cpphots::TimeSurface ts(10, 10, 0, 0, 10);
+
+    auto fc = ts.getFullContext();
+    EXPECT_EQ(fc.rows(), 10);
+    EXPECT_EQ(fc.cols(), 10);
+
+    ts.update(2, 2, 2);
+
+    EXPECT_NEAR(ts.sampleFullContext(2).sum(), 1, 0.001);
+
+    ts.update(4, 4, 4);
+
+    EXPECT_NEAR(ts.sampleFullContext(4).sum(), 1.8, 0.001);
+
+}
+
+
+TEST(TestTimeSurfacePool, Processing) {
 
     // load data
     cpphots::Events events = cpphots::loadFromFile("data/trcl0.es");
@@ -90,8 +108,25 @@ TEST(TestTimeSurfaceComputer, Processing) {
         processed++;
     }
 
-    ASSERT_NEAR(normsum, 4740.313427652784, 0.1);
-    ASSERT_NEAR(goodsum, 4562.696117657931, 0.1);
+    EXPECT_NEAR(normsum, 4740.313427652784, 0.1);
+    EXPECT_NEAR(goodsum, 4562.696117657931, 0.1);
     EXPECT_EQ(goodevents, 1783);
+
+}
+
+TEST(TestTimeSurfacePool, FullContext) {
+
+    cpphots::TimeSurfacePool tsp(10, 10, 0, 0, 10, 2);
+
+    tsp.update(2, 2, 2, 0);
+    auto ctxs = tsp.sampleFullContexts(2);
+    EXPECT_EQ(ctxs.size(), 2);
+    EXPECT_NEAR(ctxs[0].sum(), 1.0, 0.001);
+    EXPECT_NEAR(ctxs[1].sum(), 0.0, 0.001);
+
+    tsp.update(4, 4, 4, 1);
+    ctxs = tsp.sampleFullContexts(4);
+    EXPECT_NEAR(ctxs[0].sum(), 0.8, 0.001);
+    EXPECT_NEAR(ctxs[1].sum(), 1.0, 0.001);
 
 }

@@ -157,7 +157,7 @@ public:
      * This functions applies the decay to the full temporal context and returns it.
      * 
      * @param t sample time
-     * @return Decayed temporal context
+     * @return decayed temporal context
      */
     TimeSurfaceType sampleFullContext(uint64_t t) const;
 
@@ -365,7 +365,15 @@ public:
         return surfaces[idx];
     }
 
-    // TODO: sample all contexts
+    /**
+     * @brief Sample and decay all temporal contexts from the pool
+     * 
+     * This functions applies the decay to the all temporal contexts and returns them.
+     * 
+     * @param t sample time
+     * @return vector of decayed temporal contexts
+     */
+    std::vector<TimeSurfaceType> sampleFullContexts(uint64_t t);
 
     /**
      * @brief Stream insertion operator for TimeSurfacePool

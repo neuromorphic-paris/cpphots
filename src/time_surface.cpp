@@ -128,6 +128,14 @@ void TimeSurfacePool::reset() {
     }
 }
 
+std::vector<TimeSurfaceType> TimeSurfacePool::sampleFullContexts(uint64_t t) {
+    std::vector<TimeSurfaceType> ret;
+    for (const auto& ts : surfaces) {
+        ret.push_back(ts.sampleFullContext(t));
+    }
+    return ret;
+}
+
 void TimeSurfacePool::assert_polarity(uint16_t p) const {
     if (p >= surfaces.size()) {
         throw std::invalid_argument("Polarity index exceeded: " + std::to_string(p) + ". Layer has only " + std::to_string(surfaces.size()) + " input polarities.");
