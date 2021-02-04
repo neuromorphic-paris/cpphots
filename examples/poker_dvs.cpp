@@ -88,20 +88,8 @@ std::vector<double> compute_accuracy(cpphots::Network& network, const std::vecto
 
 }
 
-// shorthands for training
-void train_oneshot(cpphots::Network& network, const std::vector<std::string>& training_set, const cpphots::ClustererInitializerType& initializer, bool use_all = true) {
-
-    // load all training set
-    std::vector<cpphots::Events> training_events;
-    for (auto& filename : training_set) {
-        training_events.push_back(cpphots::loadFromFile(filename));
-    }
-
-    cpphots::train_oneshot(network, training_events, initializer, use_all);
-
-}
-
-void train_sequential(cpphots::Network& network, const std::vector<std::string>& training_set, const cpphots::ClustererInitializerType& initializer, bool use_all = true) {
+// shorthand for training
+void train(cpphots::Network& network, const std::vector<std::string>& training_set, const cpphots::ClustererInitializerType& initializer, bool use_all = true) {
 
     // load all traning set
     std::vector<cpphots::Events> training_events;
@@ -109,7 +97,7 @@ void train_sequential(cpphots::Network& network, const std::vector<std::string>&
         training_events.push_back(cpphots::loadFromFile(filename));
     }
 
-    cpphots::train_sequential(network, training_events, initializer, use_all);
+    cpphots::train(network, training_events, initializer, use_all);
 
 }
 
@@ -174,7 +162,7 @@ std::vector<std::pair<std::string, std::string>> poker_dvs_all(const std::string
 }
 
 
-std::tuple<double, double, double> test_training(const std::string& folder, bool sequential, bool multi, const cpphots::ClustererInitializerType& initializer) {
+std::tuple<double, double, double> test_training(const std::string& folder, bool multi, const cpphots::ClustererInitializerType& initializer) {
 
     cpphots::Network network;
     auto l1 = cpphots::create_layer(cpphots::TimeSurfacePool(32, 32, 2, 2, 1000, 2),
@@ -187,23 +175,13 @@ std::tuple<double, double, double> test_training(const std::string& folder, bool
     auto train_set = poker_dvs_trainset(folder);
 
     // train network
-    if (sequential) {
-        train_sequential(network,
-                         {train_set[0].first,
-                          train_set[1].first,
-                          train_set[2].first,
-                          train_set[3].first},
-                         initializer,
-                         multi);
-    } else {
-        train_oneshot(network,
-                      {train_set[0].first,
-                       train_set[1].first,
-                       train_set[2].first,
-                       train_set[3].first},
-                      initializer,
-                      multi);
-    }
+    train(network,
+          {train_set[0].first,
+           train_set[1].first,
+           train_set[2].first,
+           train_set[3].first},
+          initializer,
+          multi);
 
     for (auto cl : network.view<cpphots::ClustererBase>()) {
         cl->toggleLearning(false);
@@ -249,22 +227,16 @@ int main(int argc, char* argv[]) {
             n_trainings = 100;
         }
 
-        const std::vector<std::tuple<std::string, std::string, bool, bool, cpphots::ClustererInitializerType>> test_cases{
+        const std::vector<std::tuple<std::string, std::string, bool, cpphots::ClustererInitializerType>> test_cases{
         
-            {"afkmc2_sequential.csv", "seq", true, false, cpphots::ClustererAFKMC2Initializer(5)},
-            {"afkmc2_sequential_multi.csv", "seq-multi", true, true, cpphots::ClustererAFKMC2Initializer(5)},
-            {"afkmc2_oneshot.csv", "one", false, false, cpphots::ClustererAFKMC2Initializer(5)},
-            {"afkmc2_oneshot_multi.csv", "one-multi", false, true, cpphots::ClustererAFKMC2Initializer(5)},
+            {"afkmc2_sequential.csv", "seq", false, cpphots::ClustererAFKMC2Initializer(5)},
+            {"afkmc2_sequential_multi.csv", "seq-multi", true, cpphots::ClustererAFKMC2Initializer(5)},
 
-            {"unif_sequential.csv", "seq", true, false, cpphots::ClustererUniformInitializer},
-            {"unif_sequential_multi.csv", "seq-multi", true, true, cpphots::ClustererUniformInitializer},
-            {"unif_oneshot.csv", "one", false, false, cpphots::ClustererUniformInitializer},
-            {"unif_oneshot_multi.csv", "one-multi", false, true, cpphots::ClustererUniformInitializer},
+            {"unif_sequential.csv", "seq", false, cpphots::ClustererUniformInitializer},
+            {"unif_sequential_multi.csv", "seq-multi", true, cpphots::ClustererUniformInitializer},
         
-            {"pp_sequential.csv", "seq", true, false, cpphots::ClustererPlusPlusInitializer},
-            {"pp_sequential_multi.csv", "seq-multi", true, true, cpphots::ClustererPlusPlusInitializer},
-            {"pp_oneshot.csv", "one", false, false, cpphots::ClustererPlusPlusInitializer},
-            {"pp_oneshot_multi.csv", "one-multi", false, true, cpphots::ClustererPlusPlusInitializer}
+            {"pp_sequential.csv", "seq", false, cpphots::ClustererPlusPlusInitializer},
+            {"pp_sequential_multi.csv", "seq-multi", true, cpphots::ClustererPlusPlusInitializer},
         
         };
  
@@ -274,7 +246,7 @@ int main(int argc, char* argv[]) {
             file << "acc1,acc2,acc3" << std::endl;
             for (int i = 0; i < n_trainings; i++) {
                 std::cout << "training (" << std::get<1>(tcase) << ") " << i+1 << "/" << n_trainings << std::endl;
-                auto res = test_training(datafolder, std::get<2>(tcase), std::get<3>(tcase), std::get<4>(tcase));
+                auto res = test_training(datafolder, std::get<2>(tcase), std::get<3>(tcase));
                 file << std::get<0>(res) << "," << std::get<1>(res) << "," << std::get<2>(res) << std::endl;
             }
             file.close();
@@ -282,7 +254,7 @@ int main(int argc, char* argv[]) {
 
     } else {
 
-        auto res = test_training(datafolder, false, true, cpphots::ClustererPlusPlusInitializer);
+        auto res = test_training(datafolder, true, cpphots::ClustererPlusPlusInitializer);
         std::cout << "acc1 = " << std::get<0>(res) << ", acc2 = " << std::get<1>(res) << ", acc3 = " << std::get<2>(res) << std::endl;
 
     }
