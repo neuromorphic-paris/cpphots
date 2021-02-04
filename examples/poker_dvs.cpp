@@ -15,6 +15,105 @@
 #include <cpphots/run.h>
 
 
+cpphots::Features process_file(cpphots::Network& network, const std::string& filename) {
+
+    // load file
+    auto events = cpphots::loadFromFile(filename);
+
+    // run network
+    network.reset();
+    for (const auto& ev : events) {
+
+        // there are some events outside the range
+        if (ev.x >= 32 || ev.y >= 32) {
+            continue;
+        }
+
+        network.process(ev);
+    }
+
+    auto feats = network.back<cpphots::ClustererBase>().getHistogram();
+
+    return feats;
+
+}
+
+// test suite
+// takes a trained network, a trained classifier and a test set (vector<filename, label>)
+double compute_accuracy(cpphots::Network& network, const cpphots::Classifier& classifier, const std::vector<std::pair<std::string, std::string>>& test_set) {
+
+    double acc = 0;
+
+    for (auto sample : test_set) {
+
+        // classify
+        auto predicted = classifier.classifyName(process_file(network, sample.first));
+
+        if (predicted == sample.second) {
+            acc++;
+        }
+
+    }
+
+    return acc / test_set.size();
+
+}
+
+std::vector<double> compute_accuracy(cpphots::Network& network, const std::vector<cpphots::Classifier*>& classifiers, const std::vector<std::pair<std::string, std::string>>& test_set) {
+
+    std::vector<double> acc(classifiers.size());
+
+    for (auto sample : test_set) {
+
+        auto feats = process_file(network, sample.first);
+
+        // classify
+        for (size_t i = 0; i < classifiers.size(); i ++) {
+             auto predicted = classifiers[i]->classifyName(feats);
+
+            if (predicted == sample.second) {
+                acc[i]++;
+            }
+
+        }
+
+    }
+
+    for (size_t i = 0; i < classifiers.size(); i ++) {
+        acc[i] = acc[i] / test_set.size();
+    }
+
+
+    return acc;
+
+}
+
+// shorthands for training
+void train_oneshot(cpphots::Network& network, const std::vector<std::string>& training_set, const cpphots::ClustererInitializerType& initializer, bool use_all = true) {
+
+    // load all training set
+    std::vector<cpphots::Events> training_events;
+    for (auto& filename : training_set) {
+        training_events.push_back(cpphots::loadFromFile(filename));
+    }
+
+    cpphots::train_oneshot(network, training_events, initializer, use_all);
+
+}
+
+void train_sequential(cpphots::Network& network, const std::vector<std::string>& training_set, const cpphots::ClustererInitializerType& initializer, bool use_all = true) {
+
+    // load all traning set
+    std::vector<cpphots::Events> training_events;
+    for (auto& filename : training_set) {
+        training_events.push_back(cpphots::loadFromFile(filename));
+    }
+
+    cpphots::train_sequential(network, training_events, initializer, use_all);
+
+}
+
+
 std::vector<std::pair<std::string, std::string>> poker_dvs_trainset(const std::string& folder) {
 
     std::vector<std::pair<std::string, std::string>> ret;
@@ -89,21 +188,21 @@ std::tuple<double, double, double> test_training(const std::string& folder, bool
 
     // train network
     if (sequential) {
-        cpphots::train_sequential(network,
-                                  {train_set[0].first,
-                                   train_set[1].first,
-                                   train_set[2].first,
-                                   train_set[3].first},
-                                  initializer,
-                                  multi);
+        train_sequential(network,
+                         {train_set[0].first,
+                          train_set[1].first,
+                          train_set[2].first,
+                          train_set[3].first},
+                         initializer,
+                         multi);
     } else {
-        cpphots::train_oneshot(network,
-                               {train_set[0].first,
-                                train_set[1].first,
-                                train_set[2].first,
-                                train_set[3].first},
-                               initializer,
-                               multi);
+        train_oneshot(network,
+                      {train_set[0].first,
+                       train_set[1].first,
+                       train_set[2].first,
+                       train_set[3].first},
+                      initializer,
+                      multi);
     }
 
     for (auto cl : network.view<cpphots::ClustererBase>()) {
