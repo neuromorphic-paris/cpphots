@@ -3,8 +3,8 @@
  * @brief Data structures and functions related to event management
  */
 
-#ifndef EVENTS_UTILS_H
-#define EVENTS_UTILS_H
+#ifndef CPPHOTS_EVENTS_UTILS_H
+#define CPPHOTS_EVENTS_UTILS_H
 
 #include <vector>
 #include <cstdint>

@@ -2,6 +2,8 @@
  * @file plots.h
  * @brief Time surface plotting utilities
  */
+#ifndef CPPHOTS_PLOTS_H
+#define CPPHOTS_PLOTS_H
 
 #include "time_surface.h"
 
@@ -32,3 +34,5 @@ void plot_ts(const TimeSurfaceType& ts);
 void plot_multiple_ts(const std::vector<TimeSurfaceType>& mts, unsigned int rows = 0, unsigned int cols = 0, bool colorcode = true);
 
 }
+
+#endif

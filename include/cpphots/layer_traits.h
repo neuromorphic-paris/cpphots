@@ -2,8 +2,8 @@
  * @file layer_traits.h
  * @brief Helper functions to check traits of Layer components
  */
-#ifndef LAYER_TRAITS_H
-#define LAYER_TRAITS_H
+#ifndef CPPHOTS_LAYER_TRAITS_H
+#define CPPHOTS_LAYER_TRAITS_H
 
 #include <type_traits>
 #include <ostream>

@@ -2,8 +2,8 @@
  * @file clustering.h
  * @brief Classes and functions for time surface clustering
  */
-#ifndef CLUSTERING_H
-#define CLUSTERING_H
+#ifndef CPPHOTS_CLUSTERING_H
+#define CPPHOTS_CLUSTERING_H
 
 #include "time_surface.h"
 

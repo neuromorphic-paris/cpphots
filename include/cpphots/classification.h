@@ -3,8 +3,8 @@
  * @brief Collection of classes to perform classification on the histograms obtained from HOTS
  */
 
-#ifndef CLASSIFICATION_H
-#define CLASSIFICATION_H
+#ifndef CPPHOTS_CLASSIFICATION_H
+#define CPPHOTS_CLASSIFICATION_H
 
 #include <vector>
 #include <string>

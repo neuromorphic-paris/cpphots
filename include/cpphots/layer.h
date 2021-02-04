@@ -2,8 +2,8 @@
  * @file layer.h
  * @brief Implementation of HOTS layers
  */
-#ifndef LAYER_H
-#define LAYER_H
+#ifndef CPPHOTS_LAYER_H
+#define CPPHOTS_LAYER_H
 
 #include <type_traits>
 

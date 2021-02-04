@@ -2,6 +2,9 @@
  * @file layer_modifiers.h
  * @brief Components that modify the behaviour of Layers
  */
+#ifndef CPPHOTS_LAYER_MODIFIERS_H
+#define CPPHOTS_LAYER_MODIFIERS_H
+
 #include <vector>
 
 #include "time_surface.h"
@@ -79,3 +82,5 @@ private:
 };
 
 }
+
+#endif

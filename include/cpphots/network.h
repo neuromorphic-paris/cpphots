@@ -3,8 +3,8 @@
  * @brief Implementation of a full HOTS network
  */
 
-#ifndef HOTS_H
-#define HOTS_H
+#ifndef CPPHOTS_NETWORK_H
+#define CPPHOTS_NETWORK_H
 
 #include <cstdint>
 #include <vector>

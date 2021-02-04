@@ -3,8 +3,8 @@
  * @brief Time surface implementation
  */
 
-#ifndef TIME_SURFACE_H
-#define TIME_SURFACE_H
+#ifndef CPPHOTS_TIME_SURFACE_H
+#define CPPHOTS_TIME_SURFACE_H
 
 #include <ostream>
 #include <istream>

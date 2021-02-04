@@ -2,8 +2,8 @@
  * @file run.h
  * @brief Utilities functions for event processing
  */
-#ifndef TESTING_H
-#define TESTING_H
+#ifndef CPPHOTS_RUN_H
+#define CPPHOTS_RUN_H
 
 #include <vector>
 #include <string>
