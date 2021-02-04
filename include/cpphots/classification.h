@@ -19,9 +19,6 @@ namespace cpphots {
  */
 using Features = std::vector<uint32_t>;
 
-}
-
-
 /**
  * @brief Stream insertion operator for Features
  * 
@@ -33,8 +30,6 @@ using Features = std::vector<uint32_t>;
  */
 std::ostream& operator<<(std::ostream& out, const cpphots::Features& feats);
 
-
-namespace cpphots {
 
 /**
  * @brief An interface for a generic distance-based classification method

@@ -7,6 +7,7 @@
 #include <iomanip>
 #include <algorithm>
 
+namespace cpphots {
 
 std::ostream& operator<<(std::ostream& out, const cpphots::Features& feats) {
 
@@ -28,8 +29,6 @@ std::ostream& operator<<(std::ostream& out, const cpphots::Features& feats) {
 
 }
 
-
-namespace cpphots {
 
 Classifier::Classifier(size_t n_classes) {
 
