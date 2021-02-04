@@ -31,6 +31,7 @@ add_new_test(test_timesurface timesurface.test.cpp)
 add_new_test(test_layer layer.test.cpp)
 add_new_test(test_network network.test.cpp)
 add_new_test(test_saveload saveload.test.cpp)
+add_new_test(test_layer_modifiers layer_modifiers.test.cpp)
 
 # python test for plotting functions
 if (BUILD_PLOTS)

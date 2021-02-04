@@ -100,18 +100,49 @@ public:
             return Events{};
         }
 
-        // if there is a clustering algorithm we can use it
-        if constexpr (std::is_base_of_v<ClustererBase, Layer>) {
-            auto k = this->cluster(surface);
+        std::vector<TimeSurfaceType> surfaces;
+        std::vector<std::pair<uint16_t, uint16_t>> coords;
 
-            if constexpr (std::is_base_of_v<ArrayLayer, Layer>) {
-                return {event{t, k, y, 0}};
+        // check averaging
+        if constexpr (std::is_base_of_v<Averaging, Layer>) {
+            coords = this->findCells(x, y);
+            for (auto [cx, cy] : coords) {
+                surfaces.push_back(this->averageTS(surface, cx, cy));
             }
-
-            return {event{t, x, y, k}};
+        } else {
+            surfaces.push_back(surface);
+            coords.push_back({x, y});
         }
 
-        return Events{event{t, x, y, p}};
+        // if there is a clustering algorithm we can use it
+        if constexpr (std::is_base_of_v<ClustererBase, Layer>) {
+
+            Events retevents;
+
+            for (size_t i = 0; i < surfaces.size(); i++) {
+
+                auto& surface = surfaces[i];
+                auto [x, y] = coords[i];
+
+                auto k = this->cluster(surface);
+
+                if constexpr (std::is_base_of_v<ArrayLayer, Layer>) {
+                    retevents.push_back(event{t, k, y, 0});
+                } else {
+                    retevents.push_back(event{t, x, y, k});
+                }
+
+            }
+
+            return retevents;
+        }
+
+        Events retevents;
+        for (auto [ex, ey] : coords) {
+            retevents.push_back(event{t, ex, ey, p});
+        }
+
+        return retevents;
 
     }
 

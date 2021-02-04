@@ -5,7 +5,8 @@ set(CPPHOTS_SOURCES
     network.cpp
     run.cpp
     time_surface.cpp
-    clustering.cpp)
+    clustering.cpp
+    layer_modifiers.cpp)
 
 set(CPPHOTS_HEADERS
     "../include/cpphots/classification.h"
