@@ -24,21 +24,22 @@ namespace cpphots {
  * A processor is somenthing with the following methods:
  * 
  *   - void reset()
- *   - Events process(const event&)
+ *   - Events process(const event&, bool)
  * 
  * @tparam P processor type
  * @param processor the processor
  * @param events sequence of events
+ * @param skip_check if true consider all events as valid
  * @return events emitted by the processor
  */
 template<typename P>
-Events process(P& processor, const Events& events) {
+Events process(P& processor, const Events& events, bool skip_check = false) {
 
     processor.reset();
 
     Events ret;
     for (const auto& ev : events) {
-        Events nev = processor.process(ev);
+        Events nev = processor.process(ev, skip_check);
         ret.insert(ret.end(), nev.begin(), nev.end());
     }
 
@@ -54,20 +55,21 @@ Events process(P& processor, const Events& events) {
  * A processor is somenthing with the following methods:
  * 
  *   - void reset()
- *   - Events process(const event&)
+ *   - Events process(const event&, bool)
  * 
  * @tparam P processor type
  * @param processor the processor
  * @param events sequences of events
+ * @param skip_check if true consider all events as valid
  * @return corresponding sequences of events emitted by the processor
  */
 template<typename P>
-std::vector<Events> process(P& processor, const std::vector<Events>& events) {
+std::vector<Events> process(P& processor, const std::vector<Events>& events, bool skip_check = false) {
 
     std::vector<Events> ret;
 
     for (const auto& evts : events) {
-        ret.push_back(process(processor, evts));
+        ret.push_back(process(processor, evts, skip_check));
     }
 
     return ret;
