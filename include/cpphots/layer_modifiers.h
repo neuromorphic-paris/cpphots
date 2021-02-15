@@ -13,13 +13,63 @@
 namespace cpphots {
 
 /**
+ * @brief Interface for a modifier that remaps events
+ * 
+ * A remapper usually changes the coordinates or the polarity of an event,
+ * withoud modifying the event timestamp.
+ */
+struct EventRemapper {
+
+    /**
+     * @brief Remap event
+     
+     * @param ev event
+     * @param k cluster id
+     * @return remapped event
+     */
+    virtual event remapEvent(event ev, uint16_t k) = 0;
+
+};
+
+/**
  * @brief Changes the output of a Layer to ArrayHOTS
  * 
  * If added to a Layer, output events will be emitted as:
  * {t, k, y, 0}
  * where k is the clustering output.
  */
-struct ArrayLayer {};
+struct ArrayLayer : public EventRemapper {
+
+    event remapEvent(event ev, uint16_t k) override;
+
+};
+
+/**
+ * @brief Changes the output of a Layer to a single dimension
+ * 
+ * If added to a Layer, output events will be remapped to a single dimension,
+ * as follows:
+ * {t, w*h*k + w*y + x, 0, 0}
+ * where k is the clustering output and w,h are the dimensions of the context.
+ */
+class SerializingLayer : public EventRemapper {
+
+public:
+
+    /**
+     * @brief Construct a new SerializingLayer modifier
+     * 
+     * @param width horizontal size of the context
+     * @param height vertical size of the context
+     */
+    SerializingLayer(uint16_t width, uint16_t height);
+
+    event remapEvent(event ev, uint16_t k) override;
+
+private:
+    uint16_t w, h;
+
+};
 
 
 /**
@@ -28,7 +78,7 @@ struct ArrayLayer {};
  * If added to a layer, time surfaces will be averaged over cell of a fixed size.
  * Cells may be overlapping, causing the layer to emit more than one event.
  */
-struct Averaging {
+class Averaging {
 
 public:
     /**

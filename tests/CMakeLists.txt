@@ -26,6 +26,7 @@ function(add_new_test target)
 endfunction()
 
 # list of tests
+add_new_test(test_commons commons.test.cpp)
 add_new_test(test_classification classification.test.cpp)
 add_new_test(test_timesurface timesurface.test.cpp)
 add_new_test(test_layer layer.test.cpp)

@@ -126,8 +126,8 @@ public:
 
                 auto k = this->cluster(surface);
 
-                if constexpr (std::is_base_of_v<ArrayLayer, Layer>) {
-                    retevents.push_back(event{t, k, y, 0});
+                if constexpr (std::is_base_of_v<EventRemapper, Layer>) {
+                    retevents.push_back(this->remapEvent(event{t, x, y, p}, k));
                 } else {
                     retevents.push_back(event{t, x, y, k});
                 }

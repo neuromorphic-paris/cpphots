@@ -5,6 +5,37 @@
 
 namespace cpphots {
 
+
+event ArrayLayer::remapEvent(event ev, uint16_t k) {
+
+    ev.x = k;
+    ev.p = 0;
+
+    return ev;
+
+}
+
+
+SerializingLayer::SerializingLayer(uint16_t width, uint16_t height)
+    :w(width), h(height) {}
+
+event SerializingLayer::remapEvent(event ev, uint16_t k) {
+
+    int x = (int)w*h*k + w*ev.y + ev.x;
+
+    if (x > std::numeric_limits<uint16_t>::max()) {
+        throw std::runtime_error("Remapping exceeds uint16_t precision");
+    }
+
+    ev.x = x;
+    ev.y = 0;
+    ev.p = 0;
+
+    return ev;
+
+}
+
+
 Averaging::Averaging(uint16_t width, uint16_t height, uint16_t K, uint16_t overlap)
     :K(K), o(overlap) {
 
