@@ -66,6 +66,13 @@ public:
 
     event remapEvent(event ev, uint16_t k) override;
 
+    /**
+     * @brief Returns the size of the context
+     * 
+     * @return {width, height}
+     */
+    std::pair<uint16_t, uint16_t> getSize() const;
+
 private:
     uint16_t w, h;
 
@@ -112,8 +119,16 @@ public:
      */
     TimeSurfaceType averageTS(const TimeSurfaceType& ts, uint16_t cx, uint16_t cy);
 
+    /**
+     * @brief Returns the size of the context
+     * 
+     * @return {width, height}
+     */
+    std::pair<uint16_t, uint16_t> getSize() const;
+
 private:
 
+    uint16_t width, height;
     uint16_t K, o;
 
     struct Cell {

@@ -64,6 +64,10 @@ TimeSurfaceType TimeSurface::sampleFullContext(uint64_t t) const {
 
 }
 
+std::pair<uint16_t, uint16_t> TimeSurface::getSize() const {
+    return {width, height};
+}
+
 void TimeSurface::reset() {
     context = TimeSurfaceType::Zero(height+2*Ry, width+2*Rx) - tau;  // makes sense, but is not in the paper
 }
@@ -120,6 +124,10 @@ void TimeSurfacePool::update(uint64_t t, uint16_t x, uint16_t y, uint16_t p) {
 std::pair<TimeSurfaceType, bool> TimeSurfacePool::compute(uint64_t t, uint16_t x, uint16_t y, uint16_t p) const {
     assert_polarity(p);
     return surfaces[p].compute(t, x, y);
+}
+
+std::pair<uint16_t, uint16_t> TimeSurfacePool::getSize() const {
+    return surfaces[0].getSize();
 }
 
 void TimeSurfacePool::reset() {

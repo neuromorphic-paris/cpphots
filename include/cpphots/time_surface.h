@@ -169,6 +169,13 @@ public:
     void reset();
 
     /**
+     * @brief Returns the size of the context
+     * 
+     * @return {width, height}
+     */
+    std::pair<uint16_t, uint16_t> getSize() const;
+
+    /**
      * @brief Get the horizontal size of the window
      * 
      * @return the horizontal size of the window
@@ -328,6 +335,13 @@ public:
         update(ev.t, ev.x, ev.y, ev.p);
         return compute(ev.t, ev.x, ev.y, ev.p);
     }
+
+    /**
+     * @brief Returns the size of the context
+     * 
+     * @return {width, height}
+     */
+    std::pair<uint16_t, uint16_t> getSize() const;
 
     /**
      * @brief Reset the time surfaces

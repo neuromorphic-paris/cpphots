@@ -35,9 +35,13 @@ event SerializingLayer::remapEvent(event ev, uint16_t k) {
 
 }
 
+std::pair<uint16_t, uint16_t> SerializingLayer::getSize() const {
+    return {w, h};
+}
+
 
 Averaging::Averaging(uint16_t width, uint16_t height, uint16_t K, uint16_t overlap)
-    :K(K), o(overlap) {
+    :width(width), height(height), K(K), o(overlap) {
 
     // width
     wcell = 1 + (width - K) / (K - overlap);
@@ -97,6 +101,10 @@ TimeSurfaceType Averaging::averageTS(const TimeSurfaceType& ts, uint16_t cx, uin
 
     return cell.ts / cell.count;
 
+}
+
+std::pair<uint16_t, uint16_t> Averaging::getSize() const {
+    return {width, height};
 }
 
 std::pair<uint16_t, uint16_t> Averaging::getCellCenter(uint16_t cx, uint16_t cy) const {

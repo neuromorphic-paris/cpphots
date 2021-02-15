@@ -87,7 +87,9 @@ public:
      * @param v the components to be assembled into a layer
      */
     template < typename... U >
-    Layer(U &&... v) : T(std::forward < U >(v))... {}
+    Layer(U &&... v) : T(std::forward < U >(v))... {
+        assert_sizes();
+    }
 
     Events process(uint64_t t, uint16_t x, uint16_t y, uint16_t p, bool skip_check = false) override {
 
@@ -189,6 +191,23 @@ public:
      */
     template <typename... TT>
     friend std::istream& operator>>(std::istream& in, Layer<TT...>& layer);
+
+private:
+    void assert_sizes() const {
+        int w = -1;
+        int h = -1;
+        ([this, &w, &h]() {
+            if constexpr (has_size_v<T>) {
+                auto [_w, _h] = T::getSize();
+                if (w == -1) {
+                    w = _w;
+                    h = _h;
+                } else if (w != _w || h != _h) {
+                    throw std::invalid_argument("Size mismatch in Layer: trying to create a Layer with components of different sizes.");
+                }
+            }
+        }(), ...);
+    }
 
 };
 

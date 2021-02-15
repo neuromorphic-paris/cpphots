@@ -47,6 +47,40 @@ inline constexpr bool is_resettable_v = is_resettable<T>::value;
 
 
 /**
+ * @brief Check if a type has a size
+ * 
+ * A type has a size if has a getSize() method.
+ * 
+ * @tparam T type to check
+ */
+template<typename T,
+         typename = void>
+struct has_size : std::false_type {};
+
+/**
+ * @brief Check if a type has a size
+ * 
+ * A type has a size if has a getSize() method.
+ * 
+ * @tparam T type to check
+ */
+template<typename T>
+struct has_size <
+    T,
+    std::enable_if_t<std::is_member_function_pointer_v<decltype(&T::getSize)>> > {
+    static constexpr bool value = std::is_member_function_pointer_v<decltype(&T::getSize)>;
+};
+
+/**
+ * @brief Helper variable template of has_size
+ * 
+ * @tparam T type to check
+ */
+template<typename T>
+inline constexpr bool has_size_v = has_size<T>::value;
+
+
+/**
  * @brief Check if a type can be written to a stream
  * 
  * Check if operator<<(std::ostream&, const T&) exists.

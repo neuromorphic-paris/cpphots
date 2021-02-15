@@ -358,3 +358,27 @@ TEST(TestLayer, TSAccess) {
     ASSERT_TRUE(v);
 
 }
+
+struct HasSize {
+
+    HasSize(uint16_t w, uint16_t h)
+        :w(w), h(h) {}
+
+    std::pair<uint16_t, uint16_t> getSize() const {
+        return {w, h};
+    }
+
+    uint16_t w, h;
+
+};
+
+TEST(TestLayer, Wrongsize) {
+
+    ASSERT_THROW(cpphots::create_layer(cpphots::TimeSurfacePool(10, 20, 5, 5, 10000, 2),
+                                       HasSize(10, 30)),
+                 std::invalid_argument);
+
+    ASSERT_NO_THROW(cpphots::create_layer(cpphots::TimeSurfacePool(10, 20, 5, 5, 10000, 2),
+                                          HasSize(10, 20)));
+
+}
