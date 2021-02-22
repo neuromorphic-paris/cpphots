@@ -1,5 +1,7 @@
 # cpphots
 
+[![Documentation Status](https://readthedocs.org/projects/cpphots/badge/?version=latest)](https://cpphots.readthedocs.io/en/latest/?badge=latest)
+
 An implementation of [HOTS](https://www.neuromorphic-vision.com/public/publications/57/publication.pdf).
 
 ## Install
@@ -38,4 +40,4 @@ target_link_libraries(<target> ${CPPHOTS_LIBRARIES})
 
 ## Documentation
 
-After configuring with `cmake`, the documentation can be built with [doxygen](https://www.doxygen.nl) (and optionally with [sphinx](https://www.sphinx-doc.org/)) by running `cmake --build build --target docs`.
+An online version of the documentation can be found [here](https://cpphots.readthedocs.io/en/latest/). Offline documentation con be built with [doxygen](https://www.doxygen.nl) (and optionally with [sphinx](https://www.sphinx-doc.org/)) as follows: after configuring with `cmake`, run `cmake --build build --target docs`.
