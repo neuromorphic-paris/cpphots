@@ -50,6 +50,25 @@ const LayerBase& Network::operator[](size_t pos) const {
     return layers[pos].get();
 }
 
+Network Network::getSubnetwork(int start, int stop) const {
+
+    Network ret;
+    if (start < 0) {
+        start = layers.size() + start;
+    }
+
+    if (stop <= 0) {
+        stop = layers.size() + stop;
+    }
+
+    for (int i = start; i < stop; i++) {
+        ret.layers.push_back(layers[i]);
+    }
+
+    return ret;
+
+}
+
 void Network::reset() {
     for (auto& l : layers) {
         l.get().reset();

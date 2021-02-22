@@ -41,15 +41,46 @@ TEST(TestNetwork, GetLayer) {
     ASSERT_THROW(A& a2 = network.getLayer<A>(1), std::bad_cast);
 
     A& a = network.getLayer<A>(0);
-    ASSERT_EQ(std::addressof(a), std::addressof(l1));
+    EXPECT_EQ(std::addressof(a), std::addressof(l1));
 
     cpphots::LayerBase& lr1 = network.getLayer(0);
     cpphots::LayerBase& lr2 = network.getLayer(1);
 
-    ASSERT_EQ(std::addressof(lr1), std::addressof(l1));
-    ASSERT_EQ(std::addressof(lr2), std::addressof(l2));
+    EXPECT_EQ(std::addressof(lr1), std::addressof(l1));
+    EXPECT_EQ(std::addressof(lr2), std::addressof(l2));
 
-    ASSERT_EQ(std::addressof(network.back<A>()), std::addressof(l1));
-    ASSERT_EQ(std::addressof(network.back()), std::addressof(l2));
+    EXPECT_EQ(std::addressof(network.back<A>()), std::addressof(l1));
+    EXPECT_EQ(std::addressof(network.back()), std::addressof(l2));
+
+}
+
+TEST(TestNetwork, Subnetwork) {
+
+    cpphots::Network network;
+    cpphots::Layer<cpphots::TimeSurfacePool> l0;
+    cpphots::Layer<cpphots::TimeSurfacePool> l1;
+    cpphots::Layer<cpphots::TimeSurfacePool> l2;
+    cpphots::Layer<cpphots::TimeSurfacePool> l3;
+    network.addLayer(l0);
+    network.addLayer(l1);
+    network.addLayer(l2);
+    network.addLayer(l3);
+
+    auto net2 = network.getSubnetwork(0, 2);
+    EXPECT_EQ(net2.getNumLayers(), 2);
+    EXPECT_EQ(std::addressof(net2.getLayer(0)), std::addressof(l0));
+    EXPECT_EQ(std::addressof(net2.getLayer(1)), std::addressof(l1));
+
+    auto net3 = network.getSubnetwork(1);
+    EXPECT_EQ(net3.getNumLayers(), 3);
+    EXPECT_EQ(std::addressof(net3.getLayer(0)), std::addressof(l1));
+    EXPECT_EQ(std::addressof(net3.getLayer(1)), std::addressof(l2));
+    EXPECT_EQ(std::addressof(net3.getLayer(2)), std::addressof(l3));
+
+    auto net4 = network.getSubnetwork(0, -1);
+    EXPECT_EQ(net4.getNumLayers(), 3);
+    EXPECT_EQ(std::addressof(net4.getLayer(0)), std::addressof(l0));
+    EXPECT_EQ(std::addressof(net4.getLayer(1)), std::addressof(l1));
+    EXPECT_EQ(std::addressof(net4.getLayer(2)), std::addressof(l2));
 
 }

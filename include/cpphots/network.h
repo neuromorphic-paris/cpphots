@@ -23,6 +23,8 @@ namespace cpphots {
  * @brief A multi-layered HOTS network
  * 
  * This class can process events through a sequence of layers.
+ * 
+ * A Network owns no layers, only references to them.
  */
 class Network {
 
@@ -189,6 +191,18 @@ public:
         }
         return ret;
     }
+
+    /**
+     * @brief Create a subnetwork of the current Network
+     * 
+     * Returns a new network that shares layers [start:end) with this network.
+     * Indexes can be negative (python-like) and end=0 means up to the end.
+     * 
+     * @param start start of interval
+     * @param stop end of interval (not included)
+     * @return the subnetwork
+     */
+    Network getSubnetwork(int start, int stop = 0) const;
 
     /**
      * @brief Reset the network
