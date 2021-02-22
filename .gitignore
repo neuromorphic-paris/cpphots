@@ -43,9 +43,10 @@ build*
 # PYTHON STUFF
 .idea
 
-# python files, except those in python folder
+# python files, except those folder where are needed
 *.py
 !python/*.py
+!docs/*.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

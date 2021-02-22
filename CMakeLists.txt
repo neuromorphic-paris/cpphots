@@ -48,6 +48,8 @@ option(DOUBLE_PRECISION "Enable double precision" OFF)
 
 # dependencies
 
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
+
 # sepia
 include(FetchContent)
 FetchContent_Declare(
@@ -112,6 +114,7 @@ endif (BUILD_EXAMPLES)
 
 # docs
 option(BUILD_DOCS "Build documentation" OFF)
+option(WITH_SPHINX "Generate documentation with sphinx" OFF)
 
 if (BUILD_DOCS)
 add_subdirectory(docs)
