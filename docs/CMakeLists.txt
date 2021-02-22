@@ -38,7 +38,7 @@ if (WITH_SPHINX)
     set(SPHINX_SOURCE ${CMAKE_CURRENT_BINARY_DIR})
     set(SPHINX_BUILD ${CMAKE_CURRENT_BINARY_DIR}/sphinx)
     set(SPHINX_INDEX_FILE ${SPHINX_BUILD}/index.html)
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/conf.py.in ${SPHINX_SOURCE}/conf.py)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/conf.py ${SPHINX_SOURCE}/conf.py COPYONLY)
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/index.rst ${SPHINX_SOURCE}/index.rst COPYONLY)
 
     add_custom_command(OUTPUT ${SPHINX_INDEX_FILE}
@@ -50,7 +50,7 @@ if (WITH_SPHINX)
                     DEPENDS
                     ${CMAKE_CURRENT_SOURCE_DIR}/index.rst
                     ${DOXYGEN_INDEX_FILE}
-                    MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/conf.py.in
+                    MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/conf.py
                     COMMENT "Generating documentation with sphinx")
 
     # general docs target (with sphinx)
