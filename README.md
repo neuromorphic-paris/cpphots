@@ -18,7 +18,7 @@ cmake --build build --target install
 |:-------------------|:-------:|:---------------------------------------|:----------------------------------|
 | `DOUBLE_PRECISION` | `OFF`   | use double precision for time surfaces |                                   |
 | `BUILD_PLOTS`      | `ON`    | build plotting utilities               | Python 3 (`requirements.txt`)     |
-| `BUILD_DOC`        | `ON`    | configure for building documentation   | [doxygen](https://www.doxygen.nl) |
+| `BUILD_DOCS`       | `OFF`   | configure for building documentation   | [doxygen](https://www.doxygen.nl) |
 | `BUILD_EXAMPLES`   | `OFF`   | build examples executables             |                                   |
 | `BUILD_TEST`       | `OFF`   | build test suite                       |                                   |
 
@@ -37,4 +37,4 @@ target_link_libraries(<target> ${CPPHOTS_LIBRARIES})
 
 ## Documentation
 
-After configuring with `cmake`, the documentation can be built with [doxygen](https://www.doxygen.nl) by running `cmake --build build --target doc`.
+After configuring with `cmake`, the documentation can be built with [doxygen](https://www.doxygen.nl) by running `cmake --build build --target docs`.
