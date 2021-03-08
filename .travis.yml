@@ -11,6 +11,7 @@ env:
 before_install:
   # install dependencies
   - sudo apt-get -y install libeigen3-dev g++-8 gcc-8
+  - pip install -r requirements.txt
 
 before_script:
   # configure
