@@ -7,11 +7,11 @@ compiler:
 
 before_script:
   # configure
-  - mkdir build
-  - cmake -S . -B build -DBUILD_TEST=ON
+  - mkdir build && cd build
+  - cmake -DBUILD_TEST=ON -DBUILD_EXAMPLES=ON ..
 
 script:
   # build
-  - cmake --build build
+  - make
   # run tests
-  - cmake --build build --target test
+  - make test
