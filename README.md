@@ -1,5 +1,6 @@
 # cpphots
 
+[![Build Status](https://travis-ci.com/neuromorphic-paris/cpphots.svg?branch=master)](https://travis-ci.com/neuromorphic-paris/cpphots.svg?branch=master)
 [![Documentation Status](https://readthedocs.org/projects/cpphots/badge/?version=latest)](https://cpphots.readthedocs.io/en/latest/?badge=latest)
 
 An implementation of [HOTS](https://www.neuromorphic-vision.com/public/publications/57/publication.pdf).
