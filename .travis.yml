@@ -5,6 +5,10 @@ language: cpp
 compiler:
   - gcc
 
+before_install:
+  # install dependencies
+  - sudo apt-get -y install libeigen3-dev
+
 before_script:
   # configure
   - mkdir build && cd build
