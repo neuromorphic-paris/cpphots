@@ -10,7 +10,7 @@ env:
 
 before_install:
   # install dependencies
-  - sudo apt-get -y install libeigen3-dev g++-8 gcc-8
+  - sudo apt-get -y install libeigen3-dev g++-8 gcc-8 python3-pip
   - pip3 install -r requirements.txt
 
 before_script:
