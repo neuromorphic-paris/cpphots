@@ -54,9 +54,9 @@ TEST(TestModifiers, SerializingLayer) {
 
 }
 
-TEST(TestModifiers, Averaging) {
+TEST(TestModifiers, SuperCellOverride) {
     
-    cpphots::Averaging avg(50, 50, 5, 1);
+    cpphots::SuperCell sup(50, 50, 5, 1);
 
     std::vector<std::pair<PointType, std::vector<PointType>>> cases{
         {{9, 5}, {{2, 1}}},
@@ -71,8 +71,52 @@ TEST(TestModifiers, Averaging) {
     };
 
     for (auto [tp, tr] : cases) {
-        auto cells = avg.findCells(tp.first, tp.second);
+        auto cells = sup.findCells(tp.first, tp.second);
         EXPECT_EQ(cells, tr);
+    }
+
+}
+
+TEST(TestModifiers, SuperCell) {
+
+    {
+        cpphots::SuperCell sup(103, 50, 4, 0);
+
+        auto [supw, suph] = sup.getCellSizes();
+
+        ASSERT_EQ(supw, 25);
+        ASSERT_EQ(suph, 12);
+
+        for (uint16_t x = 0; x < 103; x++) {
+            for (uint16_t y = 0; y < 50; y++) {
+                auto cells = sup.findCells(x, y);
+                if (x < 100 && y < 48) {
+                    EXPECT_FALSE(cells.empty()) << " with " << x << ", " << y;
+                } else {
+                    EXPECT_TRUE(cells.empty()) << " with " << x << ", " << y;
+                }
+            }
+        }
+    }
+
+    {
+        cpphots::SuperCell sup(105, 50, 4, 1);
+
+        auto [supw, suph] = sup.getCellSizes();
+
+        ASSERT_EQ(supw, 34);
+        ASSERT_EQ(suph, 16);
+
+        for (uint16_t x = 0; x < 105; x++) {
+            for (uint16_t y = 0; y < 50; y++) {
+                auto cells = sup.findCells(x, y);
+                if (x < 103 && y < 49) {
+                    EXPECT_FALSE(cells.empty()) << " with " << x << ", " << y;
+                } else {
+                    EXPECT_TRUE(cells.empty()) << " with " << x << ", " << y;
+                }
+            }
+        }
     }
 
 }
@@ -146,5 +190,29 @@ TEST(TestModifiersLayer, SerializingLayerException) {
         }
     }
     EXPECT_TRUE(raised);
+
+}
+
+TEST(TestModifiersLayer, SuperCell) {
+
+    auto layer = cpphots::create_layer(cpphots::TimeSurfacePool(50, 50, 5, 5, 10000, 2),
+                                       MockClusterer(10),
+                                       cpphots::SuperCell(50, 50, 5, 1));
+
+    auto evts = layer.process(10, 8, 36, 0, true);
+
+    ASSERT_EQ(evts.size(), 4);
+
+    EXPECT_EQ(evts[0].x, 1);
+    EXPECT_EQ(evts[0].y, 8);
+
+    EXPECT_EQ(evts[1].x, 2);
+    EXPECT_EQ(evts[1].y, 8);
+
+    EXPECT_EQ(evts[2].x, 1);
+    EXPECT_EQ(evts[2].y, 9);
+
+    EXPECT_EQ(evts[3].x, 2);
+    EXPECT_EQ(evts[3].y, 9);
 
 }

@@ -80,23 +80,24 @@ private:
 
 
 /**
- * @brief Average time surfaces over cells
+ * @brief Subsample layer into super cells
  * 
- * If added to a layer, time surfaces will be averaged over cell of a fixed size.
+ * If added to a layer, the output coordinates of the events will be mapped
+ * using cells of a fixed size, thus reducing the output dimensionality.
  * Cells may be overlapping, causing the layer to emit more than one event.
  */
-class Averaging {
+class SuperCell {
 
 public:
     /**
-     * @brief Construct a new Averaging modifier
+     * @brief Construct a new SuperCell modifier
      * 
      * @param width width of the context
      * @param height height of the context
      * @param K size of the cells
      * @param overlap cells overlap
      */
-    Averaging(uint16_t width, uint16_t height, uint16_t K, uint16_t overlap = 0);
+    SuperCell(uint16_t width, uint16_t height, uint16_t K, uint16_t overlap = 0);
 
     /**
      * @brief Find coordinates of cells that are over certain coordinates
@@ -110,6 +111,53 @@ public:
     std::vector<std::pair<uint16_t, uint16_t>> findCells(uint16_t ex, uint16_t ey) const;
 
     /**
+     * @brief Returns the size of the context
+     * 
+     * @return {width, height}
+     */
+    std::pair<uint16_t, uint16_t> getSize() const;
+
+    /**
+     * @brief Get the number of the horizonat and vertical cells
+     * 
+     * @return {horizontal cells, vertical cells}
+     */
+    std::pair<uint16_t, uint16_t> getCellSizes() const;
+
+protected:
+
+    uint16_t width, height;
+    uint16_t K, o;
+
+    uint16_t wcell, hcell;
+    uint16_t wmax, hmax;
+
+    std::pair<uint16_t, uint16_t> getCellCenter(uint16_t cx, uint16_t cy) const;
+
+    bool isInCell(uint16_t cx, uint16_t cy, uint16_t ex, uint16_t ey) const;
+
+};
+
+
+/**
+ * @brief Average time surfaces over cells
+ * 
+ * If added to a layer, time surfaces will be averaged over supercells.
+ */
+class SuperCellAverage : public SuperCell {
+
+public:
+    /**
+     * @brief Construct a new SuperCellAverage modifier
+     * 
+     * @param width width of the context
+     * @param height height of the context
+     * @param K size of the cells
+     * @param overlap cells overlap
+     */
+    SuperCellAverage(uint16_t width, uint16_t height, uint16_t K, uint16_t overlap = 0);
+
+    /**
      * @brief Average time surfaces over a cell
      * 
      * @param ts new time surface computed
@@ -119,30 +167,14 @@ public:
      */
     TimeSurfaceType averageTS(const TimeSurfaceType& ts, uint16_t cx, uint16_t cy);
 
-    /**
-     * @brief Returns the size of the context
-     * 
-     * @return {width, height}
-     */
-    std::pair<uint16_t, uint16_t> getSize() const;
-
 private:
 
-    uint16_t width, height;
-    uint16_t K, o;
-
-    struct Cell {
+    struct CellMem {
         cpphots::TimeSurfaceType ts;
         unsigned int count;
     };
 
-    std::vector<std::vector<Cell>> cells;
-
-    uint16_t wcell, hcell;
-
-    std::pair<uint16_t, uint16_t> getCellCenter(uint16_t cx, uint16_t cy) const;
-
-    bool isInCell(uint16_t cx, uint16_t cy, uint16_t ex, uint16_t ey) const;
+    std::vector<std::vector<CellMem>> cells;
 
 };
 

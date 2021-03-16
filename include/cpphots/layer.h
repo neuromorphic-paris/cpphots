@@ -106,10 +106,14 @@ public:
         std::vector<std::pair<uint16_t, uint16_t>> coords;
 
         // check averaging
-        if constexpr (std::is_base_of_v<Averaging, Layer>) {
+        if constexpr (std::is_base_of_v<SuperCell, Layer>) {
             coords = this->findCells(x, y);
             for (auto [cx, cy] : coords) {
-                surfaces.push_back(this->averageTS(surface, cx, cy));
+                if constexpr (std::is_base_of_v<SuperCellAverage, Layer>) {
+                    surfaces.push_back(this->averageTS(surface, cx, cy));
+                } else {
+                    surfaces.push_back(surface);
+                }
             }
         } else {
             surfaces.push_back(surface);

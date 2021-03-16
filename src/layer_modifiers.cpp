@@ -40,28 +40,30 @@ std::pair<uint16_t, uint16_t> SerializingLayer::getSize() const {
 }
 
 
-Averaging::Averaging(uint16_t width, uint16_t height, uint16_t K, uint16_t overlap)
+SuperCell::SuperCell(uint16_t width, uint16_t height, uint16_t K, uint16_t overlap)
     :width(width), height(height), K(K), o(overlap) {
 
     // width
     wcell = 1 + (width - K) / (K - overlap);
-    uint16_t wsugg = K + (wcell-1)*(K - overlap);
-    if (width != wsugg) {
-        std::cerr << "Width " << width << " is not a multiple of K and overlap. Suggested: " << wsugg << std::endl;
+    wmax = K + (wcell-1)*(K - overlap);
+    if (width != wmax) {
+        std::cerr << "Width " << width << " is higher than the multiple of K and overlap. Events with x over " << wmax << " will be ignored" << std::endl;
     }
 
     // heigth
     hcell = 1 + (height - K) / (K - overlap);
-    uint16_t hsugg = K + (hcell-1)*(K - overlap);
-    if (height != hsugg) {
-        std::cerr << "Height " << height << " is not a multiple of K and overlap. Suggested: " << hsugg << std::endl;
+    hmax = K + (hcell-1)*(K - overlap);
+    if (height != hmax) {
+        std::cerr << "Height " << height << " is higher than the multiple of K and overlap. Events with x over " << hmax << " will be ignored" << std::endl;
     }
-
-    cells = std::vector<std::vector<Cell>>(hcell, std::vector<Cell>(wcell));
 
 }
 
-std::vector<std::pair<uint16_t, uint16_t>> Averaging::findCells(uint16_t ex, uint16_t ey) const {
+std::vector<std::pair<uint16_t, uint16_t>> SuperCell::findCells(uint16_t ex, uint16_t ey) const {
+
+    if (ex >= wmax || ey >= hmax){
+        return {};
+    }
 
     // get best cell coordinates
     uint16_t lx = (ex >= o ? ex-o : 0) / (K-o);
@@ -82,13 +84,47 @@ std::vector<std::pair<uint16_t, uint16_t>> Averaging::findCells(uint16_t ex, uin
 
 }
 
-TimeSurfaceType Averaging::averageTS(const TimeSurfaceType& ts, uint16_t cx, uint16_t cy) {
+std::pair<uint16_t, uint16_t> SuperCell::getSize() const {
+    return {width, height};
+}
+
+std::pair<uint16_t, uint16_t> SuperCell::getCellSizes() const {
+    return {wcell, hcell};
+}
+
+std::pair<uint16_t, uint16_t> SuperCell::getCellCenter(uint16_t cx, uint16_t cy) const {
+
+    return {cx * (K - o) + K / 2, cy * (K-o) + K / 2};
+
+}
+
+bool SuperCell::isInCell(uint16_t cx, uint16_t cy, uint16_t ex, uint16_t ey) const {
+
+    auto [ncx, ncy] = getCellCenter(cx, cy);
+    uint16_t csz = K / 2;
+    if ((ncx - csz <= ex && ex <= ncx + csz) && (ncy - csz <= ey && ey <= ncy + csz)) {
+        return true;
+    }
+    
+    return false;
+
+}
+
+
+SuperCellAverage::SuperCellAverage(uint16_t width, uint16_t height, uint16_t K, uint16_t overlap)
+    :SuperCell(width, height, K, o) {
+
+    cells = std::vector<std::vector<CellMem>>(hcell, std::vector<CellMem>(wcell));
+
+}
+
+TimeSurfaceType SuperCellAverage::averageTS(const TimeSurfaceType& ts, uint16_t cx, uint16_t cy) {
 
     if (cx >= wcell || cy >= hcell) {
         throw std::invalid_argument("Invalid cell index for time surface averaging");
     }
 
-    Cell& cell = cells[cy][cx];
+    CellMem& cell = cells[cy][cx];
 
     if (cell.count == 0) {
         cell.count = 1;
@@ -100,28 +136,6 @@ TimeSurfaceType Averaging::averageTS(const TimeSurfaceType& ts, uint16_t cx, uin
     cell.count++;
 
     return cell.ts / cell.count;
-
-}
-
-std::pair<uint16_t, uint16_t> Averaging::getSize() const {
-    return {width, height};
-}
-
-std::pair<uint16_t, uint16_t> Averaging::getCellCenter(uint16_t cx, uint16_t cy) const {
-
-    return {cx * (K - o) + K / 2, cy * (K-o) + K / 2};
-
-}
-
-bool Averaging::isInCell(uint16_t cx, uint16_t cy, uint16_t ex, uint16_t ey) const {
-
-    auto [ncx, ncy] = getCellCenter(cx, cy);
-    uint16_t csz = K / 2;
-    if ((ncx - csz <= ex && ex <= ncx + csz) && (ncy - csz <= ey && ey <= ncy + csz)) {
-        return true;
-    }
-    
-    return false;
 
 }
 
