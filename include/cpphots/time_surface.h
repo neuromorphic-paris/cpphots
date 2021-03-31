@@ -225,7 +225,7 @@ public:
      */
     friend std::istream& operator>>(std::istream& in, LinearTimeSurface& ts);
 
-private:
+protected:
 
     TimeSurfaceType context;
     uint16_t width, height;
@@ -233,6 +233,107 @@ private:
     uint16_t Wx, Wy;
     TimeSurfaceScalarType tau;
     uint16_t min_events;
+
+};
+
+
+/**
+ * @brief Class that can compute time surfaces, with weighted output
+ * 
+ * This class keeps track of the time context for the current stream of events and can compute
+ * the time surface for new ones.
+ * 
+ * The time surface has a linear activation as described in (Maro et al., 2020).
+ * 
+ * Output time surfaces and time context are weighted by a weight matrix.
+ */
+class WeightedLinearTimeSurface : public LinearTimeSurface {
+
+public:
+    /**
+     * @brief Construct a new Time Surface object
+     * 
+     * This constructor is provided only to create containers
+     * with WeightedLinearTimeSurface instances or to load a time surface from file.
+     * It should not be used to create an usable LinearTimeSurface object.
+     */
+    WeightedLinearTimeSurface();
+
+    /**
+     * @brief Construct a new Time Surface object
+     * 
+     * The time context is initalized to -tau.
+     * 
+     * It is possible to use the whole time context in any dimension to compute the surfaces by setting Rx or Ry to 0.
+     * However, this can break the assumption that the current event is centered in the time surface.
+     * 
+     * @param width width of the full time context
+     * @param height height of the full time context
+     * @param Rx horizontal radius of the window on which surfaces are computed (0 to use the full width)
+     * @param Ry vertical radius of the window on which surfaces are computed (0 to use the full height)
+     * @param tau time constant of the surface
+     * @param weightmatrix matrix used to weight the time surfaces
+     */
+    WeightedLinearTimeSurface(uint16_t width, uint16_t height, uint16_t Rx, uint16_t Ry, TimeSurfaceScalarType tau, const TimeSurfaceType& weightmatrix);
+
+    /**
+     * @copydoc LinearTimeSurface::compute(uint64_t,uint16_t,uint16_t) const
+     * 
+     * The output time surface is weighted.
+     */
+    std::pair<TimeSurfaceType, bool> compute(uint64_t t, uint16_t x, uint16_t y) const;
+
+    /**
+     * @copydoc LinearTimeSurface::compute(const event&) const
+     * 
+     * The output time surface is weighted.
+     */
+    inline std::pair<TimeSurfaceType, bool> compute(const event& ev) const {
+        return compute(ev.t, ev.x, ev.y);
+    }
+
+    /**
+     * @copydoc LinearTimeSurface::updateAndCompute(uint64_t,uint16_t,uint16_t)
+     * 
+     * The output time surface is weighted.
+     */
+    inline std::pair<TimeSurfaceType, bool> updateAndCompute(uint64_t t, uint16_t x, uint16_t y) {
+        update(t, x, y);
+        return compute(t, x, y);
+    }
+
+    /**
+     * @copydoc LinearTimeSurface::updateAndCompute(const event&)
+     * 
+     * The output time surface is weighted.
+     */
+    inline std::pair<TimeSurfaceType, bool> updateAndCompute(const event& ev) {
+        update(ev.t, ev.x, ev.y);
+        return compute(ev.t, ev.x, ev.y);
+    }
+
+    /**
+     * @copydoc LinearTimeSurface::sampleContext
+     * 
+     * The sampled context is weighted.
+     */
+    TimeSurfaceType sampleContext(uint64_t t) const;
+
+    /**
+     * @copydoc LinearTimeSurface::operator<<
+     */
+    friend std::ostream& operator<<(std::ostream& out, const WeightedLinearTimeSurface& ts);
+
+    /**
+     * @copydoc LinearTimeSurface::operator>>
+     */
+    friend std::istream& operator>>(std::istream& in, WeightedLinearTimeSurface& ts);
+
+private:
+
+    TimeSurfaceType weights;
+
+    void setWeightMatrix(const TimeSurfaceType& weightmatrix);
 
 };
 
@@ -534,6 +635,11 @@ std::istream& operator>>(std::istream& in, TimeSurfacePool<TS>& pool) {
  * @brief Alias for a time surface pool with linear time surfaces
  */
 using LinearTimeSurfacePool = TimeSurfacePool<LinearTimeSurface>;
+
+/**
+ * @brief Alias for a time surface pool with weighted linear time surfaces
+ */
+using WeightedLinearTimeSurfacePool = TimeSurfacePool<WeightedLinearTimeSurface>;
 
 }
 

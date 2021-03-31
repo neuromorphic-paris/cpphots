@@ -109,4 +109,74 @@ std::istream& operator>>(std::istream& in, LinearTimeSurface& ts) {
 
 }
 
+
+WeightedLinearTimeSurface::WeightedLinearTimeSurface() {}
+
+WeightedLinearTimeSurface::WeightedLinearTimeSurface(uint16_t width, uint16_t height, uint16_t Rx, uint16_t Ry, TimeSurfaceScalarType tau, const TimeSurfaceType& weightmatrix)
+    :LinearTimeSurface(width, height, Rx, Ry, tau) {
+
+    if (weightmatrix.rows() != height || weightmatrix.cols() != width) {
+        throw std::invalid_argument("Wrong size for time surface weight matrix, should be " + std::to_string(height) + "x" + std::to_string(width));
+    }
+
+    setWeightMatrix(weightmatrix);
+
+}
+
+std::pair<TimeSurfaceType, bool> WeightedLinearTimeSurface::compute(uint64_t t, uint16_t x, uint16_t y) const {
+
+    auto [ts, good] = LinearTimeSurface::compute(t, x, y);
+
+    TimeSurfaceType w = weights.block(y, x, Wy, Wx);
+
+    ts = ts * w;
+
+    return {ts, good};
+
+}
+
+TimeSurfaceType WeightedLinearTimeSurface::sampleContext(uint64_t t) const {
+
+    TimeSurfaceType ts = LinearTimeSurface::sampleContext(t);
+
+    TimeSurfaceType w = weights.block(Ry, Rx, height, width);
+
+    return ts * w;
+
+}
+
+void WeightedLinearTimeSurface::setWeightMatrix(const TimeSurfaceType& weightmatrix) {
+
+    weights = TimeSurfaceType::Zero(height+2*Ry, width+2*Rx);
+
+    weights.block(Ry, Rx, height, width) = weightmatrix;
+
+}
+
+std::ostream& operator<<(std::ostream& out, const WeightedLinearTimeSurface& ts) {
+
+    out << static_cast<const LinearTimeSurface&>(ts) << std::endl;
+
+    out << ts.weights;
+
+    return out;
+
+}
+
+std::istream& operator>>(std::istream& in, WeightedLinearTimeSurface& ts) {
+
+    in >> static_cast<LinearTimeSurface&>(ts);
+
+    ts.weights = TimeSurfaceType::Zero(ts.height+2*ts.Ry, ts.width+2*ts.Rx);
+
+    for (uint16_t y = 0; y < ts.height; y++) {
+        for (uint16_t x = 0; x < ts.width; x++) {
+            in >> ts.weights(y, x);
+        }
+    }
+
+    return in;
+
+}
+
 }

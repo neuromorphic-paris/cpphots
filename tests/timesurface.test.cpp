@@ -99,6 +99,82 @@ TEST(TestTimeSurface, FullContext) {
 }
 
 
+TEST(TestWeightedTimeSurface, Processing) {
+
+    // load data
+    cpphots::Events events = cpphots::loadFromFile("data/trcl0.es");
+
+    // create time surface
+    cpphots::WeightedLinearTimeSurface ts(32, 32, 2, 2, 1000, cpphots::TimeSurfaceType::Constant(32, 32, 0.5f));
+
+    cpphots::TimeSurfaceScalarType normsum = 0.;
+    cpphots::TimeSurfaceScalarType goodsum = 0.;
+
+    unsigned int processed = 0;
+    unsigned int goodevents = 0;
+    for (auto& ev : events) {
+        if (ev.p == 0) {
+            continue;
+        }
+        auto nts = ts.updateAndCompute(ev.t, ev.x, ev.y);
+        cpphots::TimeSurfaceScalarType norm = nts.first.matrix().norm();
+        normsum += norm;
+        if (nts.second) {
+            goodsum += norm;
+            goodevents++;
+        }
+        processed++;
+    }
+
+    EXPECT_NEAR(normsum, 4740.313427652784 * 0.5f, 0.1);
+    EXPECT_NEAR(goodsum, 4562.696117657931 * 0.5f, 0.1);
+    EXPECT_EQ(goodevents, 1783);
+
+}
+
+TEST(TestWeightedTimeSurface, Basic) {
+
+    {
+        cpphots::LinearTimeSurface lts(10, 10, 2, 2, 10);
+        cpphots::WeightedLinearTimeSurface wts(10, 10, 2, 2, 10, cpphots::TimeSurfaceType::Constant(10, 10, 0.5f));
+
+        cpphots::TimeSurfaceType ts_diff = lts.updateAndCompute(2, 2, 2).first * 0.5f - wts.updateAndCompute(2, 2, 2).first;
+        EXPECT_NEAR(ts_diff.matrix().norm(), 0.f, 0.001);
+
+        cpphots::TimeSurfaceType c_diff = lts.sampleContext(3) * 0.5f - wts.sampleContext(3);
+        EXPECT_NEAR(c_diff.matrix().norm(), 0.f, 0.001);
+    }
+
+    {
+        cpphots::LinearTimeSurface lts1(10, 10, 2, 2, 10);
+        cpphots::LinearTimeSurface lts2(10, 10, 2, 2, 10);
+
+        cpphots::TimeSurfaceType w = cpphots::TimeSurfaceType::Zero(10, 20);
+        w.block(0, 0, 10, 10) = cpphots::TimeSurfaceType::Constant(10, 10, 0.25);
+        w.block(0, 10, 10, 10) = cpphots::TimeSurfaceType::Constant(10, 10, 0.75);
+
+        cpphots::WeightedLinearTimeSurface wts(20, 10, 2, 2, 10, w);
+
+        lts1.update(2, 2, 2);
+        lts2.update(2, 2, 2);
+        wts.update(2, 2, 2);
+        wts.update(2, 12, 2);
+
+        cpphots::TimeSurfaceType res = cpphots::TimeSurfaceType::Zero(10, 20);
+        res.block(0, 0, 10, 10) = lts1.sampleContext(2) * 0.25 - wts.sampleContext(2).block(0, 0, 10, 10);
+        res.block(0, 10, 10, 10) = lts2.sampleContext(2) * 0.75 - wts.sampleContext(2).block(0, 10, 10, 10);
+
+        EXPECT_NEAR(res.matrix().norm(), 0.f, 0.001);
+
+        wts.update(20, 9, 5);
+        auto ts = wts.updateAndCompute(20, 10, 5);
+        EXPECT_NEAR(ts.first.sum(), 1.f, 0.001);
+        EXPECT_EQ(ts.first.count(), 2);
+    }
+
+}
+
+
 TEST(TestTimeSurfacePool, Processing) {
 
     // load data
@@ -128,6 +204,39 @@ TEST(TestTimeSurfacePool, Processing) {
 
     EXPECT_NEAR(normsum, 4740.313427652784, 0.1);
     EXPECT_NEAR(goodsum, 4562.696117657931, 0.1);
+    EXPECT_EQ(goodevents, 1783);
+
+}
+
+TEST(TestWeightedTimeSurfacePool, Processing) {
+
+    // load data
+    cpphots::Events events = cpphots::loadFromFile("data/trcl0.es");
+
+    // create time surface
+    cpphots::WeightedLinearTimeSurfacePool ts(2, 32, 32, 2, 2, 1000, cpphots::TimeSurfaceType::Constant(32, 32, 0.5));
+
+    cpphots::TimeSurfaceScalarType normsum = 0.;
+    cpphots::TimeSurfaceScalarType goodsum = 0.;
+
+    unsigned int processed = 0;
+    unsigned int goodevents = 0;
+    for (auto& ev : events) {
+        if (ev.p == 0) {
+            continue;
+        }
+        auto nts = ts.updateAndCompute(ev.t, ev.x, ev.y, ev.p);
+        cpphots::TimeSurfaceScalarType norm = nts.first.matrix().norm();
+        normsum += norm;
+        if (nts.second) {
+            goodsum += norm;
+            goodevents++;
+        }
+        processed++;
+    }
+
+    EXPECT_NEAR(normsum, 4740.313427652784 * 0.5f, 0.1);
+    EXPECT_NEAR(goodsum, 4562.696117657931 * 0.5f, 0.1);
     EXPECT_EQ(goodevents, 1783);
 
 }
