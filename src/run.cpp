@@ -1,7 +1,5 @@
 #include "cpphots/run.h"
 
-#include <iostream>
-
 #include "cpphots/events_utils.h"
 
 
