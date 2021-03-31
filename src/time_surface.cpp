@@ -3,9 +3,9 @@
 
 namespace cpphots {
 
-TimeSurface::TimeSurface() {}
+LinearTimeSurface::LinearTimeSurface() {}
 
-TimeSurface::TimeSurface(uint16_t width, uint16_t height, uint16_t Rx, uint16_t Ry, TimeSurfaceScalarType tau)
+LinearTimeSurface::LinearTimeSurface(uint16_t width, uint16_t height, uint16_t Rx, uint16_t Ry, TimeSurfaceScalarType tau)
     :width(width), height(height), Rx(Rx), Ry(Ry), tau(tau) {
 
     reset();
@@ -32,13 +32,13 @@ TimeSurface::TimeSurface(uint16_t width, uint16_t height, uint16_t Rx, uint16_t 
 
 }
 
-void TimeSurface::update(uint64_t t, uint16_t x, uint16_t y) {
+void LinearTimeSurface::update(uint64_t t, uint16_t x, uint16_t y) {
 
     context(y+Ry, x+Rx) = t;
 
 }
 
-std::pair<TimeSurfaceType, bool> TimeSurface::compute(uint64_t t, uint16_t x, uint16_t y) const {
+std::pair<TimeSurfaceType, bool> LinearTimeSurface::compute(uint64_t t, uint16_t x, uint16_t y) const {
 
     // override for the full context
     if (Rx == 0)
@@ -56,7 +56,7 @@ std::pair<TimeSurfaceType, bool> TimeSurface::compute(uint64_t t, uint16_t x, ui
 
 }
 
-TimeSurfaceType TimeSurface::sampleFullContext(uint64_t t) const {
+TimeSurfaceType LinearTimeSurface::sampleFullContext(uint64_t t) const {
 
     auto ret = 1. - (t - context) / tau;
 
@@ -64,16 +64,16 @@ TimeSurfaceType TimeSurface::sampleFullContext(uint64_t t) const {
 
 }
 
-std::pair<uint16_t, uint16_t> TimeSurface::getSize() const {
+std::pair<uint16_t, uint16_t> LinearTimeSurface::getSize() const {
     return {width, height};
 }
 
-void TimeSurface::reset() {
+void LinearTimeSurface::reset() {
     context = TimeSurfaceType::Zero(height+2*Ry, width+2*Rx) - tau;  // makes sense, but is not in the paper
 }
 
 
-std::ostream& operator<<(std::ostream& out, const TimeSurface& ts) {
+std::ostream& operator<<(std::ostream& out, const LinearTimeSurface& ts) {
 
     out << ts.width << " ";
     out << ts.height << " ";
@@ -88,7 +88,7 @@ std::ostream& operator<<(std::ostream& out, const TimeSurface& ts) {
 
 }
 
-std::istream& operator>>(std::istream& in, TimeSurface& ts) {
+std::istream& operator>>(std::istream& in, LinearTimeSurface& ts) {
 
     in >> ts.width;
     in >> ts.height;
@@ -100,76 +100,6 @@ std::istream& operator>>(std::istream& in, TimeSurface& ts) {
     in >> ts.min_events;
 
     ts.reset();
-
-    return in;
-
-}
-
-
-TimeSurfacePool::TimeSurfacePool() {}
-
-TimeSurfacePool::TimeSurfacePool(uint16_t width, uint16_t height, uint16_t Rx, uint16_t Ry, TimeSurfaceScalarType tau, uint16_t polarities) {
-
-    for (uint16_t i = 0; i < polarities; i++) {
-        surfaces.push_back(TimeSurface(width, height, Rx, Ry, tau));
-    }
-
-}
-
-void TimeSurfacePool::update(uint64_t t, uint16_t x, uint16_t y, uint16_t p) {
-    assert_polarity(p);
-    surfaces[p].update(t, x, y);
-}
-
-std::pair<TimeSurfaceType, bool> TimeSurfacePool::compute(uint64_t t, uint16_t x, uint16_t y, uint16_t p) const {
-    assert_polarity(p);
-    return surfaces[p].compute(t, x, y);
-}
-
-std::pair<uint16_t, uint16_t> TimeSurfacePool::getSize() const {
-    return surfaces[0].getSize();
-}
-
-void TimeSurfacePool::reset() {
-    for (auto& ts : surfaces) {
-        ts.reset();
-    }
-}
-
-std::vector<TimeSurfaceType> TimeSurfacePool::sampleFullContexts(uint64_t t) {
-    std::vector<TimeSurfaceType> ret;
-    for (const auto& ts : surfaces) {
-        ret.push_back(ts.sampleFullContext(t));
-    }
-    return ret;
-}
-
-void TimeSurfacePool::assert_polarity(uint16_t p) const {
-    if (p >= surfaces.size()) {
-        throw std::invalid_argument("Polarity index exceeded: " + std::to_string(p) + ". Layer has only " + std::to_string(surfaces.size()) + " input polarities.");
-    }
-}
-
-std::ostream& operator<<(std::ostream& out, const TimeSurfacePool& pool) {
-
-    out << pool.surfaces.size() << "\n";
-    for (const auto& ts : pool.surfaces) {
-        out << ts << "\n";
-    }
-
-    return out;
-
-}
-
-std::istream& operator>>(std::istream& in, TimeSurfacePool& pool) {
-
-    pool.surfaces.clear();
-    size_t n_surfaces;
-    in >> n_surfaces;
-    pool.surfaces.resize(n_surfaces);
-    for (auto& sur : pool.surfaces) {
-        in >> sur;
-    }
 
     return in;
 

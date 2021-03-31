@@ -124,7 +124,7 @@ TEST(TestModifiers, SuperCell) {
 
 TEST(TestModifiersLayer, ArrayLayer) {
 
-    auto layer = cpphots::create_layer(cpphots::TimeSurfacePool(100, 100, 5, 5, 10000, 2),
+    auto layer = cpphots::create_layer(cpphots::LinearTimeSurfacePool(2, 100, 100, 5, 5, 10000),
                                        MockClusterer(10),
                                        cpphots::ArrayLayer{});
 
@@ -143,7 +143,7 @@ TEST(TestModifiersLayer, ArrayLayer) {
 
 TEST(TestModifiersLayer, SerializingLayer) {
 
-    auto layer = cpphots::create_layer(cpphots::TimeSurfacePool(10, 10, 5, 5, 10000, 2),
+    auto layer = cpphots::create_layer(cpphots::LinearTimeSurfacePool(2, 10, 10, 5, 5, 10000),
                                        MockClusterer(10),
                                        cpphots::SerializingLayer(10, 10));
 
@@ -169,7 +169,7 @@ TEST(TestModifiersLayer, SerializingLayer) {
 
 TEST(TestModifiersLayer, SerializingLayerException) {
 
-    auto layer = cpphots::create_layer(cpphots::TimeSurfacePool(100, 100, 5, 5, 10000, 2),
+    auto layer = cpphots::create_layer(cpphots::LinearTimeSurfacePool(2, 100, 100, 5, 5, 10000),
                                        MockClusterer(10),
                                        cpphots::SerializingLayer(100, 100));
 
@@ -195,7 +195,7 @@ TEST(TestModifiersLayer, SerializingLayerException) {
 
 TEST(TestModifiersLayer, SuperCell) {
 
-    auto layer = cpphots::create_layer(cpphots::TimeSurfacePool(50, 50, 5, 5, 10000, 2),
+    auto layer = cpphots::create_layer(cpphots::LinearTimeSurfacePool(2, 50, 50, 5, 5, 10000),
                                        MockClusterer(10),
                                        cpphots::SuperCell(50, 50, 5, 1));
 

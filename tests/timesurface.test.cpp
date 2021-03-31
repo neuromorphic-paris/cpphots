@@ -5,25 +5,25 @@
 
 
 TEST(TestTimeSurfaceSize, Square) {
-    cpphots::TimeSurface ts(32, 32, 2, 2, 1000);
+    cpphots::LinearTimeSurface ts(32, 32, 2, 2, 1000);
     EXPECT_EQ(ts.getWx(), 5);
     EXPECT_EQ(ts.getWy(), 5);
 }
 
 TEST(TestTimeSurfaceSize, Asymmetric) {
-    cpphots::TimeSurface ts(32, 32, 5, 2, 1000);
+    cpphots::LinearTimeSurface ts(32, 32, 5, 2, 1000);
     EXPECT_EQ(ts.getWx(), 11);
     EXPECT_EQ(ts.getWy(), 5);
 }
 
 TEST(TestTimeSurfaceSize, Rx0) {
-    cpphots::TimeSurface ts(32, 32, 0, 2, 1000);
+    cpphots::LinearTimeSurface ts(32, 32, 0, 2, 1000);
     EXPECT_EQ(ts.getWx(), 32);
     EXPECT_EQ(ts.getWy(), 5);
 }
 
 TEST(TestTimeSurfaceSize, Ry0) {
-    cpphots::TimeSurface ts(32, 32, 2, 0, 1000);
+    cpphots::LinearTimeSurface ts(32, 32, 2, 0, 1000);
     EXPECT_EQ(ts.getWx(), 5);
     EXPECT_EQ(ts.getWy(), 32);
 }
@@ -35,7 +35,7 @@ TEST(TestTimeSurface, Processing) {
     cpphots::Events events = cpphots::loadFromFile("data/trcl0.es");
 
     // create time surface
-    cpphots::TimeSurface ts(32, 32, 2, 2, 1000);
+    cpphots::LinearTimeSurface ts(32, 32, 2, 2, 1000);
 
     cpphots::TimeSurfaceScalarType normsum = 0.;
     cpphots::TimeSurfaceScalarType goodsum = 0.;
@@ -64,7 +64,7 @@ TEST(TestTimeSurface, Processing) {
 
 TEST(TestTimeSurface, FullContext) {
 
-    cpphots::TimeSurface ts(10, 10, 0, 0, 10);
+    cpphots::LinearTimeSurface ts(10, 10, 0, 0, 10);
 
     auto fc = ts.getFullContext();
     EXPECT_EQ(fc.rows(), 10);
@@ -87,7 +87,7 @@ TEST(TestTimeSurfacePool, Processing) {
     cpphots::Events events = cpphots::loadFromFile("data/trcl0.es");
 
     // create time surface
-    cpphots::TimeSurfacePool ts(32, 32, 2, 2, 1000, 2);
+    cpphots::LinearTimeSurfacePool ts(2, 32, 32, 2, 2, 1000);
 
     cpphots::TimeSurfaceScalarType normsum = 0.;
     cpphots::TimeSurfaceScalarType goodsum = 0.;
@@ -116,7 +116,7 @@ TEST(TestTimeSurfacePool, Processing) {
 
 TEST(TestTimeSurfacePool, FullContext) {
 
-    cpphots::TimeSurfacePool tsp(10, 10, 0, 0, 10, 2);
+    cpphots::LinearTimeSurfacePool tsp(2, 10, 10, 0, 0, 10);
 
     tsp.update(2, 2, 2, 0);
     auto ctxs = tsp.sampleFullContexts(2);

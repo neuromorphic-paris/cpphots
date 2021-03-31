@@ -37,7 +37,7 @@ void perform_test(uint16_t sz, uint16_t r, cpphots::TimeSurfaceScalarType tau, u
 
         auto event_gen = getRandomEventGenerator(sz, sz);
 
-        cpphots::TimeSurface ts(sz, sz, r, r, tau);
+        cpphots::LinearTimeSurface ts(sz, sz, r, r, tau);
 
         auto start = std::chrono::system_clock::now();
         for (size_t i = 0; i < 1e6; i++) {

@@ -164,12 +164,12 @@ protected:
 
     void SetUp() override {
         events = cpphots::loadFromFile("data/trcl0.es");
-        layer = cpphots::create_layer(cpphots::TimeSurfacePool(32, 32, 2, 2, 1000, 1),
+        layer = cpphots::create_layer(cpphots::LinearTimeSurfacePool(1, 32, 32, 2, 2, 1000),
                                       cpphots::HOTSClusterer(8));
     }
 
     cpphots::Events events;
-    cpphots::Layer<cpphots::TimeSurfacePool,
+    cpphots::Layer<cpphots::LinearTimeSurfacePool,
                    cpphots::HOTSClusterer> layer;
 
 };
@@ -237,12 +237,12 @@ protected:
 
     void SetUp() override {
         events = cpphots::loadFromFile("data/trcl0.es");
-        layer = cpphots::create_layer(cpphots::TimeSurfacePool(32, 32, 2, 2, 1000, 2),
+        layer = cpphots::create_layer(cpphots::LinearTimeSurfacePool(2, 32, 32, 2, 2, 1000),
                                       cpphots::HOTSClusterer(8));
     }
 
     cpphots::Events events;
-    cpphots::Layer<cpphots::TimeSurfacePool,
+    cpphots::Layer<cpphots::LinearTimeSurfacePool,
                    cpphots::HOTSClusterer> layer;
 
 };
@@ -294,7 +294,7 @@ TEST_F(TestLayerInitialization, Random) {
 
 TEST(TestLayer, NoInitialization) {
 
-    auto layer = cpphots::create_layer(cpphots::TimeSurfacePool(32, 32, 2, 2, 1000, 2),
+    auto layer = cpphots::create_layer(cpphots::LinearTimeSurfacePool(2, 32, 32, 2, 2, 1000),
                                        cpphots::HOTSClusterer(8));
 
     ASSERT_THROW(layer.process({0, 0, 0, 0}, true), std::runtime_error);
@@ -306,7 +306,7 @@ TEST(TestLayer, SkipValidityCheck) {
 
     cpphots::Events events = cpphots::loadFromFile("data/trcl0.es");
 
-    auto layer = cpphots::create_layer(cpphots::TimeSurfacePool(32, 32, 2, 2, 1000, 2),
+    auto layer = cpphots::create_layer(cpphots::LinearTimeSurfacePool(2, 32, 32, 2, 2, 1000),
                                        cpphots::HOTSClusterer(8));
 
     auto initializer = cpphots::ClustererRandomInitializer(5, 5);
@@ -327,7 +327,7 @@ TEST(TestLayer, SkipValidityCheck) {
 
 TEST(TestLayer, WrongPolarity) {
 
-    auto layer = cpphots::create_layer(cpphots::TimeSurfacePool(32, 32, 2, 2, 1000, 2),
+    auto layer = cpphots::create_layer(cpphots::LinearTimeSurfacePool(2, 32, 32, 2, 2, 1000),
                                        cpphots::HOTSClusterer(8));
 
     auto initializer = cpphots::ClustererRandomInitializer(5, 5);
@@ -340,7 +340,7 @@ TEST(TestLayer, WrongPolarity) {
 
 TEST(TestLayer, TSAccess) {
 
-    auto layer = cpphots::create_layer(cpphots::TimeSurfacePool(32, 32, 2, 2, 1000, 2),
+    auto layer = cpphots::create_layer(cpphots::LinearTimeSurfacePool(2, 32, 32, 2, 2, 1000),
                                        cpphots::HOTSClusterer(8));
 
     auto ts1 = layer.getSurface(0).updateAndCompute(10, 2, 2);
@@ -374,11 +374,11 @@ struct HasSize {
 
 TEST(TestLayer, Wrongsize) {
 
-    ASSERT_THROW(cpphots::create_layer(cpphots::TimeSurfacePool(10, 20, 5, 5, 10000, 2),
+    ASSERT_THROW(cpphots::create_layer(cpphots::LinearTimeSurfacePool(2, 10, 20, 5, 5, 10000),
                                        HasSize(10, 30)),
                  std::invalid_argument);
 
-    ASSERT_NO_THROW(cpphots::create_layer(cpphots::TimeSurfacePool(10, 20, 5, 5, 10000, 2),
+    ASSERT_NO_THROW(cpphots::create_layer(cpphots::LinearTimeSurfacePool(2, 10, 20, 5, 5, 10000),
                                           HasSize(10, 20)));
 
 }

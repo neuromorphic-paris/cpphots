@@ -11,7 +11,7 @@ TEST(TestSaveLoad, SimpleTSLoad) {
 
     std::string ts_string("5 5 2 2 5 5 1.2 4");
 
-    cpphots::TimeSurface ts;
+    cpphots::LinearTimeSurface ts;
     std::stringstream instream(ts_string);
     instream >> ts;
 
@@ -33,7 +33,7 @@ TEST(TestSaveLoad, TSProcess) {
     cpphots::Events events = cpphots::loadFromFile("data/trcl0.es");
 
     // create time surface
-    cpphots::TimeSurface ts(32, 32, 2, 2, 1000);
+    cpphots::LinearTimeSurface ts(32, 32, 2, 2, 1000);
 
     std::stringstream instream("32 32 2 2 5 5 1000.0 4");
     instream >> ts;
@@ -66,7 +66,7 @@ TEST(TestSaveLoad, TSProcess) {
 TEST(TestSaveLoad, LSaveLoad) {
 
     // cpphots::Layer layer1(32, 32, 1, 2, 1000, 2, 8);
-    auto layer1 = cpphots::create_layer(cpphots::TimeSurfacePool(32, 32, 1, 2, 1000, 2),
+    auto layer1 = cpphots::create_layer(cpphots::LinearTimeSurfacePool(2, 32, 32, 1, 2, 1000),
                                         cpphots::HOTSClusterer(8));
 
     auto initializer = cpphots::ClustererRandomInitializer(3, 5);
@@ -75,7 +75,7 @@ TEST(TestSaveLoad, LSaveLoad) {
     std::stringstream outstream;
     outstream << layer1;
 
-    cpphots::Layer<cpphots::TimeSurfacePool,
+    cpphots::Layer<cpphots::LinearTimeSurfacePool,
                    cpphots::HOTSClusterer> layer2;
 
     std::stringstream instream(outstream.str());
