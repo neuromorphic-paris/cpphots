@@ -36,8 +36,6 @@ using TimeSurfaceScalarType = TimeSurfaceType::Scalar;
  * the time surface for new ones.
  * 
  * The time surface has a linear activation as described in (Maro et al., 2020).
- * 
- * The time context and time surfaces are represented with Eigen Arrays.
  */
 class LinearTimeSurface {
 
@@ -143,7 +141,10 @@ public:
     /**
      * @brief Get the temporal context
      * 
-     * This function returns the full temporal context on which surfaces are computed.
+     * This function returns the full temporal context (including padding)
+     * on which surfaces are computed.
+     * 
+     * You may want to use LinearTimeSurface::getContext() in normal circumnstances.
      * 
      * @return the temporal context
      */
@@ -152,14 +153,23 @@ public:
     }
 
     /**
+     * @brief Get the temporal context
+     * 
+     * This function returns the whole temporal context on which surfaces are computed.
+     * 
+     * @return the temporal context
+     */
+    TimeSurfaceType getContext() const;
+
+    /**
      * @brief Sample and decay all temporal context
      * 
-     * This functions applies the decay to the full temporal context and returns it.
+     * This functions applies the decay to the whole temporal context and returns it.
      * 
      * @param t sample time
      * @return decayed temporal context
      */
-    TimeSurfaceType sampleFullContext(uint64_t t) const;
+    TimeSurfaceType sampleContext(uint64_t t) const;
 
     /**
      * @brief Reset the time context
@@ -344,7 +354,7 @@ public:
      * @param t sample time
      * @return vector of decayed temporal contexts
      */
-    virtual std::vector<TimeSurfaceType> sampleFullContexts(uint64_t t) = 0;
+    virtual std::vector<TimeSurfaceType> sampleContexts(uint64_t t) = 0;
 
 };
 
@@ -443,10 +453,10 @@ public:
         return surfaces[idx];
     }
 
-    std::vector<TimeSurfaceType> sampleFullContexts(uint64_t t) override {
+    std::vector<TimeSurfaceType> sampleContexts(uint64_t t) override {
         std::vector<TimeSurfaceType> ret;
         for (const auto& ts : surfaces) {
-            ret.push_back(ts.sampleFullContext(t));
+            ret.push_back(ts.sampleContext(t));
         }
         return ret;
     }

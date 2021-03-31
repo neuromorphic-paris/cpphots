@@ -64,19 +64,37 @@ TEST(TestTimeSurface, Processing) {
 
 TEST(TestTimeSurface, FullContext) {
 
-    cpphots::LinearTimeSurface ts(10, 10, 0, 0, 10);
+    {
+        cpphots::LinearTimeSurface ts(200, 100, 10, 5, 10);
 
-    auto fc = ts.getFullContext();
-    EXPECT_EQ(fc.rows(), 10);
-    EXPECT_EQ(fc.cols(), 10);
+        auto c = ts.getContext();
+        EXPECT_EQ(c.rows(), 100);
+        EXPECT_EQ(c.cols(), 200);
+        EXPECT_NEAR(c.sum(), -10*200*100, 0.001);
 
-    ts.update(2, 2, 2);
+        auto fc = ts.getFullContext();
+        EXPECT_EQ(fc.rows(), 110);
+        EXPECT_EQ(fc.cols(), 220);
+        EXPECT_NEAR(fc.sum(), -10*220*110, 0.001);
 
-    EXPECT_NEAR(ts.sampleFullContext(2).sum(), 1, 0.001);
+    }
 
-    ts.update(4, 4, 4);
+    {
 
-    EXPECT_NEAR(ts.sampleFullContext(4).sum(), 1.8, 0.001);
+        cpphots::LinearTimeSurface ts(10, 10, 0, 0, 10);
+
+        auto fc = ts.getContext();
+        EXPECT_EQ(fc.rows(), 10);
+        EXPECT_EQ(fc.cols(), 10);
+        EXPECT_NEAR(fc.sum(), -10*10*10, 0.001);
+
+        ts.update(2, 2, 2);
+        EXPECT_NEAR(ts.sampleContext(2).sum(), 1, 0.001);
+
+        ts.update(4, 4, 4);
+        EXPECT_NEAR(ts.sampleContext(4).sum(), 1.8, 0.001);
+
+    }
 
 }
 
@@ -119,13 +137,13 @@ TEST(TestTimeSurfacePool, FullContext) {
     cpphots::LinearTimeSurfacePool tsp(2, 10, 10, 0, 0, 10);
 
     tsp.update(2, 2, 2, 0);
-    auto ctxs = tsp.sampleFullContexts(2);
+    auto ctxs = tsp.sampleContexts(2);
     EXPECT_EQ(ctxs.size(), 2);
     EXPECT_NEAR(ctxs[0].sum(), 1.0, 0.001);
     EXPECT_NEAR(ctxs[1].sum(), 0.0, 0.001);
 
     tsp.update(4, 4, 4, 1);
-    ctxs = tsp.sampleFullContexts(4);
+    ctxs = tsp.sampleContexts(4);
     EXPECT_NEAR(ctxs[0].sum(), 0.8, 0.001);
     EXPECT_NEAR(ctxs[1].sum(), 1.0, 0.001);
 

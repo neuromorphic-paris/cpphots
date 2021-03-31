@@ -48,7 +48,7 @@ std::pair<TimeSurfaceType, bool> LinearTimeSurface::compute(uint64_t t, uint16_t
 
     TimeSurfaceType retmat = context.block(y, x, Wy, Wx);  // should be (x-Rx, y-Ry), but the context is padded
 
-    auto ret = 1. - (t - retmat) / tau;
+    TimeSurfaceType ret = 1. - (t - retmat) / tau;
 
     bool good = (ret > 0.).count() >= min_events;
 
@@ -56,9 +56,13 @@ std::pair<TimeSurfaceType, bool> LinearTimeSurface::compute(uint64_t t, uint16_t
 
 }
 
-TimeSurfaceType LinearTimeSurface::sampleFullContext(uint64_t t) const {
+TimeSurfaceType LinearTimeSurface::getContext() const {
+    return context.block(Ry, Rx, height, width);
+}
 
-    auto ret = 1. - (t - context) / tau;
+TimeSurfaceType LinearTimeSurface::sampleContext(uint64_t t) const {
+
+    TimeSurfaceType ret = 1. - (t - getContext()) / tau;
 
     return (ret <= 0.).select(0., ret);
 
