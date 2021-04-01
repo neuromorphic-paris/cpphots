@@ -5,7 +5,7 @@
 
 namespace cpphots {
 
-void train(Network& network, Events training_events, const ClustererInitializerType& initializer) {
+void train(Network& network, Events training_events, const ClustererInitializerType& initializer, bool skip_check) {
 
     auto network_clusterers = network.viewFull<ClustererBase>();
     auto network_tspools = network.viewFull<TimeSurfacePoolBase>();
@@ -14,22 +14,22 @@ void train(Network& network, Events training_events, const ClustererInitializerT
 
         if (network_clusterers[l]) {
             // learn prototypes for this layer
-            layerInitializePrototypes(initializer, *network_tspools[l], *network_clusterers[l], training_events);
+            layerInitializePrototypes(initializer, *network_tspools[l], *network_clusterers[l], training_events, !skip_check);
 
             // train
             network_clusterers[l]->toggleLearning(true);
-            process(network.getLayer(l), training_events);
+            process(network.getLayer(l), training_events, skip_check);
             network_clusterers[l]->toggleLearning(false);
 
         }
         // genereate events for the next layer
-        training_events = cpphots::process(network.getLayer(l), training_events);
+        training_events = cpphots::process(network.getLayer(l), training_events, skip_check);
 
     }
 
 }
 
-void train(Network& network, std::vector<Events> training_events, const ClustererInitializerType& initializer, bool use_all) {
+void train(Network& network, std::vector<Events> training_events, const ClustererInitializerType& initializer, bool use_all, bool skip_check) {
 
     auto network_clusterers = network.viewFull<ClustererBase>();
     auto network_tspools = network.viewFull<TimeSurfacePoolBase>();
@@ -39,18 +39,18 @@ void train(Network& network, std::vector<Events> training_events, const Clustere
         if (network_clusterers[l]) {
             // learn prototypes for this layer
             if (use_all)
-                layerInitializePrototypes(initializer, *network_tspools[l], *network_clusterers[l], training_events);
+                layerInitializePrototypes(initializer, *network_tspools[l], *network_clusterers[l], training_events, !skip_check);
             else
-                layerInitializePrototypes(initializer, *network_tspools[l], *network_clusterers[l], training_events[0]);
+                layerInitializePrototypes(initializer, *network_tspools[l], *network_clusterers[l], training_events[0], !skip_check);
 
             // train
             network_clusterers[l]->toggleLearning(true);
-            process(network.getLayer(l), training_events);
+            process(network.getLayer(l), training_events, skip_check);
             network_clusterers[l]->toggleLearning(false);
 
         }
         // genereate events for the next layer
-        training_events = process(network.getLayer(l), training_events);
+        training_events = process(network.getLayer(l), training_events, skip_check);
 
     }
 

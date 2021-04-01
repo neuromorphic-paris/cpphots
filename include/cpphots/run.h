@@ -88,8 +88,9 @@ std::vector<Events> process(P& processor, const std::vector<Events>& events, boo
  * @param network the newtork
  * @param training_events events
  * @param initializer a clustering initializer function
+ * @param skip_check if true consider all events as valid
  */
-void train(Network& network, Events training_events, const ClustererInitializerType& initializer);
+void train(Network& network, Events training_events, const ClustererInitializerType& initializer, bool skip_check = false);
 
 /**
  * @brief Initialize and train layers in a network
@@ -102,9 +103,10 @@ void train(Network& network, Events training_events, const ClustererInitializerT
  * @param network the newtork
  * @param training_events sequences of events
  * @param initializer a clustering initializer function
- * @param use_all_for_initialization if true use all sequence to initialize the prototypes (all sequences will used for training regardless)
+ * @param use_all if true use all sequence to initialize the prototypes (all sequences will used for training regardless)
+ * @param skip_check if true consider all events as valid
  */
-void train(Network& network, std::vector<Events> training_events, const ClustererInitializerType& initializer, bool use_all = true);
+void train(Network& network, std::vector<Events> training_events, const ClustererInitializerType& initializer, bool use_all = true, bool skip_check = false);
 
 }
 

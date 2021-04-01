@@ -266,7 +266,7 @@ Layer<std::decay_t<T>...> create_layer(T&&... v) {
  * 
  * @param initializer the initialization algorithm
  * @param ts_processer the time surface processed used to generate time surface from events
- * @param clusterer the clustere to be initialized
+ * @param clusterer the clusterer to be initialized
  * @param events the stream of events to be used
  * @param valid_only use only valid time surfaces for the initialization
  */
@@ -299,12 +299,13 @@ void layerInitializePrototypes(const ClustererInitializerType& initializer, TSP&
  * 
  * @param initializer the initialization algorithm
  * @param ts_processer the time surface processed used to generate time surface from events
- * @param clusterer the clustere to be initialized
+ * @param clusterer the clusterer to be initialized
  * @param event_streams the vector of streams of events to be used
  * @param valid_only use only valid time surfaces for the initialization
  */
-template <typename TSP>
-void layerInitializePrototypes(const ClustererInitializerType& initializer, TSP& ts_processer, ClustererBase& clusterer, const std::vector<Events>& event_streams, bool valid_only = true) {
+template <typename TSP,
+          typename C>
+void layerInitializePrototypes(const ClustererInitializerType& initializer, TSP& ts_processer, C& clusterer, const std::vector<Events>& event_streams, bool valid_only = true) {
 
     // store all time surfaces
     std::vector<TimeSurfaceType> time_surfaces;
