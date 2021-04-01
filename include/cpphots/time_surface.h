@@ -227,11 +227,49 @@ public:
 
 protected:
 
+    /**
+     * @brief Time context
+     */
     TimeSurfaceType context;
-    uint16_t width, height;
-    uint16_t Rx, Ry;
-    uint16_t Wx, Wy;
+
+    /**
+     * @brief Width of the context
+     */
+    uint16_t width;
+
+    /**
+     * @brief Height of the context
+     */
+    uint16_t height;
+
+    /**
+     * @brief Horizontal radius of the window
+     */
+    uint16_t Rx;
+
+    /**
+     * @brief Vertical radius of the window
+     */
+    uint16_t Ry;
+
+    /**
+     * @brief Horizontal size of the window
+     */
+    uint16_t Wx;
+
+    /**
+     * @brief Vertical size of the window
+     */
+    uint16_t Wy;
+
+    /**
+     * @brief Time constant
+     */
     TimeSurfaceScalarType tau;
+
+    /**
+     * @brief Minimum number of events for a valid surface
+     */
     uint16_t min_events;
 
 };
@@ -614,7 +652,7 @@ std::ostream& operator<<(std::ostream& out, const TimeSurfacePool<TS>& pool) {
 }
 
 /**
- * @copydoc TimeSurfacePool::operator<<
+ * @copydoc TimeSurfacePool::operator>>
  */
 template <typename TS>
 std::istream& operator>>(std::istream& in, TimeSurfacePool<TS>& pool) {

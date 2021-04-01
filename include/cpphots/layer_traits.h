@@ -34,6 +34,9 @@ template<typename T>
 struct is_resettable <
     T,
     std::enable_if_t<std::is_member_function_pointer_v<decltype(&T::reset)>> > {
+    /**
+     * @brief Value of the expression
+     */
     static constexpr bool value = std::is_member_function_pointer_v<decltype(&T::reset)>;
 };
 
@@ -68,6 +71,9 @@ template<typename T>
 struct has_size <
     T,
     std::enable_if_t<std::is_member_function_pointer_v<decltype(&T::getSize)>> > {
+    /**
+     * @brief Value of the expression
+     */
     static constexpr bool value = std::is_member_function_pointer_v<decltype(&T::getSize)>;
 };
 

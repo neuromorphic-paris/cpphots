@@ -12,7 +12,9 @@
 #include "layer_traits.h"
 #include "layer_modifiers.h"
 
-
+/**
+ * @brief Main cpphots namespace
+ */
 namespace cpphots {
 
 /**

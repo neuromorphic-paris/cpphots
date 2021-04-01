@@ -126,14 +126,65 @@ public:
 
 protected:
 
-    uint16_t width, height;
-    uint16_t K, o;
+    /**
+     * @brief Width of the context
+     */
+    uint16_t width;
 
-    uint16_t wcell, hcell;
-    uint16_t wmax, hmax;
+    /**
+     * @brief Height of the context
+     */
+    uint16_t height;
 
+    /**
+     * @brief Size of the cells
+     */
+    uint16_t K;
+
+    /**
+     * @brief Overlap of the cells
+     */
+    uint16_t o;
+
+    /**
+     * @brief Number of cells (horizontal)
+     */
+    uint16_t wcell;
+
+    /**
+     * @brief Number of cells (vertical)
+     */
+    uint16_t hcell;
+
+    /**
+     * @brief Max horizontal processing size
+     */
+    uint16_t wmax;
+
+    /**
+     * @brief Max vertical processing size
+     */
+    uint16_t hmax;
+
+    /**
+     * @brief Get the center of a cell in event-space
+     * 
+     * @param cx cell x
+     * @param cy cell y
+     * @return event-space coordinates of the center
+     */
     std::pair<uint16_t, uint16_t> getCellCenter(uint16_t cx, uint16_t cy) const;
 
+    /**
+     * @brief Check whether some events coordinates are in a certain cell or not
+     * 
+     * @param cx cell x
+     * @param cy cell y
+     * @param ex event x
+     * @param ey event y
+     * @return true if event is in cell
+     * @return false otherwise
+     */
     bool isInCell(uint16_t cx, uint16_t cy, uint16_t ex, uint16_t ey) const;
 
 };
