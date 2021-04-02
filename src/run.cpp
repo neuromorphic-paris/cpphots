@@ -5,7 +5,7 @@
 
 namespace cpphots {
 
-void train(Network& network, Events training_events, const ClustererInitializerType& initializer, bool skip_check) {
+Events train(Network& network, Events training_events, const ClustererInitializerType& initializer, bool skip_check) {
 
     auto network_clusterers = network.viewFull<ClustererBase>();
     auto network_tspools = network.viewFull<TimeSurfacePoolBase>();
@@ -27,9 +27,11 @@ void train(Network& network, Events training_events, const ClustererInitializerT
 
     }
 
+    return training_events;
+
 }
 
-void train(Network& network, std::vector<Events> training_events, const ClustererInitializerType& initializer, bool use_all, bool skip_check) {
+std::vector<Events> train(Network& network, std::vector<Events> training_events, const ClustererInitializerType& initializer, bool use_all, bool skip_check) {
 
     auto network_clusterers = network.viewFull<ClustererBase>();
     auto network_tspools = network.viewFull<TimeSurfacePoolBase>();
@@ -53,6 +55,8 @@ void train(Network& network, std::vector<Events> training_events, const Clustere
         training_events = process(network.getLayer(l), training_events, skip_check);
 
     }
+
+    return training_events;
 
 }
 
