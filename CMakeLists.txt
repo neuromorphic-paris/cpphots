@@ -52,6 +52,8 @@ set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
 # sepia
 include(FetchContent)
+set(FETCHCONTENT_QUIET OFF)
+
 FetchContent_Declare(
     sepia
     GIT_REPOSITORY https://github.com/neuromorphic-paris/sepia
