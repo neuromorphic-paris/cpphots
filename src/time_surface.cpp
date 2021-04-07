@@ -3,9 +3,9 @@
 
 namespace cpphots {
 
-LinearTimeSurface::LinearTimeSurface() {}
+TimeSurfaceBase::TimeSurfaceBase() {}
 
-LinearTimeSurface::LinearTimeSurface(uint16_t width, uint16_t height, uint16_t Rx, uint16_t Ry, TimeSurfaceScalarType tau)
+TimeSurfaceBase::TimeSurfaceBase(uint16_t width, uint16_t height, uint16_t Rx, uint16_t Ry, TimeSurfaceScalarType tau)
     :width(width), height(height), Rx(Rx), Ry(Ry), tau(tau) {
 
     reset();
@@ -32,11 +32,56 @@ LinearTimeSurface::LinearTimeSurface(uint16_t width, uint16_t height, uint16_t R
 
 }
 
-void LinearTimeSurface::update(uint64_t t, uint16_t x, uint16_t y) {
+void TimeSurfaceBase::update(uint64_t t, uint16_t x, uint16_t y) {
 
     context(y+Ry, x+Rx) = t;
 
 }
+
+std::pair<uint16_t, uint16_t> TimeSurfaceBase::getSize() const {
+    return {width, height};
+}
+
+void TimeSurfaceBase::reset() {
+    context = TimeSurfaceType::Zero(height+2*Ry, width+2*Rx) - tau;  // makes sense, but is not in the paper
+}
+
+TimeSurfaceType TimeSurfaceBase::getContext() const {
+    return context.block(Ry, Rx, height, width);
+}
+
+std::ostream& operator<<(std::ostream& out, const TimeSurfaceBase& ts) {
+
+    out << ts.width << " ";
+    out << ts.height << " ";
+    out << ts.Rx << " ";
+    out << ts.Ry << " ";
+    out << ts.Wx << " ";
+    out << ts.Wy << " ";
+    out << ts.tau << " ";
+    out << ts.min_events;
+
+    return out;
+
+}
+
+std::istream& operator>>(std::istream& in, TimeSurfaceBase& ts) {
+
+    in >> ts.width;
+    in >> ts.height;
+    in >> ts.Rx;
+    in >> ts.Ry;
+    in >> ts.Wx;
+    in >> ts.Wy;
+    in >> ts.tau;
+    in >> ts.min_events;
+
+    ts.reset();
+
+    return in;
+
+}
+
 
 std::pair<TimeSurfaceType, bool> LinearTimeSurface::compute(uint64_t t, uint16_t x, uint16_t y) const {
 
@@ -56,8 +101,8 @@ std::pair<TimeSurfaceType, bool> LinearTimeSurface::compute(uint64_t t, uint16_t
 
 }
 
-TimeSurfaceType LinearTimeSurface::getContext() const {
-    return context.block(Ry, Rx, height, width);
+std::pair<TimeSurfaceType, bool> LinearTimeSurface::compute(const event& ev) const {
+    return compute(ev.t, ev.x, ev.y);
 }
 
 TimeSurfaceType LinearTimeSurface::sampleContext(uint64_t t) const {
@@ -68,25 +113,9 @@ TimeSurfaceType LinearTimeSurface::sampleContext(uint64_t t) const {
 
 }
 
-std::pair<uint16_t, uint16_t> LinearTimeSurface::getSize() const {
-    return {width, height};
-}
-
-void LinearTimeSurface::reset() {
-    context = TimeSurfaceType::Zero(height+2*Ry, width+2*Rx) - tau;  // makes sense, but is not in the paper
-}
-
-
 std::ostream& operator<<(std::ostream& out, const LinearTimeSurface& ts) {
 
-    out << ts.width << " ";
-    out << ts.height << " ";
-    out << ts.Rx << " ";
-    out << ts.Ry << " ";
-    out << ts.Wx << " ";
-    out << ts.Wy << " ";
-    out << ts.tau << " ";
-    out << ts.min_events;
+    out << static_cast<const TimeSurfaceBase&>(ts);
 
     return out;
 
@@ -94,16 +123,7 @@ std::ostream& operator<<(std::ostream& out, const LinearTimeSurface& ts) {
 
 std::istream& operator>>(std::istream& in, LinearTimeSurface& ts) {
 
-    in >> ts.width;
-    in >> ts.height;
-    in >> ts.Rx;
-    in >> ts.Ry;
-    in >> ts.Wx;
-    in >> ts.Wy;
-    in >> ts.tau;
-    in >> ts.min_events;
-
-    ts.reset();
+    in >> static_cast<TimeSurfaceBase&>(ts);
 
     return in;
 
@@ -133,6 +153,10 @@ std::pair<TimeSurfaceType, bool> WeightedLinearTimeSurface::compute(uint64_t t, 
 
     return {ts, good};
 
+}
+
+std::pair<TimeSurfaceType, bool> WeightedLinearTimeSurface::compute(const event& ev) const {
+    return compute(ev.t, ev.x, ev.y);
 }
 
 TimeSurfaceType WeightedLinearTimeSurface::sampleContext(uint64_t t) const {

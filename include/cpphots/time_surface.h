@@ -30,14 +30,12 @@ using TimeSurfaceScalarType = TimeSurfaceType::Scalar;
 
 
 /**
- * @brief Class that can compute time surfaces
+ * @brief Base class for classes that can compute time surfaces
  * 
- * This class keeps track of the time context for the current stream of events and can compute
- * the time surface for new ones.
- * 
- * The time surface has a linear activation as described in (Maro et al., 2020).
+ * This class keeps track of the time context for the current stream of events,
+ * but it's up to the suclasses to compute the time surfaces.
  */
-class LinearTimeSurface {
+class TimeSurfaceBase {
 
 public:
 
@@ -45,10 +43,10 @@ public:
      * @brief Construct a new Time Surface object
      * 
      * This constructor is provided only to create containers
-     * with LinearTimeSurface instances or to load a time surface from file.
-     * It should not be used to create an usable LinearTimeSurface object.
+     * with time surfaces instances or to load a time surface from file.
+     * It should not be used to create an usable time surface object.
      */
-    LinearTimeSurface();
+    TimeSurfaceBase();
 
     /**
      * @brief Construct a new Time Surface object
@@ -64,7 +62,7 @@ public:
      * @param Ry vertical radius of the window on which surfaces are computed (0 to use the full height)
      * @param tau time constant of the surface
      */
-    LinearTimeSurface(uint16_t width, uint16_t height, uint16_t Rx, uint16_t Ry, TimeSurfaceScalarType tau);
+    TimeSurfaceBase(uint16_t width, uint16_t height, uint16_t Rx, uint16_t Ry, TimeSurfaceScalarType tau);
 
     /**
      * @brief Update the time context with a new event
@@ -80,7 +78,7 @@ public:
      * 
      * @param ev the new event
      */
-    inline void update(const event& ev) {
+    void update(const event& ev) {
         update(ev.t, ev.x, ev.y);
     }
 
@@ -97,7 +95,7 @@ public:
      * @param y vertical coordinate of the event
      * @return a std::pair with the computed time surface and whether the surface is valid or not
      */
-    std::pair<TimeSurfaceType, bool> compute(uint64_t t, uint16_t x, uint16_t y) const;
+    virtual std::pair<TimeSurfaceType, bool> compute(uint64_t t, uint16_t x, uint16_t y) const = 0;
 
     /**
      * @brief Compute the time surface for an event
@@ -110,9 +108,7 @@ public:
      * @param ev the event
      * @return a std::pair with the computed time surface and whether the surface is valid or not
      */
-    inline std::pair<TimeSurfaceType, bool> compute(const event& ev) const {
-        return compute(ev.t, ev.x, ev.y);
-    }
+    virtual std::pair<TimeSurfaceType, bool> compute(const event& ev) const = 0;
 
     /**
      * @brief Update the time context and compute the new surface
@@ -122,7 +118,7 @@ public:
      * @param y vertical coordinate of the event
      * @return a std::pair with the computed time surface and whether the surface is valid or not
      */
-    inline std::pair<TimeSurfaceType, bool> updateAndCompute(uint64_t t, uint16_t x, uint16_t y) {
+    std::pair<TimeSurfaceType, bool> updateAndCompute(uint64_t t, uint16_t x, uint16_t y) {
         update(t, x, y);
         return compute(t, x, y);
     }
@@ -133,7 +129,7 @@ public:
      * @param ev the event
      * @return a std::pair with the computed time surface and whether the surface is valid or not
      */
-    inline std::pair<TimeSurfaceType, bool> updateAndCompute(const event& ev) {
+    std::pair<TimeSurfaceType, bool> updateAndCompute(const event& ev) {
         update(ev.t, ev.x, ev.y);
         return compute(ev.t, ev.x, ev.y);
     }
@@ -144,11 +140,11 @@ public:
      * This function returns the full temporal context (including padding)
      * on which surfaces are computed.
      * 
-     * You may want to use LinearTimeSurface::getContext() in normal circumnstances.
+     * You may want to use getContext() in normal circumnstances.
      * 
      * @return the temporal context
      */
-    inline const TimeSurfaceType& getFullContext() const {
+    const TimeSurfaceType& getFullContext() const {
         return context;
     }
 
@@ -169,7 +165,7 @@ public:
      * @param t sample time
      * @return decayed temporal context
      */
-    TimeSurfaceType sampleContext(uint64_t t) const;
+    virtual TimeSurfaceType sampleContext(uint64_t t) const = 0;
 
     /**
      * @brief Reset the time context
@@ -190,7 +186,7 @@ public:
      * 
      * @return the horizontal size of the window
      */
-    inline uint16_t getWx() const {
+    uint16_t getWx() const {
         return Wx;
     }
 
@@ -199,31 +195,31 @@ public:
      * 
      * @return the vertical size of the window
      */
-    inline uint16_t getWy() const {
+    uint16_t getWy() const {
         return Wy;
     }
 
     /**
-     * @brief Stream insertion operator for Time Surfaces
+     * @brief Stream insertion operator for time surfaces
      * 
      * Puts all parameters in sequence on the stream, but leaves out the time context.
      * 
      * @param out output stream
-     * @param ts LinearTimeSurface to insert
+     * @param ts time surface to insert
      * @return output stream
      */
-    friend std::ostream& operator<<(std::ostream& out, const LinearTimeSurface& ts);
+    friend std::ostream& operator<<(std::ostream& out, const TimeSurfaceBase& ts);
 
     /**
-     * @brief Stream extraction operator for Time Surfaces
+     * @brief Stream extraction operator for time surfaces
      * 
      * Reads all parameters from the stream. Previous parameters are overwritten.
      * 
      * @param in input stream
-     * @param ts LinearTimeSurface where to extract into
+     * @param ts time surface where to extract into
      * @return input stream
      */
-    friend std::istream& operator>>(std::istream& in, LinearTimeSurface& ts);
+    friend std::istream& operator>>(std::istream& in, TimeSurfaceBase& ts);
 
 protected:
 
@@ -276,7 +272,40 @@ protected:
 
 
 /**
- * @brief Class that can compute time surfaces, with weighted output
+ * @brief Class that can compute linear time surfaces
+ * 
+ * This class keeps track of the time context for the current stream of events and can compute
+ * the time surface for new ones.
+ * 
+ * The time surface has a linear activation as described in (Maro et al., 2020).
+ */
+class LinearTimeSurface : public TimeSurfaceBase {
+
+public:
+
+    using TimeSurfaceBase::TimeSurfaceBase;
+
+    std::pair<TimeSurfaceType, bool> compute(uint64_t t, uint16_t x, uint16_t y) const override;
+
+    std::pair<TimeSurfaceType, bool> compute(const event& ev) const override;
+
+    TimeSurfaceType sampleContext(uint64_t t) const override;
+
+    /**
+     * @copydoc TimeSurfaceBase::operator<<
+     */
+    friend std::ostream& operator<<(std::ostream& out, const LinearTimeSurface& ts);
+
+    /**
+     * @copydoc TimeSurfaceBase::operator>>
+     */
+    friend std::istream& operator>>(std::istream& in, LinearTimeSurface& ts);
+
+};
+
+
+/**
+ * @brief Class that can compute linear time surfaces, with weighted output
  * 
  * This class keeps track of the time context for the current stream of events and can compute
  * the time surface for new ones.
@@ -288,29 +317,17 @@ protected:
 class WeightedLinearTimeSurface : public LinearTimeSurface {
 
 public:
+
     /**
-     * @brief Construct a new Time Surface object
-     * 
-     * This constructor is provided only to create containers
-     * with WeightedLinearTimeSurface instances or to load a time surface from file.
-     * It should not be used to create an usable LinearTimeSurface object.
+     * @copydoc TimeSurfaceBase::TimeSurfaceBase()
      */
     WeightedLinearTimeSurface();
 
     /**
-     * @brief Construct a new Time Surface object
-     * 
-     * The time context is initalized to -tau.
-     * 
-     * It is possible to use the whole time context in any dimension to compute the surfaces by setting Rx or Ry to 0.
-     * However, this can break the assumption that the current event is centered in the time surface.
-     * 
-     * @param width width of the full time context
-     * @param height height of the full time context
-     * @param Rx horizontal radius of the window on which surfaces are computed (0 to use the full width)
-     * @param Ry vertical radius of the window on which surfaces are computed (0 to use the full height)
-     * @param tau time constant of the surface
+     * @copydoc TimeSurfaceBase::TimeSurfaceBase(uint16_t,uint16_t,uint16_t,uint16_t,TimeSurfaceScalarType)
      * @param weightmatrix matrix used to weight the time surfaces
+     * 
+     * The weight matrix must have the same size as the context.
      */
     WeightedLinearTimeSurface(uint16_t width, uint16_t height, uint16_t Rx, uint16_t Ry, TimeSurfaceScalarType tau, const TimeSurfaceType& weightmatrix);
 
@@ -319,51 +336,29 @@ public:
      * 
      * The output time surface is weighted.
      */
-    std::pair<TimeSurfaceType, bool> compute(uint64_t t, uint16_t x, uint16_t y) const;
+    std::pair<TimeSurfaceType, bool> compute(uint64_t t, uint16_t x, uint16_t y) const override;
 
     /**
      * @copydoc LinearTimeSurface::compute(const event&) const
      * 
      * The output time surface is weighted.
      */
-    inline std::pair<TimeSurfaceType, bool> compute(const event& ev) const {
-        return compute(ev.t, ev.x, ev.y);
-    }
-
-    /**
-     * @copydoc LinearTimeSurface::updateAndCompute(uint64_t,uint16_t,uint16_t)
-     * 
-     * The output time surface is weighted.
-     */
-    inline std::pair<TimeSurfaceType, bool> updateAndCompute(uint64_t t, uint16_t x, uint16_t y) {
-        update(t, x, y);
-        return compute(t, x, y);
-    }
-
-    /**
-     * @copydoc LinearTimeSurface::updateAndCompute(const event&)
-     * 
-     * The output time surface is weighted.
-     */
-    inline std::pair<TimeSurfaceType, bool> updateAndCompute(const event& ev) {
-        update(ev.t, ev.x, ev.y);
-        return compute(ev.t, ev.x, ev.y);
-    }
+    std::pair<TimeSurfaceType, bool> compute(const event& ev) const override;
 
     /**
      * @copydoc LinearTimeSurface::sampleContext
      * 
      * The sampled context is weighted.
      */
-    TimeSurfaceType sampleContext(uint64_t t) const;
+    TimeSurfaceType sampleContext(uint64_t t) const override;
 
     /**
-     * @copydoc LinearTimeSurface::operator<<
+     * @copydoc TimeSurfaceBase::operator<<
      */
     friend std::ostream& operator<<(std::ostream& out, const WeightedLinearTimeSurface& ts);
 
     /**
-     * @copydoc LinearTimeSurface::operator>>
+     * @copydoc TimeSurfaceBase::operator>>
      */
     friend std::istream& operator>>(std::istream& in, WeightedLinearTimeSurface& ts);
 
