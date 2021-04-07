@@ -169,8 +169,8 @@ std::istream& operator>>(std::istream& in, WeightedLinearTimeSurface& ts) {
 
     ts.weights = TimeSurfaceType::Zero(ts.height+2*ts.Ry, ts.width+2*ts.Rx);
 
-    for (uint16_t y = 0; y < ts.height; y++) {
-        for (uint16_t x = 0; x < ts.width; x++) {
+    for (uint16_t y = 0; y < ts.height+2*ts.Ry; y++) {
+        for (uint16_t x = 0; x < ts.width+2*ts.Rx; x++) {
             in >> ts.weights(y, x);
         }
     }

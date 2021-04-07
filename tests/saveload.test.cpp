@@ -26,6 +26,28 @@ TEST(TestSaveLoad, SimpleTSLoad) {
 
 }
 
+TEST(TestSaveLoad, SimpleWTSLoad) {
+
+    std::string ts_string("5 5 2 2 5 5 1.2 4");
+
+    cpphots::TimeSurfaceType w = cpphots::TimeSurfaceType::Constant(32, 32, 0.5);
+
+    cpphots::WeightedLinearTimeSurface ts1(32, 32, 2, 2, 1000, w);
+
+    std::ostringstream outstream1;
+    outstream1 << ts1;
+
+    cpphots::WeightedLinearTimeSurface ts2;
+
+    std::istringstream instream(outstream1.str());
+    instream >> ts2;
+
+    std::stringstream outstream2;
+    outstream2 << ts2;
+
+    EXPECT_EQ(outstream1.str(), outstream2.str());
+
+}
 
 TEST(TestSaveLoad, TSProcess) {
 
