@@ -1,5 +1,6 @@
 # define file lists
 set(CPPHOTS_SOURCES
+    interfaces.cpp
     classification.cpp
     events_utils.cpp
     network.cpp
@@ -9,6 +10,7 @@ set(CPPHOTS_SOURCES
     layer_modifiers.cpp)
 
 set(CPPHOTS_HEADERS
+    "../include/cpphots/interfaces.h"
     "../include/cpphots/classification.h"
     "../include/cpphots/events_utils.h"
     "../include/cpphots/layer.h"

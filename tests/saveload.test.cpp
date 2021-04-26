@@ -9,7 +9,7 @@
 
 TEST(TestSaveLoad, SimpleTSLoad) {
 
-    std::string ts_string("5 5 2 2 5 5 1.2 4");
+    std::string ts_string("!LINEARTIMESURFACE\n5 5 2 2 5 5 1.2 4\n");
 
     cpphots::LinearTimeSurface ts;
     std::stringstream instream(ts_string);
@@ -82,6 +82,24 @@ TEST(TestSaveLoad, TSProcess) {
     ASSERT_NEAR(normsum, 4740.313427652784, 0.1);
     ASSERT_NEAR(goodsum, 4562.696117657931, 0.1);
     EXPECT_EQ(goodevents, 1783);
+
+}
+
+TEST(TestSaveLoad, TSPool) {
+
+    cpphots::LinearTimeSurfacePool tsp1(2, 30, 50, 2, 2, 1000);
+
+    std::ostringstream out;
+    out << tsp1;
+
+    std::istringstream in(out.str());
+    cpphots::LinearTimeSurfacePool tsp2;
+    in >> tsp2;
+
+    auto [sx, sy] = tsp1.getSurface(1).getSize();
+
+    EXPECT_EQ(sx, 30);
+    EXPECT_EQ(sy, 50);
 
 }
 

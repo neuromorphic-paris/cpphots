@@ -8,8 +8,11 @@
 
 #include <ostream>
 #include <istream>
+
 #include <Eigen/Dense>
+
 #include "events_utils.h"
+#include "interfaces.h"
 
 
 namespace cpphots {
@@ -35,7 +38,7 @@ using TimeSurfaceScalarType = TimeSurfaceType::Scalar;
  * This class keeps track of the time context for the current stream of events,
  * but it's up to the suclasses to compute the time surfaces.
  */
-class TimeSurfaceBase {
+class TimeSurfaceBase : public Streamable {
 
 public:
 
@@ -200,26 +203,13 @@ public:
     }
 
     /**
-     * @brief Stream insertion operator for time surfaces
+     * @copydoc Streamable::toStream
      * 
-     * Puts all parameters in sequence on the stream, but leaves out the time context.
-     * 
-     * @param out output stream
-     * @param ts time surface to insert
-     * @return output stream
+     * Does not save the current time context.
      */
-    friend std::ostream& operator<<(std::ostream& out, const TimeSurfaceBase& ts);
+    void toStream(std::ostream& out) const override;
 
-    /**
-     * @brief Stream extraction operator for time surfaces
-     * 
-     * Reads all parameters from the stream. Previous parameters are overwritten.
-     * 
-     * @param in input stream
-     * @param ts time surface where to extract into
-     * @return input stream
-     */
-    friend std::istream& operator>>(std::istream& in, TimeSurfaceBase& ts);
+    void fromStream(std::istream& in) override;
 
 protected:
 
@@ -291,15 +281,9 @@ public:
 
     TimeSurfaceType sampleContext(uint64_t t) const override;
 
-    /**
-     * @copydoc TimeSurfaceBase::operator<<
-     */
-    friend std::ostream& operator<<(std::ostream& out, const LinearTimeSurface& ts);
+    void toStream(std::ostream& out) const override;
 
-    /**
-     * @copydoc TimeSurfaceBase::operator>>
-     */
-    friend std::istream& operator>>(std::istream& in, LinearTimeSurface& ts);
+    void fromStream(std::istream& in) override;
 
 };
 
@@ -352,15 +336,9 @@ public:
      */
     TimeSurfaceType sampleContext(uint64_t t) const override;
 
-    /**
-     * @copydoc TimeSurfaceBase::operator<<
-     */
-    friend std::ostream& operator<<(std::ostream& out, const WeightedLinearTimeSurface& ts);
+    void toStream(std::ostream& out) const override;
 
-    /**
-     * @copydoc TimeSurfaceBase::operator>>
-     */
-    friend std::istream& operator>>(std::istream& in, WeightedLinearTimeSurface& ts);
+    void fromStream(std::istream& in) override;
 
 private:
 
@@ -639,7 +617,7 @@ std::ostream& operator<<(std::ostream& out, const TimeSurfacePool<TS>& pool) {
 
     out << pool.surfaces.size() << "\n";
     for (const auto& ts : pool.surfaces) {
-        out << ts << "\n";
+        out << ts;
     }
 
     return out;

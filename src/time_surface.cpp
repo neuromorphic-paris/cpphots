@@ -50,35 +50,31 @@ TimeSurfaceType TimeSurfaceBase::getContext() const {
     return context.block(Ry, Rx, height, width);
 }
 
-std::ostream& operator<<(std::ostream& out, const TimeSurfaceBase& ts) {
+void TimeSurfaceBase::toStream(std::ostream& out) const {
 
-    out << ts.width << " ";
-    out << ts.height << " ";
-    out << ts.Rx << " ";
-    out << ts.Ry << " ";
-    out << ts.Wx << " ";
-    out << ts.Wy << " ";
-    out << ts.tau << " ";
-    out << ts.min_events;
-
-    return out;
+    out << width << " ";
+    out << height << " ";
+    out << Rx << " ";
+    out << Ry << " ";
+    out << Wx << " ";
+    out << Wy << " ";
+    out << tau << " ";
+    out << min_events << std::endl;
 
 }
 
-std::istream& operator>>(std::istream& in, TimeSurfaceBase& ts) {
+void TimeSurfaceBase::fromStream(std::istream& in) {
 
-    in >> ts.width;
-    in >> ts.height;
-    in >> ts.Rx;
-    in >> ts.Ry;
-    in >> ts.Wx;
-    in >> ts.Wy;
-    in >> ts.tau;
-    in >> ts.min_events;
+    in >> width;
+    in >> height;
+    in >> Rx;
+    in >> Ry;
+    in >> Wx;
+    in >> Wy;
+    in >> tau;
+    in >> min_events;
 
-    ts.reset();
-
-    return in;
+    reset();
 
 }
 
@@ -113,19 +109,17 @@ TimeSurfaceType LinearTimeSurface::sampleContext(uint64_t t) const {
 
 }
 
-std::ostream& operator<<(std::ostream& out, const LinearTimeSurface& ts) {
+void LinearTimeSurface::toStream(std::ostream& out) const {
 
-    out << static_cast<const TimeSurfaceBase&>(ts);
-
-    return out;
+    writeMetacommand(out, "LINEARTIMESURFACE");
+    TimeSurfaceBase::toStream(out);
 
 }
 
-std::istream& operator>>(std::istream& in, LinearTimeSurface& ts) {
+void LinearTimeSurface::fromStream(std::istream& in) {
 
-    in >> static_cast<TimeSurfaceBase&>(ts);
-
-    return in;
+    matchMetacommandOptional(in, "LINEARTIMESURFACE");
+    TimeSurfaceBase::fromStream(in);
 
 }
 
@@ -177,29 +171,27 @@ void WeightedLinearTimeSurface::setWeightMatrix(const TimeSurfaceType& weightmat
 
 }
 
-std::ostream& operator<<(std::ostream& out, const WeightedLinearTimeSurface& ts) {
+void WeightedLinearTimeSurface::toStream(std::ostream& out) const {
 
-    out << static_cast<const LinearTimeSurface&>(ts) << std::endl;
+    writeMetacommand(out, "WEIGHTEDLINEARTIMESURFACE");
+    TimeSurfaceBase::toStream(out);
 
-    out << ts.weights;
-
-    return out;
+    out << weights;
 
 }
 
-std::istream& operator>>(std::istream& in, WeightedLinearTimeSurface& ts) {
+void WeightedLinearTimeSurface::fromStream(std::istream& in) {
 
-    in >> static_cast<LinearTimeSurface&>(ts);
+    matchMetacommandOptional(in, "WEIGHTEDLINEARTIMESURFACE");
+    TimeSurfaceBase::fromStream(in);
 
-    ts.weights = TimeSurfaceType::Zero(ts.height+2*ts.Ry, ts.width+2*ts.Rx);
+    weights = TimeSurfaceType::Zero(height+2*Ry, width+2*Rx);
 
-    for (uint16_t y = 0; y < ts.height+2*ts.Ry; y++) {
-        for (uint16_t x = 0; x < ts.width+2*ts.Rx; x++) {
-            in >> ts.weights(y, x);
+    for (uint16_t y = 0; y < height+2*Ry; y++) {
+        for (uint16_t x = 0; x < width+2*Rx; x++) {
+            in >> weights(y, x);
         }
     }
-
-    return in;
 
 }
 
