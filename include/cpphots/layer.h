@@ -6,6 +6,7 @@
 #define CPPHOTS_LAYER_H
 
 #include <type_traits>
+#include <memory>
 
 #include "events_utils.h"
 #include "clustering.h"
@@ -51,6 +52,11 @@ public:
     virtual void reset() = 0;
 
 };
+
+/**
+ * @brief Alias for pointer to layer
+ */
+using LayerPtr = std::shared_ptr<LayerBase>;
 
 
 /**
@@ -262,6 +268,18 @@ Layer<std::decay_t<T>...> create_layer(T&&... v) {
     return Layer<std::decay_t<T>...>{v...};
 }
 
+/**
+ * @brief Create a new layer
+ * 
+ * Creates a new Layer by copying the components passed
+ * 
+ * @param v layer components
+ * @return pointer to layer
+ */
+template <typename... T>
+LayerPtr create_layer_ptr(T&&... v) {
+    return std::make_shared<Layer<std::decay_t<T>...>>(v...);
+}
 
 /**
  * @brief Initialize prototypes from a stream of events

@@ -165,12 +165,10 @@ std::vector<std::pair<std::string, std::string>> poker_dvs_all(const std::string
 std::tuple<double, double, double> test_training(const std::string& folder, bool multi, const cpphots::ClustererInitializerType& initializer) {
 
     cpphots::Network network;
-    auto l1 = cpphots::create_layer(cpphots::LinearTimeSurfacePool(2, 32, 32, 2, 2, 1000),
-                                    cpphots::HOTSClusterer(16));
-    auto l2 = cpphots::create_layer(cpphots::LinearTimeSurfacePool(16, 32, 32, 4, 4, 5000),
-                                    cpphots::HOTSClusterer(32));
-    network.addLayer(l1);
-    network.addLayer(l2);
+    network.addLayer(cpphots::LinearTimeSurfacePool(2, 32, 32, 2, 2, 1000),
+                     cpphots::HOTSClusterer(16));
+    network.addLayer(cpphots::LinearTimeSurfacePool(16, 32, 32, 4, 4, 5000),
+                     cpphots::HOTSClusterer(32));
 
     auto train_set = poker_dvs_trainset(folder);
 

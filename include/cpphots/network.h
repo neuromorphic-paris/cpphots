@@ -38,11 +38,23 @@ public:
     Network();
 
     /**
-     * @brief Add a new layer to the network, in the back
+     * @brief Create a new layer and append it to the network
+     * 
+     * Creates a new Layer by copying the components passed
+     * 
+     * @param v layer components
+     */
+    template <typename... T>
+    void addLayer(T&&... v) {
+        layers.push_back(create_layer_ptr(std::forward<T>(v)...));
+    }
+
+    /**
+     * @brief Append a layer to the network
      * 
      * @param layer the layer to be added
      */
-    void addLayer(LayerBase& layer);
+    void addLayer(LayerPtr layer);
 
     /**
      * @brief Process an event
@@ -90,7 +102,7 @@ public:
      */
     template <typename T = LayerBase>
     T& getLayer(size_t pos) {
-        return dynamic_cast<T&>(layers[pos].get());
+        return dynamic_cast<T&>(*layers[pos]);
     }
 
     /**
@@ -105,7 +117,7 @@ public:
      */
     template <typename T = LayerBase>
     const T& getLayer(size_t pos) const {
-        return dynamic_cast<const T&>(layers[pos].get());
+        return dynamic_cast<const T&>(*layers[pos]);
     }
 
     /**
@@ -165,7 +177,7 @@ public:
     std::vector<T*> view() {
         std::vector<T*> ret;
         for (auto& l : layers) {
-            T* lp = dynamic_cast<T*>(&(l.get()));
+            T* lp = dynamic_cast<T*>(l.get());
             if (lp) {
                 ret.push_back(lp);
             }
@@ -187,7 +199,7 @@ public:
     std::vector<T*> viewFull() {
         std::vector<T*> ret;
         for (auto& l : layers) {
-            ret.push_back(dynamic_cast<T*>(&(l.get())));
+            ret.push_back(dynamic_cast<T*>(l.get()));
         }
         return ret;
     }
@@ -212,7 +224,7 @@ public:
     void reset();
 
 private:
-    std::vector<std::reference_wrapper<LayerBase>> layers;
+    std::vector<LayerPtr> layers;
 
 };
 

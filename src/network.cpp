@@ -5,7 +5,7 @@ namespace cpphots {
 
 Network::Network() {}
 
-void Network::addLayer(LayerBase& layer) {
+void Network::addLayer(LayerPtr layer) {
     layers.push_back(layer);
 }
 
@@ -23,7 +23,7 @@ Events Network::process(const event& ev, bool skip_check) {
         Events next_evs;
 
         for (auto& nev : evs) {
-            Events pevs = layer.get().process(nev, skip_check);
+            Events pevs = layer->process(nev, skip_check);
             next_evs.insert(next_evs.end(), pevs.begin(), pevs.end());
         }
 
@@ -43,11 +43,11 @@ size_t Network::getNumLayers() const {
 }
 
 LayerBase& Network::operator[](size_t pos) {
-    return layers[pos].get();
+    return *layers[pos];
 }
 
 const LayerBase& Network::operator[](size_t pos) const {
-    return layers[pos].get();
+    return *layers[pos];
 }
 
 Network Network::getSubnetwork(int start, int stop) const {
@@ -71,7 +71,7 @@ Network Network::getSubnetwork(int start, int stop) const {
 
 void Network::reset() {
     for (auto& l : layers) {
-        l.get().reset();
+        l->reset();
     }
 }
 

@@ -9,23 +9,23 @@ struct A{};
 TEST(TestNetwork, View) {
 
     cpphots::Network network;
-    cpphots::Layer<cpphots::LinearTimeSurfacePool, A> l1;
-    cpphots::Layer<cpphots::LinearTimeSurfacePool> l2;
-    cpphots::Layer<cpphots::LinearTimeSurfacePool, A> l3;
-    cpphots::Layer<cpphots::LinearTimeSurfacePool> l4;
-    network.addLayer(l1);
-    network.addLayer(l2);
-    network.addLayer(l3);
-    network.addLayer(l4);
+    cpphots::Layer<cpphots::LinearTimeSurfacePool, A>* l1 = new cpphots::Layer<cpphots::LinearTimeSurfacePool, A>();
+    cpphots::Layer<cpphots::LinearTimeSurfacePool>* l2 = new cpphots::Layer<cpphots::LinearTimeSurfacePool>();
+    cpphots::Layer<cpphots::LinearTimeSurfacePool, A>* l3 = new cpphots::Layer<cpphots::LinearTimeSurfacePool, A>();
+    cpphots::Layer<cpphots::LinearTimeSurfacePool>* l4 = new cpphots::Layer<cpphots::LinearTimeSurfacePool>();
+    network.addLayer(cpphots::LayerPtr(l1));
+    network.addLayer(cpphots::LayerPtr(l2));
+    network.addLayer(cpphots::LayerPtr(l3));
+    network.addLayer(cpphots::LayerPtr(l4));
 
     auto a = network.view<A>();
     EXPECT_EQ(a.size(), 2);
-    std::vector<A*> expected{&l1, &l3};
+    std::vector<A*> expected{l1, l3};
     EXPECT_EQ(a, expected);
 
     a = network.viewFull<A>();
     EXPECT_EQ(a.size(), 4);
-    expected = std::vector<A*>{&l1, nullptr, &l3, nullptr};
+    expected = std::vector<A*>{l1, nullptr, l3, nullptr};
     EXPECT_EQ(a, expected);
 
 }
@@ -33,54 +33,54 @@ TEST(TestNetwork, View) {
 TEST(TestNetwork, GetLayer) {
 
     cpphots::Network network;
-    cpphots::Layer<cpphots::LinearTimeSurfacePool, A> l1;
-    cpphots::Layer<cpphots::LinearTimeSurfacePool> l2;
-    network.addLayer(l1);
-    network.addLayer(l2);
+    cpphots::Layer<cpphots::LinearTimeSurfacePool, A>* l1 = new cpphots::Layer<cpphots::LinearTimeSurfacePool, A>();
+    cpphots::Layer<cpphots::LinearTimeSurfacePool>* l2 = new cpphots::Layer<cpphots::LinearTimeSurfacePool>();
+    network.addLayer(cpphots::LayerPtr(l1));
+    network.addLayer(cpphots::LayerPtr(l2));
 
     ASSERT_THROW(A& a2 = network.getLayer<A>(1), std::bad_cast);
 
     A& a = network.getLayer<A>(0);
-    EXPECT_EQ(std::addressof(a), std::addressof(l1));
+    EXPECT_EQ(std::addressof(a), l1);
 
     cpphots::LayerBase& lr1 = network.getLayer(0);
     cpphots::LayerBase& lr2 = network.getLayer(1);
 
-    EXPECT_EQ(std::addressof(lr1), std::addressof(l1));
-    EXPECT_EQ(std::addressof(lr2), std::addressof(l2));
+    EXPECT_EQ(std::addressof(lr1), l1);
+    EXPECT_EQ(std::addressof(lr2), l2);
 
-    EXPECT_EQ(std::addressof(network.back<A>()), std::addressof(l1));
-    EXPECT_EQ(std::addressof(network.back()), std::addressof(l2));
+    EXPECT_EQ(std::addressof(network.back<A>()), l1);
+    EXPECT_EQ(std::addressof(network.back()), l2);
 
 }
 
 TEST(TestNetwork, Subnetwork) {
 
     cpphots::Network network;
-    cpphots::Layer<cpphots::LinearTimeSurfacePool> l0;
-    cpphots::Layer<cpphots::LinearTimeSurfacePool> l1;
-    cpphots::Layer<cpphots::LinearTimeSurfacePool> l2;
-    cpphots::Layer<cpphots::LinearTimeSurfacePool> l3;
-    network.addLayer(l0);
-    network.addLayer(l1);
-    network.addLayer(l2);
-    network.addLayer(l3);
+    cpphots::Layer<cpphots::LinearTimeSurfacePool>* l0 = new cpphots::Layer<cpphots::LinearTimeSurfacePool>();
+    cpphots::Layer<cpphots::LinearTimeSurfacePool>* l1 = new cpphots::Layer<cpphots::LinearTimeSurfacePool>();
+    cpphots::Layer<cpphots::LinearTimeSurfacePool>* l2 = new cpphots::Layer<cpphots::LinearTimeSurfacePool>();
+    cpphots::Layer<cpphots::LinearTimeSurfacePool>* l3 = new cpphots::Layer<cpphots::LinearTimeSurfacePool>();
+    network.addLayer(cpphots::LayerPtr(l0));
+    network.addLayer(cpphots::LayerPtr(l1));
+    network.addLayer(cpphots::LayerPtr(l2));
+    network.addLayer(cpphots::LayerPtr(l3));
 
     auto net2 = network.getSubnetwork(0, 2);
     EXPECT_EQ(net2.getNumLayers(), 2);
-    EXPECT_EQ(std::addressof(net2.getLayer(0)), std::addressof(l0));
-    EXPECT_EQ(std::addressof(net2.getLayer(1)), std::addressof(l1));
+    EXPECT_EQ(std::addressof(net2.getLayer(0)), l0);
+    EXPECT_EQ(std::addressof(net2.getLayer(1)), l1);
 
     auto net3 = network.getSubnetwork(1);
     EXPECT_EQ(net3.getNumLayers(), 3);
-    EXPECT_EQ(std::addressof(net3.getLayer(0)), std::addressof(l1));
-    EXPECT_EQ(std::addressof(net3.getLayer(1)), std::addressof(l2));
-    EXPECT_EQ(std::addressof(net3.getLayer(2)), std::addressof(l3));
+    EXPECT_EQ(std::addressof(net3.getLayer(0)), l1);
+    EXPECT_EQ(std::addressof(net3.getLayer(1)), l2);
+    EXPECT_EQ(std::addressof(net3.getLayer(2)), l3);
 
     auto net4 = network.getSubnetwork(0, -1);
     EXPECT_EQ(net4.getNumLayers(), 3);
-    EXPECT_EQ(std::addressof(net4.getLayer(0)), std::addressof(l0));
-    EXPECT_EQ(std::addressof(net4.getLayer(1)), std::addressof(l1));
-    EXPECT_EQ(std::addressof(net4.getLayer(2)), std::addressof(l2));
+    EXPECT_EQ(std::addressof(net4.getLayer(0)), l0);
+    EXPECT_EQ(std::addressof(net4.getLayer(1)), l1);
+    EXPECT_EQ(std::addressof(net4.getLayer(2)), l2);
 
 }
