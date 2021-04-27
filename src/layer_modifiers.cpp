@@ -159,7 +159,7 @@ bool SuperCell::isInCell(uint16_t cx, uint16_t cy, uint16_t ex, uint16_t ey) con
 
 
 SuperCellAverage::SuperCellAverage(uint16_t width, uint16_t height, uint16_t K, uint16_t overlap)
-    :SuperCell(width, height, K, o) {
+    :SuperCell(width, height, K, overlap) {
 
     cells = std::vector<std::vector<CellMem>>(hcell, std::vector<CellMem>(wcell));
 

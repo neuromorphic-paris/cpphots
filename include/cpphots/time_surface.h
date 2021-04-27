@@ -549,6 +549,15 @@ public:
     }
 
     /**
+     * @brief Get the number of surfaces in the pool
+     * 
+     * @return number of surfaces
+     */
+    size_t getNumSurfaces() {
+        return surfaces.size();
+    }
+
+    /**
      * @copydoc Streamable::toStream
      * 
      * Save paramaters for all time surfaces to the stream.

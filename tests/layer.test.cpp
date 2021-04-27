@@ -382,3 +382,20 @@ TEST(TestLayer, Wrongsize) {
                                           HasSize(10, 20)));
 
 }
+
+TEST(TestLayer, CreateLayer) {
+
+    {
+        auto layer = cpphots::create_layer(cpphots::create_pool<cpphots::LinearTimeSurface>(8, 10, 20, 5, 5, 10000));
+        EXPECT_EQ(layer.getSize().first, 10);
+        EXPECT_EQ(layer.getSize().second, 20);
+        EXPECT_EQ(layer.getNumSurfaces(), 8);
+    }
+
+    {
+        auto layer = cpphots::create_layer(cpphots::create_pool<cpphots::LinearTimeSurface>(8, 10, 20, 5, 5, 10000),
+                                           cpphots::HOTSClusterer(12));
+        EXPECT_EQ(layer.getNumClusters(), 12);
+    }
+
+}

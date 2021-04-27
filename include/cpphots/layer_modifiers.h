@@ -144,7 +144,7 @@ public:
     std::pair<uint16_t, uint16_t> getSize() const;
 
     /**
-     * @brief Get the number of the horizonat and vertical cells
+     * @brief Get the number of the horizontal and vertical cells
      * 
      * @return {horizontal cells, vertical cells}
      */

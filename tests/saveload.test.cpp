@@ -207,3 +207,74 @@ TEST(TestLoad, Network) {
     EXPECT_TRUE(clust2[1]->isInitialized());
 
 }
+
+TEST(TestSaveLoad, ArrayLayer) {
+
+    cpphots::ArrayLayer mod1;
+
+    std::stringstream outstream;
+    outstream << mod1;
+
+    std::stringstream instream(outstream.str());
+
+    cpphots::ArrayLayer mod2;
+    instream >> mod2;
+
+}
+
+TEST(TestSaveLoad, SerializingLayer) {
+
+    cpphots::SerializingLayer mod1(10, 20);
+
+    std::stringstream outstream;
+    outstream << mod1;
+
+    std::stringstream instream(outstream.str());
+
+    cpphots::SerializingLayer mod2;
+    instream >> mod2;
+
+    EXPECT_EQ(mod1.getSize().first, mod2.getSize().first);
+    EXPECT_EQ(mod1.getSize().second, mod2.getSize().second);
+
+}
+
+TEST(TestSaveLoad, SuperCell) {
+
+    cpphots::SuperCell mod1(49, 9, 5, 1);
+
+    std::stringstream outstream;
+    outstream << mod1;
+
+    std::stringstream instream(outstream.str());
+
+    cpphots::SuperCell mod2;
+    instream >> mod2;
+
+    EXPECT_EQ(mod1.getSize().first, mod2.getSize().first);
+    EXPECT_EQ(mod1.getSize().second, mod2.getSize().second);
+
+    EXPECT_EQ(mod1.getCellSizes().first, mod2.getCellSizes().first);
+    EXPECT_EQ(mod1.getCellSizes().second, mod2.getCellSizes().second);
+
+}
+
+TEST(TestSaveLoad, SuperCellAverage) {
+
+    cpphots::SuperCellAverage mod1(49, 9, 5, 1);
+
+    std::stringstream outstream;
+    outstream << mod1;
+
+    std::stringstream instream(outstream.str());
+
+    cpphots::SuperCellAverage mod2;
+    instream >> mod2;
+
+    EXPECT_EQ(mod1.getSize().first, mod2.getSize().first);
+    EXPECT_EQ(mod1.getSize().second, mod2.getSize().second);
+
+    EXPECT_EQ(mod1.getCellSizes().first, mod2.getCellSizes().first);
+    EXPECT_EQ(mod1.getCellSizes().second, mod2.getCellSizes().second);
+
+}
