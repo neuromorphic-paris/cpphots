@@ -126,6 +126,22 @@ public:
         return false;
     }
 
+    void toStream(std::ostream& out) const override {
+        out << ks.size() << std::endl;
+        for (auto k : ks) {
+            out << k << " ";
+        }
+    }
+
+    void fromStream(std::istream& in) override {
+        size_t sz;
+        in >> sz;
+        ks.resize(sz);
+        for (auto& k : ks) {
+            in >> k;
+        }
+    }
+
 private:
     std::vector<uint16_t> ks;
     size_t next = 0;

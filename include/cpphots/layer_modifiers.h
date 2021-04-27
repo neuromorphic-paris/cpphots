@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "time_surface.h"
+#include "interfaces.h"
 
 
 namespace cpphots {
@@ -18,7 +19,7 @@ namespace cpphots {
  * A remapper usually changes the coordinates or the polarity of an event,
  * withoud modifying the event timestamp.
  */
-struct EventRemapper {
+struct EventRemapper : public Streamable {
 
     /**
      * @brief Remap event
@@ -42,6 +43,10 @@ struct ArrayLayer : public EventRemapper {
 
     event remapEvent(event ev, uint16_t k) override;
 
+    void toStream(std::ostream& out) const override;
+
+    void fromStream(std::istream& in) override;
+
 };
 
 /**
@@ -55,6 +60,14 @@ struct ArrayLayer : public EventRemapper {
 class SerializingLayer : public EventRemapper {
 
 public:
+
+    /**
+     * @brief Construct a new SerializingLayer modifier
+     * 
+     * This constructor should not be used explicitly, it is provided only to
+     * load this modifier from a stream.
+     */
+    SerializingLayer() {}
 
     /**
      * @brief Construct a new SerializingLayer modifier
@@ -73,6 +86,10 @@ public:
      */
     std::pair<uint16_t, uint16_t> getSize() const;
 
+    void toStream(std::ostream& out) const override;
+
+    void fromStream(std::istream& in) override;
+
 private:
     uint16_t w, h;
 
@@ -86,9 +103,18 @@ private:
  * using cells of a fixed size, thus reducing the output dimensionality.
  * Cells may be overlapping, causing the layer to emit more than one event.
  */
-class SuperCell {
+class SuperCell : public Streamable {
 
 public:
+
+    /**
+     * @brief Construct a new SuperCell modifier
+     * 
+     * This constructor should not be used explicitly, it is provided only to
+     * load this modifier from a stream.
+     */
+    SuperCell() {}
+
     /**
      * @brief Construct a new SuperCell modifier
      * 
@@ -123,6 +149,10 @@ public:
      * @return {horizontal cells, vertical cells}
      */
     std::pair<uint16_t, uint16_t> getCellSizes() const;
+
+    void toStream(std::ostream& out) const override;
+
+    void fromStream(std::istream& in) override;
 
 protected:
 
@@ -217,6 +247,10 @@ public:
      * @return averaged time surface
      */
     TimeSurfaceType averageTS(const TimeSurfaceType& ts, uint16_t cx, uint16_t cy);
+
+    void toStream(std::ostream& out) const override;
+
+    void fromStream(std::istream& in) override;
 
 private:
 

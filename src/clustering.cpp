@@ -102,31 +102,33 @@ bool HOTSClusterer::isInitialized() const {
     return (prototypes.size() == clusters) && (prototypes_activations.size() == clusters);
 }
 
-std::ostream& operator<<(std::ostream& out, const HOTSClusterer& clusterer) {
+void HOTSClusterer::toStream(std::ostream& out) const {
 
-    out << clusterer.clusters << " ";
-    out << clusterer.learning << " ";
+    writeMetacommand(out, "HOTSCLUSTERER");
 
-    out << clusterer.prototypes.size() << " ";
-    out << clusterer.prototypes[0].rows() << " ";
-    out << clusterer.prototypes[0].cols() << " ";
+    out << clusters << " ";
+    out << learning << " ";
 
-    for (const auto& pa : clusterer.prototypes_activations) {
+    out << prototypes.size() << " ";
+    out << prototypes[0].rows() << " ";
+    out << prototypes[0].cols() << " ";
+
+    for (const auto& pa : prototypes_activations) {
         out << pa << " ";
     }
     out << "\n";
-    for (const auto& p : clusterer.prototypes) {
+    for (const auto& p : prototypes) {
         out << p << "\n";
     }
 
-    return out;
-
 }
 
-std::istream& operator>>(std::istream& in, HOTSClusterer& clusterer) {
+void HOTSClusterer::fromStream(std::istream& in) {
 
-    in >> clusterer.clusters;
-    in >> clusterer.learning;
+    matchMetacommandOptional(in, "HOTSCLUSTERER");
+
+    in >> clusters;
+    in >> learning;
 
     size_t n_prototypes;
     uint16_t wx, wy;
@@ -134,12 +136,12 @@ std::istream& operator>>(std::istream& in, HOTSClusterer& clusterer) {
     in >> wy;
     in >> wx;
 
-    clusterer.prototypes_activations.clear();
-    clusterer.prototypes_activations.resize(n_prototypes);
-    for (auto& pa : clusterer.prototypes_activations) {
+    prototypes_activations.clear();
+    prototypes_activations.resize(n_prototypes);
+    for (auto& pa : prototypes_activations) {
         in >> pa;
     }
-    clusterer.prototypes.clear();
+    prototypes.clear();
     for (size_t i = 0; i < n_prototypes; i++) {
         TimeSurfaceType p = TimeSurfaceType::Zero(wy, wx);
         for (uint16_t y = 0; y < wy; y++) {
@@ -147,12 +149,10 @@ std::istream& operator>>(std::istream& in, HOTSClusterer& clusterer) {
                 in >> p(y, x);
             }
         }
-        clusterer.prototypes.push_back(p);
+        prototypes.push_back(p);
     }
 
-    clusterer.reset();
-
-    return in;
+    reset();
 
 }
 

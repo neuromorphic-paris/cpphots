@@ -15,6 +15,14 @@ event ArrayLayer::remapEvent(event ev, uint16_t k) {
 
 }
 
+void ArrayLayer::toStream(std::ostream& out) const {
+    writeMetacommand(out, "ARRAYLAYER");
+}
+
+void ArrayLayer::fromStream(std::istream& in) {
+    matchMetacommandOptional(in, "ARRAYLAYER");
+}
+
 
 SerializingLayer::SerializingLayer(uint16_t width, uint16_t height)
     :w(width), h(height) {}
@@ -38,6 +46,18 @@ event SerializingLayer::remapEvent(event ev, uint16_t k) {
 std::pair<uint16_t, uint16_t> SerializingLayer::getSize() const {
     return {w, h};
 }
+
+void SerializingLayer::toStream(std::ostream& out) const {
+    writeMetacommand(out, "SERIALIZINGLAYER");
+    out << w << " " << h << std::endl;
+}
+
+void SerializingLayer::fromStream(std::istream& in) {
+    matchMetacommandOptional(in, "SERIALIZINGLAYER");
+    in >> w;
+    in >> h;
+}
+
 
 
 SuperCell::SuperCell(uint16_t width, uint16_t height, uint16_t K, uint16_t overlap)
@@ -92,6 +112,30 @@ std::pair<uint16_t, uint16_t> SuperCell::getCellSizes() const {
     return {wcell, hcell};
 }
 
+void SuperCell::toStream(std::ostream& out) const {
+    writeMetacommand(out, "SUPERCELL");
+    out << width << " ";
+    out << height << " ";
+    out << K << " ";
+    out << o << " ";
+    out << wcell << " ";
+    out << hcell << " ";
+    out << wmax << " ";
+    out << hmax << std::endl;
+}
+
+void SuperCell::fromStream(std::istream& in) {
+    matchMetacommandOptional(in, "SUPERCELL");
+    in >> width;
+    in >> height;
+    in >> K;
+    in >> o;
+    in >> wcell;
+    in >> hcell;
+    in >> wmax;
+    in >> hmax;
+}
+
 std::pair<uint16_t, uint16_t> SuperCell::getCellCenter(uint16_t cx, uint16_t cy) const {
 
     return {cx * (K - o) + K / 2, cy * (K-o) + K / 2};
@@ -137,6 +181,31 @@ TimeSurfaceType SuperCellAverage::averageTS(const TimeSurfaceType& ts, uint16_t 
 
     return cell.ts / cell.count;
 
+}
+
+void SuperCellAverage::toStream(std::ostream& out) const {
+    writeMetacommand(out, "SUPERCELLAVERAGE");
+    out << width << " ";
+    out << height << " ";
+    out << K << " ";
+    out << o << " ";
+    out << wcell << " ";
+    out << hcell << " ";
+    out << wmax << " ";
+    out << hmax << std::endl;
+}
+
+void SuperCellAverage::fromStream(std::istream& in) {
+    matchMetacommandOptional(in, "SUPERCELLAVERAGE");
+    in >> width;
+    in >> height;
+    in >> K;
+    in >> o;
+    in >> wcell;
+    in >> hcell;
+    in >> wmax;
+    in >> hmax;
+    cells = std::vector<std::vector<CellMem>>(hcell, std::vector<CellMem>(wcell));
 }
 
 }

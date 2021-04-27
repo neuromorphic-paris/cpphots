@@ -197,34 +197,28 @@ void WeightedLinearTimeSurface::fromStream(std::istream& in) {
 
 }
 
-/**
- * @copydoc TimeSurfacePool::operator<<
- */
-std::ostream& operator<<(std::ostream& out, const TimeSurfacePool& pool) {
+void TimeSurfacePool::toStream(std::ostream& out) const {
 
-    out << pool.surfaces.size() << "\n";
-    for (const auto& ts : pool.surfaces) {
+    writeMetacommand(out, "TIMESURFACEPOOL");
+
+    out << surfaces.size() << "\n";
+    for (const auto& ts : surfaces) {
         out << *ts;
     }
 
-    return out;
-
 }
 
-/**
- * @copydoc TimeSurfacePool::operator>>
- */
-std::istream& operator>>(std::istream& in, TimeSurfacePool& pool) {
+void TimeSurfacePool::fromStream(std::istream& in) {
 
-    pool.surfaces.clear();
+    matchMetacommandOptional(in, "TIMESURFACEPOOL");
+
+    surfaces.clear();
     size_t n_surfaces;
     in >> n_surfaces;
-    pool.surfaces.resize(n_surfaces);
-    for (auto& sur : pool.surfaces) {
+    surfaces.resize(n_surfaces);
+    for (auto& sur : surfaces) {
         sur = loadTSFromStream(in);
     }
-
-    return in;
 
 }
 

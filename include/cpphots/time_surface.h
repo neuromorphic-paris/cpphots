@@ -362,7 +362,7 @@ private:
  * events with different polarities to the appropriate time surface.
  * 
  */
-class TimeSurfacePool {
+class TimeSurfacePool : public Streamable {
 
 public:
 
@@ -549,27 +549,18 @@ public:
     }
 
     /**
-     * @brief Stream insertion operator for TimeSurfacePool
+     * @copydoc Streamable::toStream
      * 
-     * Insert parameters of the pool (and of all the timesurfaces included) on the stream.
-     * 
-     * @param out output stream
-     * @param pool TimeSurfacePool to insert
-     * @return output stream
+     * Save paramaters for all time surfaces to the stream.
      */
-    friend std::ostream& operator<<(std::ostream& out, const TimeSurfacePool& pool);
+    void toStream(std::ostream& out) const override;
 
     /**
-     * @brief Stream extraction operator for TimeSurfacePool
+     * @copydoc Streamable::fromStream
      * 
-     * Reads parameters and prototypes for the pool (ad for all the timesurfaces included).
-     * Previous parameters are overwritten.
-     * 
-     * @param in input stream
-     * @param pool TimeSurfacePool where to extract into
-     * @return input stream
+     * Load parameters for all time surfaces from the stream.
      */
-    friend std::istream& operator>>(std::istream& in, TimeSurfacePool& pool);
+    void fromStream(std::istream& in) override;
 
 private:
     std::vector<TimeSurfacePtr> surfaces;

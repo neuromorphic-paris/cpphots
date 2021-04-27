@@ -6,6 +6,7 @@
 #define CPPHOTS_CLUSTERING_H
 
 #include "time_surface.h"
+#include "interfaces.h"
 
 
 namespace cpphots {
@@ -13,7 +14,7 @@ namespace cpphots {
 /**
  * @brief Interface for time surface clustering
  */
-class ClustererBase {
+class ClustererBase : public Streamable {
 
 public:
     /**
@@ -160,26 +161,18 @@ public:
     bool toggleLearning(bool enable = true) override;
 
     /**
-     * @brief Stream insertion operator for HOTSClusterer
+     * @copydoc Streamable::toStream
      * 
      * Insert parameters of the clusterer and prototypes on the stream.
-     * 
-     * @param out output stream
-     * @param clusterer HOTSClusterer to insert
-     * @return output stream
      */
-    friend std::ostream& operator<<(std::ostream& out, const HOTSClusterer& clusterer);
+    void toStream(std::ostream& out) const override;
 
     /**
-     * @brief Stream extraction operator for HOTSClusterer
+     * @copydoc Streamable::fromStream
      * 
-     * Reads parameters and prototypes for the HOTSClusterer. Previous parameters are overwritten.
-     * 
-     * @param in input stream
-     * @param clusterer HOTSClusterer where to extract into
-     * @return input stream
+     * Reads parameters and prototypes from the stream.
      */
-    friend std::istream& operator>>(std::istream& in, HOTSClusterer& clusterer);
+    void fromStream(std::istream& in) override;
 
 private:
     std::vector<TimeSurfaceType> prototypes;
