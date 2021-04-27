@@ -85,68 +85,6 @@ struct has_size <
 template<typename T>
 inline constexpr bool has_size_v = has_size<T>::value;
 
-
-/**
- * @brief Check if a type can be written to a stream
- * 
- * Check if operator<<(std::ostream&, const T&) exists.
- * 
- * @tparam T type to check
- */
-template<typename T, typename = void>
-struct is_to_stream_writable : std::false_type {};
-
-/**
- * @brief Check if a type can be written to a stream
- * 
- * Check if operator<<(std::ostream&, const T&) exists.
- * 
- * @tparam T type to check
- */
-template<typename T>
-struct is_to_stream_writable<
-    T,
-    std::void_t<decltype(std::declval<std::ostream&>() << std::declval<T&>())>> : std::true_type {};
-
-/**
- * @brief Helper variable template of is_to_stream_writable
- * 
- * @tparam T type to check
- */
-template<typename T>
-inline constexpr bool is_to_stream_writable_v = is_to_stream_writable<T>::value;
-
-
-/**
- * @brief Check if a type can be read from a stream
- * 
- * Check if operator>>(std::istream&, T&) exists.
- * 
- * @tparam T type to check
- */
-template<typename T, typename = void>
-struct is_from_stream_readable : std::false_type {};
-
-/**
- * @brief Check if a type can be read from a stream
- * 
- * Check if operator>>(std::istream&, T&) exists.
- * 
- * @tparam T type to check
- */
-template<typename T>
-struct is_from_stream_readable<
-    T,
-    std::void_t<decltype(std::declval<std::istream&>() >> std::declval<T&>())>> : std::true_type {};
-
-/**
- * @brief Helper variable template of is_from_stream_readable
- * 
- * @tparam T type to check
- */
-template<typename T>
-inline constexpr bool is_from_stream_readable_v = is_from_stream_readable<T>::value;
-
 }
 
 #endif

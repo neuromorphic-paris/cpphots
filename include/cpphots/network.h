@@ -15,6 +15,7 @@
 
 #include "layer.h"
 #include "events_utils.h"
+#include "interfaces.h"
 
 
 namespace cpphots {
@@ -26,7 +27,7 @@ namespace cpphots {
  * 
  * A Network owns no layers, only references to them.
  */
-class Network {
+class Network : public Streamable {
 
 public:
 
@@ -222,6 +223,20 @@ public:
      * Call reset on every layer.
      */
     void reset();
+
+    /**
+     * @copydoc Streamable::toStream
+     * 
+     * Save all layers to the stream.
+     */
+    void toStream(std::ostream& out) const override;
+
+    /**
+     * @copydoc Streamable::fromStream
+     * 
+     * Load all layers to the stream.
+     */
+    void fromStream(std::istream& in) override;
 
 private:
     std::vector<LayerPtr> layers;

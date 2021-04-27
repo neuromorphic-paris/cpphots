@@ -19,7 +19,7 @@ namespace cpphots {
  * A remapper usually changes the coordinates or the polarity of an event,
  * withoud modifying the event timestamp.
  */
-struct EventRemapper : public Streamable {
+struct EventRemapper : public virtual Streamable {
 
     /**
      * @brief Remap event
@@ -103,7 +103,7 @@ private:
  * using cells of a fixed size, thus reducing the output dimensionality.
  * Cells may be overlapping, causing the layer to emit more than one event.
  */
-class SuperCell : public Streamable {
+class SuperCell : public virtual Streamable {
 
 public:
 
@@ -228,6 +228,15 @@ protected:
 class SuperCellAverage : public SuperCell {
 
 public:
+
+    /**
+     * @brief Construct a new Super Cell Average object
+     * 
+     * This constructor should not be used explicitly, it is provided only to
+     * load this modifier from a stream.
+     */
+    SuperCellAverage() {}
+
     /**
      * @brief Construct a new SuperCellAverage modifier
      * 

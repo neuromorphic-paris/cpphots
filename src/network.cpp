@@ -1,5 +1,7 @@
 #include "cpphots/network.h"
 
+#include "cpphots/load.h"
+
 
 namespace cpphots {
 
@@ -73,6 +75,36 @@ void Network::reset() {
     for (auto& l : layers) {
         l->reset();
     }
+}
+
+
+void Network::toStream(std::ostream& out) const {
+    writeMetacommand(out, "NETWORKBEGIN");
+    for (const auto& l : layers) {
+        l->toStream(out);
+        out << std::endl;
+    }
+    writeMetacommand(out, "NETWORKEND");
+}
+
+void Network::fromStream(std::istream& in) {
+
+    layers.clear();
+
+    matchMetacommandRequired(in, "NETWORKBEGIN");
+
+    auto cmd = Streamable::getNextMetacommand(in);
+
+    while (cmd != "NETWORKEND") {
+
+        if (cmd == "LAYERBEGIN") {
+            addLayer(loadLayerFromStream(in));
+        }
+
+        cmd = Streamable::getNextMetacommand(in);
+
+    }
+
 }
 
 }

@@ -12,6 +12,7 @@
 #include "clustering.h"
 #include "layer_traits.h"
 #include "layer_modifiers.h"
+#include "interfaces.h"
 
 /**
  * @brief Main cpphots namespace
@@ -21,7 +22,7 @@ namespace cpphots {
 /**
  * @brief Interface for a generic layer
  */
-class LayerBase {
+class LayerBase : public virtual Streamable {
 
 public:
 
@@ -180,29 +181,43 @@ public:
     }
 
     /**
-     * @brief Stream insertion operator for Layer
+     * @copydoc Streamable::toStream
      * 
-     * Calls operator<< on the supertypes that support it.
-     * 
-     * @param out output stream
-     * @param layer Layer to insert
-     * @return output stream
+     * Calls toStream on the supertypes that support it.
      */
-    template <typename... TT>
-    friend std::ostream& operator<<(std::ostream& out, const Layer<TT...>& layer);
+    void toStream(std::ostream& out) const override {
+
+        writeMetacommand(out, "LAYERBEGIN");
+
+        ([&]() {
+        if constexpr (std::is_base_of_v<Streamable, T>) {
+            T::toStream(out);
+            out << std::endl;
+        }
+        }(), ...);
+
+        writeMetacommand(out, "LAYEREND");
+
+    }
 
     /**
-     * @brief Stream extraction operator for Layer
+     * @copydoc Streamable::fromStream
      * 
-     * Calls operator>> on the supertypes that support it.
-     * Previous parameters are overwritten.
-     * 
-     * @param in input stream
-     * @param layer Layer where to extract into
-     * @return input stream
+     * Calls fromStream on the supertypes that support it.
      */
-    template <typename... TT>
-    friend std::istream& operator>>(std::istream& in, Layer<TT...>& layer);
+    void fromStream(std::istream& in) override {
+
+        matchMetacommandOptional(in, "LAYERBEGIN");
+
+        ([&]() {
+        if constexpr (std::is_base_of_v<Streamable, T>) {
+            T::fromStream(in);
+        }
+        }(), ...);
+
+        matchMetacommandOptional(in, "LAYEREND");
+
+    }
 
 private:
     void assert_sizes() const {
@@ -222,38 +237,6 @@ private:
     }
 
 };
-
-/**
- * @copydoc Layer::operator<<
- */
-template <typename... T>
-std::ostream& operator<<(std::ostream& out, const Layer<T...>& layer) {
-
-    ([&]() {
-    if constexpr (is_to_stream_writable_v<T>) {
-        out << static_cast<const T&>(layer) << std::endl;
-    }
-    }(), ...);
-
-    return out;
-
-}
-
-/**
- * @copydoc Layer::operator>>
- */
-template <typename... T>
-std::istream& operator>>(std::istream& in, Layer<T...>& layer) {
-
-    ([&]() {
-    if constexpr (is_from_stream_readable_v<T>) {
-        in >> static_cast<T&>(layer);
-    }
-    }(), ...);
-
-    return in;
-
-}
 
 /**
  * @brief Create a new Layer

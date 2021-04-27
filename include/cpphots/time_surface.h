@@ -38,7 +38,7 @@ using TimeSurfaceScalarType = TimeSurfaceType::Scalar;
  * This class keeps track of the time context for the current stream of events,
  * but it's up to the suclasses to compute the time surfaces.
  */
-class TimeSurfaceBase : public Streamable {
+class TimeSurfaceBase : public virtual Streamable {
 
 public:
 
@@ -362,7 +362,7 @@ private:
  * events with different polarities to the appropriate time surface.
  * 
  */
-class TimeSurfacePool : public Streamable {
+class TimeSurfacePool : public virtual Streamable {
 
 public:
 

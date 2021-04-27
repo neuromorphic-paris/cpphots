@@ -17,10 +17,13 @@ event ArrayLayer::remapEvent(event ev, uint16_t k) {
 
 void ArrayLayer::toStream(std::ostream& out) const {
     writeMetacommand(out, "ARRAYLAYER");
+    out << 0;
 }
 
 void ArrayLayer::fromStream(std::istream& in) {
     matchMetacommandOptional(in, "ARRAYLAYER");
+    int n;
+    in >> n;
 }
 
 

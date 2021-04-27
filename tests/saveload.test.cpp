@@ -3,6 +3,7 @@
 #include <cpphots/time_surface.h>
 #include <cpphots/layer.h>
 #include <cpphots/network.h>
+#include <cpphots/load.h>
 
 #include <gtest/gtest.h>
 
@@ -105,7 +106,6 @@ TEST(TestSaveLoad, TSPool) {
 
 TEST(TestSaveLoad, LSaveLoad) {
 
-    // cpphots::Layer layer1(32, 32, 1, 2, 1000, 2, 8);
     auto layer1 = cpphots::create_layer(cpphots::create_pool<cpphots::LinearTimeSurface>(2, 32, 32, 1, 2, 1000),
                                         cpphots::HOTSClusterer(8));
 
@@ -121,7 +121,6 @@ TEST(TestSaveLoad, LSaveLoad) {
     std::stringstream instream(outstream.str());
     instream >> layer2;
 
-    // ASSERT_EQ(layer1.getDescription(), layer2.getDescription());
     ASSERT_EQ(layer1.getNumClusters(), layer2.getNumClusters());
 
     auto surface = layer2.getSurface(1);
@@ -129,5 +128,82 @@ TEST(TestSaveLoad, LSaveLoad) {
     ASSERT_EQ(surface->getWy(), 5);
 
     ASSERT_TRUE(layer2.isInitialized());
+
+}
+
+TEST(TestLoad, Layer) {
+
+    auto layer1 = cpphots::create_layer(cpphots::create_pool<cpphots::LinearTimeSurface>(2, 32, 32, 1, 2, 1000),
+                                        cpphots::HOTSClusterer(8));
+
+    auto initializer = cpphots::ClustererRandomInitializer(3, 5);
+    initializer(layer1, {});
+
+    std::stringstream outstream;
+    outstream << layer1;
+
+    std::stringstream instream(outstream.str());
+
+    auto layer2 = cpphots::loadLayerFromStream(instream);
+
+    cpphots::TimeSurfacePool* pool2 = dynamic_cast<cpphots::TimeSurfacePool*>(layer2.get());
+    cpphots::HOTSClusterer* clust2 = dynamic_cast<cpphots::HOTSClusterer*>(layer2.get());
+
+    ASSERT_EQ(layer1.getNumClusters(), clust2->getNumClusters());
+
+    auto surface = pool2->getSurface(1);
+    ASSERT_EQ(surface->getWx(), 3);
+    ASSERT_EQ(surface->getWy(), 5);
+
+    ASSERT_TRUE(clust2->isInitialized());
+
+}
+
+TEST(TestLoad, Network) {
+
+    cpphots::Network net1;
+    net1.addLayer(cpphots::create_pool<cpphots::LinearTimeSurface>(2, 32, 32, 1, 2, 1000),
+                  cpphots::HOTSClusterer(8));
+    net1.addLayer(cpphots::create_pool<cpphots::LinearTimeSurface>(8, 32, 32, 2, 4, 2000),
+                  cpphots::HOTSClusterer(16));
+
+    auto pools1 = net1.viewFull<cpphots::TimeSurfacePool>();
+    auto clust1 = net1.viewFull<cpphots::ClustererBase>();
+
+    auto initializer1 = cpphots::ClustererRandomInitializer(3, 5);
+    initializer1(*clust1[0], {});
+    auto initializer2 = cpphots::ClustererRandomInitializer(5, 9);
+    initializer2(*clust1[1], {});
+
+    std::stringstream outstream;
+    outstream << net1;
+
+    std::stringstream instream(outstream.str());
+
+    cpphots::Network net2;
+    instream >> net2;
+
+    auto pools2 = net2.viewFull<cpphots::TimeSurfacePool>();
+    auto clust2 = net2.viewFull<cpphots::ClustererBase>();
+
+    EXPECT_EQ(net1.getNumLayers(), net2.getNumLayers());
+
+    EXPECT_EQ(clust1[0]->getNumClusters(), clust2[0]->getNumClusters());
+    EXPECT_EQ(clust1[1]->getNumClusters(), clust2[1]->getNumClusters());
+
+    {
+        auto surface = pools2[0]->getSurface(1);
+        EXPECT_EQ(surface->getWx(), 3);
+        EXPECT_EQ(surface->getWy(), 5);
+    }
+
+    {
+        auto surface = pools2[1]->getSurface(7);
+        EXPECT_EQ(surface->getWx(), 5);
+        EXPECT_EQ(surface->getWy(), 9);
+    }
+
+    EXPECT_TRUE(clust2[0]->isInitialized());
+    EXPECT_TRUE(clust2[1]->isInitialized());
 
 }

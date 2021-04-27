@@ -14,7 +14,7 @@ namespace cpphots {
 /**
  * @brief Interface for time surface clustering
  */
-class ClustererBase : public Streamable {
+class ClustererBase : public virtual Streamable {
 
 public:
     /**
