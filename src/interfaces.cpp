@@ -31,41 +31,50 @@ void skip_whitespace(std::istream& in) {
 
 }
 
-void Streamable::matchMetacommandOptional(std::istream& in, const std::string& cmd) {
+std::string Streamable::getNextMetacommand(std::istream& in) {
 
     skip_whitespace(in);
 
-    char ex = in.peek();
+    char ch = in.peek();
 
-    if (ex != '!') {
+    if (ch != '!') {
+        return "";
+    }
+
+    in.get();  // consume '!'
+
+    std::string cmd;
+    std::getline(in, cmd);
+    return cmd;
+
+}
+
+void Streamable::matchMetacommandOptional(std::istream& in, const std::string& cmd) {
+
+    auto meta = getNextMetacommand(in);
+
+    if (meta == "") {
         return;
     }
 
-    in.get();
-    std::string line;
-    std::getline(in, line);
-    if (line != to_upper(cmd)) {
-        throw std::runtime_error("Wrong metacommand: expected '" + to_upper(cmd) + "', got '" + line + "'");
+    if (meta != to_upper(cmd)) {
+        throw std::runtime_error("Wrong metacommand: expected '" + to_upper(cmd) + "', got '" + meta + "'");
     }
 
 }
 
 void Streamable::matchMetacommandRequired(std::istream& in, const std::string& cmd) {
 
-    skip_whitespace(in);
+    auto meta = getNextMetacommand(in);
 
-    char ex = in.peek();
-
-    if (ex != '!') {
+    if (meta == "") {
         throw std::runtime_error("Wrong metacommand: expected '" + to_upper(cmd) + "', nothing found");
     }
 
-    in.get();
-    std::string line;
-    std::getline(in, line);
-    if (line != to_upper(cmd)) {
-        throw std::runtime_error("Wrong metacommand: expected '" + to_upper(cmd) + "', got '" + line + "'");
+    if (meta != to_upper(cmd)) {
+        throw std::runtime_error("Wrong metacommand: expected '" + to_upper(cmd) + "', got '" + meta + "'");
     }
+
 }
 
 std::ostream& operator<<(std::ostream& out, const Streamable& streamable) {

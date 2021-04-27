@@ -1,3 +1,7 @@
+/**
+ * @file interfaces.h
+ * @brief Common interfaces for library components
+ */
 #ifndef CPPHOTS_INTERFACES_H
 #define CPPHOTS_INTERFACES_H
 
@@ -36,6 +40,14 @@ public:
      * @param in stream where to extract from
      */
     virtual void fromStream(std::istream& in) = 0;
+
+    /**
+     * @brief Get the next metacommand in the stream
+     * 
+     * @param in input stream
+     * @return metacommand, might be empty
+     */
+    static std::string getNextMetacommand(std::istream& in);
 
 protected:
 

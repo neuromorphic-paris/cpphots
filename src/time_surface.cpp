@@ -1,5 +1,7 @@
 #include "cpphots/time_surface.h"
 
+#include "cpphots/load.h"
+
 
 namespace cpphots {
 
@@ -192,6 +194,37 @@ void WeightedLinearTimeSurface::fromStream(std::istream& in) {
             in >> weights(y, x);
         }
     }
+
+}
+
+/**
+ * @copydoc TimeSurfacePool::operator<<
+ */
+std::ostream& operator<<(std::ostream& out, const TimeSurfacePool& pool) {
+
+    out << pool.surfaces.size() << "\n";
+    for (const auto& ts : pool.surfaces) {
+        out << *ts;
+    }
+
+    return out;
+
+}
+
+/**
+ * @copydoc TimeSurfacePool::operator>>
+ */
+std::istream& operator>>(std::istream& in, TimeSurfacePool& pool) {
+
+    pool.surfaces.clear();
+    size_t n_surfaces;
+    in >> n_surfaces;
+    pool.surfaces.resize(n_surfaces);
+    for (auto& sur : pool.surfaces) {
+        sur = loadTSFromStream(in);
+    }
+
+    return in;
 
 }
 

@@ -181,7 +181,7 @@ TEST(TestTimeSurfacePool, Processing) {
     cpphots::Events events = cpphots::loadFromFile("data/trcl0.es");
 
     // create time surface
-    cpphots::LinearTimeSurfacePool ts(2, 32, 32, 2, 2, 1000);
+    auto ts = cpphots::create_pool<cpphots::LinearTimeSurface>(2, 32, 32, 2, 2, 1000);
 
     cpphots::TimeSurfaceScalarType normsum = 0.;
     cpphots::TimeSurfaceScalarType goodsum = 0.;
@@ -214,7 +214,7 @@ TEST(TestWeightedTimeSurfacePool, Processing) {
     cpphots::Events events = cpphots::loadFromFile("data/trcl0.es");
 
     // create time surface
-    cpphots::WeightedLinearTimeSurfacePool ts(2, 32, 32, 2, 2, 1000, cpphots::TimeSurfaceType::Constant(32, 32, 0.5));
+    auto ts = cpphots::create_pool<cpphots::WeightedLinearTimeSurface>(2, 32, 32, 2, 2, 1000, cpphots::TimeSurfaceType::Constant(32, 32, 0.5));
 
     cpphots::TimeSurfaceScalarType normsum = 0.;
     cpphots::TimeSurfaceScalarType goodsum = 0.;
@@ -243,7 +243,7 @@ TEST(TestWeightedTimeSurfacePool, Processing) {
 
 TEST(TestTimeSurfacePool, FullContext) {
 
-    cpphots::LinearTimeSurfacePool tsp(2, 10, 10, 0, 0, 10);
+    auto tsp = cpphots::create_pool<cpphots::LinearTimeSurface>(2, 10, 10, 0, 0, 10);
 
     tsp.update(2, 2, 2, 0);
     auto ctxs = tsp.sampleContexts(2);

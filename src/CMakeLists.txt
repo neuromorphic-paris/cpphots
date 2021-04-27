@@ -7,7 +7,8 @@ set(CPPHOTS_SOURCES
     run.cpp
     time_surface.cpp
     clustering.cpp
-    layer_modifiers.cpp)
+    layer_modifiers.cpp
+    load.cpp)
 
 set(CPPHOTS_HEADERS
     "../include/cpphots/interfaces.h"
@@ -19,7 +20,8 @@ set(CPPHOTS_HEADERS
     "../include/cpphots/network.h"
     "../include/cpphots/run.h"
     "../include/cpphots/time_surface.h"
-    "../include/cpphots/clustering.h")
+    "../include/cpphots/clustering.h"
+    "../include/cpphots/load.h")
 
 if (BUILD_PLOTS)
     file(READ ../python/tsplot.py PYTHON_PLOT_CODE)

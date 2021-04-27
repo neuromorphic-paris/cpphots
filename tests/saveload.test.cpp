@@ -87,16 +87,16 @@ TEST(TestSaveLoad, TSProcess) {
 
 TEST(TestSaveLoad, TSPool) {
 
-    cpphots::LinearTimeSurfacePool tsp1(2, 30, 50, 2, 2, 1000);
+    auto tsp1 = cpphots::create_pool<cpphots::LinearTimeSurface>(2, 30, 50, 2, 2, 1000);
 
     std::ostringstream out;
     out << tsp1;
 
     std::istringstream in(out.str());
-    cpphots::LinearTimeSurfacePool tsp2;
+    cpphots::TimeSurfacePool tsp2;
     in >> tsp2;
 
-    auto [sx, sy] = tsp1.getSurface(1).getSize();
+    auto [sx, sy] = tsp1.getSurface(1)->getSize();
 
     EXPECT_EQ(sx, 30);
     EXPECT_EQ(sy, 50);
@@ -106,7 +106,7 @@ TEST(TestSaveLoad, TSPool) {
 TEST(TestSaveLoad, LSaveLoad) {
 
     // cpphots::Layer layer1(32, 32, 1, 2, 1000, 2, 8);
-    auto layer1 = cpphots::create_layer(cpphots::LinearTimeSurfacePool(2, 32, 32, 1, 2, 1000),
+    auto layer1 = cpphots::create_layer(cpphots::create_pool<cpphots::LinearTimeSurface>(2, 32, 32, 1, 2, 1000),
                                         cpphots::HOTSClusterer(8));
 
     auto initializer = cpphots::ClustererRandomInitializer(3, 5);
@@ -115,7 +115,7 @@ TEST(TestSaveLoad, LSaveLoad) {
     std::stringstream outstream;
     outstream << layer1;
 
-    cpphots::Layer<cpphots::LinearTimeSurfacePool,
+    cpphots::Layer<cpphots::TimeSurfacePool,
                    cpphots::HOTSClusterer> layer2;
 
     std::stringstream instream(outstream.str());
@@ -125,8 +125,8 @@ TEST(TestSaveLoad, LSaveLoad) {
     ASSERT_EQ(layer1.getNumClusters(), layer2.getNumClusters());
 
     auto surface = layer2.getSurface(1);
-    ASSERT_EQ(surface.getWx(), 3);
-    ASSERT_EQ(surface.getWy(), 5);
+    ASSERT_EQ(surface->getWx(), 3);
+    ASSERT_EQ(surface->getWy(), 5);
 
     ASSERT_TRUE(layer2.isInitialized());
 

@@ -9,10 +9,10 @@ struct A{};
 TEST(TestNetwork, View) {
 
     cpphots::Network network;
-    cpphots::Layer<cpphots::LinearTimeSurfacePool, A>* l1 = new cpphots::Layer<cpphots::LinearTimeSurfacePool, A>();
-    cpphots::Layer<cpphots::LinearTimeSurfacePool>* l2 = new cpphots::Layer<cpphots::LinearTimeSurfacePool>();
-    cpphots::Layer<cpphots::LinearTimeSurfacePool, A>* l3 = new cpphots::Layer<cpphots::LinearTimeSurfacePool, A>();
-    cpphots::Layer<cpphots::LinearTimeSurfacePool>* l4 = new cpphots::Layer<cpphots::LinearTimeSurfacePool>();
+    cpphots::Layer<cpphots::TimeSurfacePool, A>* l1 = new cpphots::Layer<cpphots::TimeSurfacePool, A>();
+    cpphots::Layer<cpphots::TimeSurfacePool>* l2 = new cpphots::Layer<cpphots::TimeSurfacePool>();
+    cpphots::Layer<cpphots::TimeSurfacePool, A>* l3 = new cpphots::Layer<cpphots::TimeSurfacePool, A>();
+    cpphots::Layer<cpphots::TimeSurfacePool>* l4 = new cpphots::Layer<cpphots::TimeSurfacePool>();
     network.addLayer(cpphots::LayerPtr(l1));
     network.addLayer(cpphots::LayerPtr(l2));
     network.addLayer(cpphots::LayerPtr(l3));
@@ -33,8 +33,8 @@ TEST(TestNetwork, View) {
 TEST(TestNetwork, GetLayer) {
 
     cpphots::Network network;
-    cpphots::Layer<cpphots::LinearTimeSurfacePool, A>* l1 = new cpphots::Layer<cpphots::LinearTimeSurfacePool, A>();
-    cpphots::Layer<cpphots::LinearTimeSurfacePool>* l2 = new cpphots::Layer<cpphots::LinearTimeSurfacePool>();
+    cpphots::Layer<cpphots::TimeSurfacePool, A>* l1 = new cpphots::Layer<cpphots::TimeSurfacePool, A>();
+    cpphots::Layer<cpphots::TimeSurfacePool>* l2 = new cpphots::Layer<cpphots::TimeSurfacePool>();
     network.addLayer(cpphots::LayerPtr(l1));
     network.addLayer(cpphots::LayerPtr(l2));
 
@@ -57,10 +57,10 @@ TEST(TestNetwork, GetLayer) {
 TEST(TestNetwork, Subnetwork) {
 
     cpphots::Network network;
-    cpphots::Layer<cpphots::LinearTimeSurfacePool>* l0 = new cpphots::Layer<cpphots::LinearTimeSurfacePool>();
-    cpphots::Layer<cpphots::LinearTimeSurfacePool>* l1 = new cpphots::Layer<cpphots::LinearTimeSurfacePool>();
-    cpphots::Layer<cpphots::LinearTimeSurfacePool>* l2 = new cpphots::Layer<cpphots::LinearTimeSurfacePool>();
-    cpphots::Layer<cpphots::LinearTimeSurfacePool>* l3 = new cpphots::Layer<cpphots::LinearTimeSurfacePool>();
+    cpphots::Layer<cpphots::TimeSurfacePool>* l0 = new cpphots::Layer<cpphots::TimeSurfacePool>();
+    cpphots::Layer<cpphots::TimeSurfacePool>* l1 = new cpphots::Layer<cpphots::TimeSurfacePool>();
+    cpphots::Layer<cpphots::TimeSurfacePool>* l2 = new cpphots::Layer<cpphots::TimeSurfacePool>();
+    cpphots::Layer<cpphots::TimeSurfacePool>* l3 = new cpphots::Layer<cpphots::TimeSurfacePool>();
     network.addLayer(cpphots::LayerPtr(l0));
     network.addLayer(cpphots::LayerPtr(l1));
     network.addLayer(cpphots::LayerPtr(l2));
