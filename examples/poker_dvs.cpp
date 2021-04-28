@@ -14,7 +14,9 @@
 #include <cpphots/events_utils.h>
 #include <cpphots/classification.h>
 #include <cpphots/run.h>
-#include <cpphots/gmm_clustering.h>
+#ifdef CPPHOTS_WITH_PEREGRINE
+#include "cpphots/gmm_clustering.h"
+#endif
 
 
 cpphots::Features process_file(cpphots::Network& network, const std::string& filename) {

@@ -20,7 +20,7 @@ cmake --build build --target install
  Option             | default | description                            | dependencies
 :-------------------|:-------:|:---------------------------------------|:------------
  `DOUBLE_PRECISION` | `OFF`   | use double precision for time surfaces | 
- `WITH_PEREGRINE`   | `OFF`   | include GMM clustering from Peregrine  | [blaze](https://bitbucket.org/blaze-lib/blaze), [TBB](https://github.com/oneapi-src/oneTBB)
+ `WITH_PEREGRINE`   | `OFF`   | include GMM clustering from [Peregrine](https://github.com/OOub/peregrine)  | [blaze](https://bitbucket.org/blaze-lib/blaze), [TBB](https://github.com/oneapi-src/oneTBB)
  `BUILD_PLOTS`      | `ON`    | build plotting utilities               | Python 3 (`requirements.txt`)
  `BUILD_EXAMPLES`   | `OFF`   | build examples executables             | 
  `BUILD_TEST`       | `OFF`   | build test suite                       | 
