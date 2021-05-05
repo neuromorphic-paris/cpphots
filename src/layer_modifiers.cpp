@@ -77,7 +77,7 @@ SuperCell::SuperCell(uint16_t width, uint16_t height, uint16_t K, uint16_t overl
     hcell = 1 + (height - K) / (K - overlap);
     hmax = K + (hcell-1)*(K - overlap);
     if (height != hmax) {
-        std::cerr << "Height " << height << " is higher than the multiple of K and overlap. Events with x over " << hmax << " will be ignored" << std::endl;
+        std::cerr << "Height " << height << " is higher than the multiple of K and overlap. Events with y over " << hmax << " will be ignored" << std::endl;
     }
 
 }
