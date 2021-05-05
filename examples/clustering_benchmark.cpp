@@ -1,3 +1,7 @@
+/**
+ * @file clustering_benchmark.cpp
+ * @brief Performance comparison between different clustering algorithms
+ */
 #include <iostream>
 #include <chrono>
 #include <iomanip>

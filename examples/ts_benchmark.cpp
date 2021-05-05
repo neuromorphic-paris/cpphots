@@ -1,3 +1,10 @@
+/**
+ * @file ts_benchmark.cpp
+ * @brief Time surface computation time benchmark
+ * 
+ * Computes the amount of time that it takes to compute a million time surfaces from random events,
+ * with various parameters values.
+ */
 #include <iostream>
 #include <chrono>
 
