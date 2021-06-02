@@ -161,14 +161,14 @@ public:
     bool toggleLearning(bool enable = true) override;
 
     /**
-     * @copydoc Streamable::toStream
+     * @copydoc interfaces::Streamable::toStream
      * 
      * Insert parameters of the clusterer and prototypes on the stream.
      */
     void toStream(std::ostream& out) const override;
 
     /**
-     * @copydoc Streamable::fromStream
+     * @copydoc interfaces::Streamable::fromStream
      * 
      * Reads parameters and prototypes from the stream.
      */

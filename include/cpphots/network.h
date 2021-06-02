@@ -225,14 +225,14 @@ public:
     void reset();
 
     /**
-     * @copydoc Streamable::toStream
+     * @copydoc interfaces::Streamable::toStream
      * 
      * Save all layers to the stream.
      */
     void toStream(std::ostream& out) const override;
 
     /**
-     * @copydoc Streamable::fromStream
+     * @copydoc interfaces::Streamable::fromStream
      * 
      * Load all layers to the stream.
      */

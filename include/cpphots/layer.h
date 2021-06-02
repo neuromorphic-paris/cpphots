@@ -181,7 +181,7 @@ public:
     }
 
     /**
-     * @copydoc Streamable::toStream
+     * @copydoc interfaces::Streamable::toStream
      * 
      * Calls toStream on the supertypes that support it.
      */
@@ -201,7 +201,7 @@ public:
     }
 
     /**
-     * @copydoc Streamable::fromStream
+     * @copydoc interfaces::Streamable::fromStream
      * 
      * Calls fromStream on the supertypes that support it.
      */

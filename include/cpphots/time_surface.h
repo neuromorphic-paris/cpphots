@@ -187,7 +187,7 @@ public:
     }
 
     /**
-     * @copydoc Streamable::toStream
+     * @copydoc interfaces::Streamable::toStream
      * 
      * Does not save the current time context.
      */
@@ -542,14 +542,14 @@ public:
     }
 
     /**
-     * @copydoc Streamable::toStream
+     * @copydoc interfaces::Streamable::toStream
      * 
      * Save paramaters for all time surfaces to the stream.
      */
     void toStream(std::ostream& out) const override;
 
     /**
-     * @copydoc Streamable::fromStream
+     * @copydoc interfaces::Streamable::fromStream
      * 
      * Load parameters for all time surfaces from the stream.
      */
