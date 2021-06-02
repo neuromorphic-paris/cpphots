@@ -17,6 +17,7 @@ set(CPPHOTS_HEADERS
     "../include/cpphots/types.h"
     "../include/cpphots/interfaces/streamable.h"
     "../include/cpphots/interfaces/clustering.h"
+    "../include/cpphots/interfaces/time_surface.h"
     "../include/cpphots/classification.h"
     "../include/cpphots/events_utils.h"
     "../include/cpphots/layer.h"

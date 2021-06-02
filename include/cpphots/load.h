@@ -7,7 +7,7 @@
 
 #include <istream>
 
-#include "time_surface.h"
+#include "interfaces/time_surface.h"
 #include "layer.h"
 #include "network.h"
 

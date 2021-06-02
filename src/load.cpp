@@ -2,6 +2,7 @@
 
 #include <stdexcept>
 
+#include "cpphots/time_surface.h"
 #include "cpphots/interfaces/streamable.h"
 
 #ifdef CPPHOTS_WITH_PEREGRINE
