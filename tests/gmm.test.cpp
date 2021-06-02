@@ -2,6 +2,7 @@
 
 #include <cpphots/time_surface.h>
 #include <cpphots/gmm_clustering.h>
+#include <cpphots/clustering.h>
 
 #include <gtest/gtest.h>
 

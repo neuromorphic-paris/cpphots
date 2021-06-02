@@ -8,19 +8,6 @@
 
 namespace cpphots {
 
-std::vector<uint32_t> ClustererBase::getHistogram() const {
-    return hist;
-}
-
-void ClustererBase::reset() {
-    hist.clear();
-    hist.resize(getNumClusters());
-}
-
-void ClustererBase::updateHistogram(uint16_t k) {
-    hist[k]++;
-}
-
 
 HOTSClusterer::HOTSClusterer() {}
 
@@ -157,7 +144,7 @@ void HOTSClusterer::fromStream(std::istream& in) {
 }
 
 
-void ClustererUniformInitializer(ClustererBase& clusterer, const std::vector<TimeSurfaceType>& time_surfaces) {
+void ClustererUniformInitializer(interfaces::Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces) {
 
     std::vector<TimeSurfaceType> selected;
     std::sample(time_surfaces.begin(), time_surfaces.end(), std::back_inserter(selected), clusterer.getNumClusters(), std::mt19937{std::random_device{}()});
@@ -168,7 +155,7 @@ void ClustererUniformInitializer(ClustererBase& clusterer, const std::vector<Tim
 
 }
 
-void ClustererPlusPlusInitializer(ClustererBase& clusterer, const std::vector<TimeSurfaceType>& time_surfaces) {
+void ClustererPlusPlusInitializer(interfaces::Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces) {
 
     // chosen surfaces
     std::set<int> chosen;
@@ -229,7 +216,7 @@ void ClustererPlusPlusInitializer(ClustererBase& clusterer, const std::vector<Ti
 
 }
 
-void ClustererAFKMC2InitializerImpl(ClustererBase& clusterer, const std::vector<TimeSurfaceType>& time_surfaces, uint16_t chain) {
+void ClustererAFKMC2InitializerImpl(interfaces::Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces, uint16_t chain) {
 
     std::mt19937 mt{std::random_device{}()};
 
@@ -312,7 +299,7 @@ ClustererInitializerType ClustererAFKMC2Initializer(uint16_t chain) {
 
 }
 
-void ClustererRandomInitializerImpl(ClustererBase& clusterer, const std::vector<TimeSurfaceType>& time_surfaces, uint16_t width, uint16_t height) {
+void ClustererRandomInitializerImpl(interfaces::Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces, uint16_t width, uint16_t height) {
 
     std::srand((unsigned int) std::time(0));
 

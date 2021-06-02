@@ -169,7 +169,7 @@ TEST(TestLoad, Network) {
                   cpphots::HOTSClusterer(16));
 
     auto pools1 = net1.viewFull<cpphots::TimeSurfacePool>();
-    auto clust1 = net1.viewFull<cpphots::ClustererBase>();
+    auto clust1 = net1.viewFull<cpphots::interfaces::Clusterer>();
 
     auto initializer1 = cpphots::ClustererRandomInitializer(3, 5);
     initializer1(*clust1[0], {});
@@ -185,7 +185,7 @@ TEST(TestLoad, Network) {
     instream >> net2;
 
     auto pools2 = net2.viewFull<cpphots::TimeSurfacePool>();
-    auto clust2 = net2.viewFull<cpphots::ClustererBase>();
+    auto clust2 = net2.viewFull<cpphots::interfaces::Clusterer>();
 
     EXPECT_EQ(net1.getNumLayers(), net2.getNumLayers());
 

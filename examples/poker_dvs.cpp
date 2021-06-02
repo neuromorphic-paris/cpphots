@@ -37,7 +37,7 @@ cpphots::Features process_file(cpphots::Network& network, const std::string& fil
         network.process(ev);
     }
 
-    auto feats = network.back<cpphots::ClustererBase>().getHistogram();
+    auto feats = network.back<cpphots::interfaces::Clusterer>().getHistogram();
 
     return feats;
 

@@ -85,7 +85,7 @@ double test_layer(unsigned int num_layers, unsigned int num_events) {
     for (unsigned int l = 0; l < num_layers; l++) {
         auto layer = cpphots::create_layer_ptr(cpphots::create_pool<cpphots::LinearTimeSurface>(2, 50, 50, 2, 2, 100),
                                                cpphots::HOTSClusterer(2));
-        initializer(*dynamic_cast<cpphots::ClustererBase*>(layer.get()), {});
+        initializer(*dynamic_cast<cpphots::interfaces::Clusterer*>(layer.get()), {});
         layers.push_back(layer);
     }
 
@@ -117,7 +117,7 @@ double test_network(unsigned int num_layers, unsigned int num_events) {
     for (unsigned int l = 0; l < num_layers; l++) {
         auto layer = cpphots::create_layer_ptr(cpphots::create_pool<cpphots::LinearTimeSurface>(2, 50, 50, 2, 2, 100),
                                                cpphots::HOTSClusterer(2));
-        initializer(*dynamic_cast<cpphots::ClustererBase*>(layer.get()), {});
+        initializer(*dynamic_cast<cpphots::interfaces::Clusterer*>(layer.get()), {});
         network.addLayer(layer);
     }
 

@@ -98,7 +98,7 @@ void Network::fromStream(std::istream& in) {
     while (cmd != "NETWORKEND") {
 
         if (cmd == "LAYERBEGIN") {
-            addLayer(loadLayerFromStream(in));
+            // addLayer(loadLayerFromStream(in));
         }
 
         cmd = Streamable::getNextMetacommand(in);

@@ -34,7 +34,7 @@ TimeSurfacePtr loadTSFromStream(std::istream& in);
  * @param in input stream
  * @return pointer to the new layer
  */
-LayerPtr loadLayerFromStream(std::istream& in);
+// LayerPtr loadLayerFromStream(std::istream& in);
 
 }
 

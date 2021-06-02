@@ -13,6 +13,8 @@
 #include "layer_traits.h"
 #include "layer_modifiers.h"
 #include "interfaces/streamable.h"
+#include "interfaces/clustering.h"
+
 
 /**
  * @brief Main cpphots namespace
@@ -69,7 +71,7 @@ using LayerPtr = std::shared_ptr<LayerBase>;
  * One of these components should behave like a TimeSurfacesPool,
  * by providing an updateAndCompute method that computes a time surface.
  * 
- * If one of the components is a subclass of ClustererBase, clustering
+ * If one of the components is a subclass of Clusterer, clustering
  * is also performed on every event.
  * 
  * @tparam T types of the components
@@ -130,7 +132,7 @@ public:
         }
 
         // if there is a clustering algorithm we can use it
-        if constexpr (std::is_base_of_v<ClustererBase, Layer>) {
+        if constexpr (std::is_base_of_v<interfaces::Clusterer, Layer>) {
 
             Events retevents;
 

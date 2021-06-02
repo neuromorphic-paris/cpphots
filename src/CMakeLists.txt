@@ -2,6 +2,7 @@
 set(CPPHOTS_SOURCES
     types.cpp
     interfaces/streamable.cpp
+    interfaces/clustering.cpp
     classification.cpp
     events_utils.cpp
     network.cpp
@@ -14,6 +15,7 @@ set(CPPHOTS_SOURCES
 set(CPPHOTS_HEADERS
     "../include/cpphots/types.h"
     "../include/cpphots/interfaces/streamable.h"
+    "../include/cpphots/interfaces/clustering.h"
     "../include/cpphots/classification.h"
     "../include/cpphots/events_utils.h"
     "../include/cpphots/layer.h"
