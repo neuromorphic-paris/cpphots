@@ -14,6 +14,7 @@
 #include "layer_modifiers.h"
 #include "interfaces/streamable.h"
 #include "interfaces/clustering.h"
+#include "interfaces/layer_modifiers.h"
 
 
 /**
@@ -117,10 +118,10 @@ public:
         std::vector<std::pair<uint16_t, uint16_t>> coords;
 
         // check averaging
-        if constexpr (std::is_base_of_v<SuperCell, Layer>) {
+        if constexpr (std::is_base_of_v<interfaces::SuperCell, Layer>) {
             coords = this->findCells(x, y);
             for (auto [cx, cy] : coords) {
-                if constexpr (std::is_base_of_v<SuperCellAverage, Layer>) {
+                if constexpr (std::is_base_of_v<interfaces::SuperCell, Layer>) {
                     surfaces.push_back(this->averageTS(surface, cx, cy));
                 } else {
                     surfaces.push_back(surface);
@@ -143,7 +144,7 @@ public:
 
                 auto k = this->cluster(surface);
 
-                if constexpr (std::is_base_of_v<EventRemapper, Layer>) {
+                if constexpr (std::is_base_of_v<interfaces::EventRemapper, Layer>) {
                     retevents.push_back(this->remapEvent(event{t, x, y, p}, k));
                 } else {
                     retevents.push_back(event{t, x, y, k});
@@ -192,7 +193,7 @@ public:
         writeMetacommand(out, "LAYERBEGIN");
 
         ([&]() {
-        if constexpr (std::is_base_of_v<Streamable, T>) {
+        if constexpr (std::is_base_of_v<interfaces::Streamable, T>) {
             T::toStream(out);
             out << std::endl;
         }
@@ -212,7 +213,7 @@ public:
         matchMetacommandOptional(in, "LAYERBEGIN");
 
         ([&]() {
-        if constexpr (std::is_base_of_v<Streamable, T>) {
+        if constexpr (std::is_base_of_v<interfaces::Streamable, T>) {
             T::fromStream(in);
         }
         }(), ...);

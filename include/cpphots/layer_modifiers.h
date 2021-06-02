@@ -8,29 +8,10 @@
 #include <vector>
 
 #include "types.h"
-#include "interfaces/streamable.h"
+#include "interfaces/layer_modifiers.h"
 
 
 namespace cpphots {
-
-/**
- * @brief Interface for a modifier that remaps events
- * 
- * A remapper usually changes the coordinates or the polarity of an event,
- * withoud modifying the event timestamp.
- */
-struct EventRemapper : public virtual interfaces::Streamable {
-
-    /**
-     * @brief Remap event
-     
-     * @param ev event
-     * @param k cluster id
-     * @return remapped event
-     */
-    virtual event remapEvent(event ev, uint16_t k) = 0;
-
-};
 
 /**
  * @brief Changes the output of a Layer to ArrayHOTS
@@ -39,7 +20,7 @@ struct EventRemapper : public virtual interfaces::Streamable {
  * {t, k, y, 0}
  * where k is the clustering output.
  */
-struct ArrayLayer : public EventRemapper {
+struct ArrayLayer : public interfaces::EventRemapper {
 
     event remapEvent(event ev, uint16_t k) override;
 
@@ -57,7 +38,7 @@ struct ArrayLayer : public EventRemapper {
  * {t, w*h*k + w*y + x, 0, 0}
  * where k is the clustering output and w,h are the dimensions of the context.
  */
-class SerializingLayer : public EventRemapper {
+class SerializingLayer : public interfaces::EventRemapper {
 
 public:
 
@@ -97,13 +78,13 @@ private:
 
 
 /**
- * @brief Subsample layer into super cells
+ * @brief Subsample layer into super cells, without averaging
  * 
  * If added to a layer, the output coordinates of the events will be mapped
  * using cells of a fixed size, thus reducing the output dimensionality.
  * Cells may be overlapping, causing the layer to emit more than one event.
  */
-class SuperCell : public virtual interfaces::Streamable {
+class SuperCell : public virtual interfaces::SuperCell {
 
 public:
 
@@ -125,30 +106,23 @@ public:
      */
     SuperCell(uint16_t width, uint16_t height, uint16_t K, uint16_t overlap = 0);
 
-    /**
-     * @brief Find coordinates of cells that are over certain coordinates
-     * 
-     * The output contains more than one set of coordinates only if overlap > 0.
-     * 
-     * @param ex x coordinate of the event
-     * @param ey y coordinate of the event
-     * @return vector of cell coordinates
-     */
-    std::vector<std::pair<uint16_t, uint16_t>> findCells(uint16_t ex, uint16_t ey) const;
+    std::vector<std::pair<uint16_t, uint16_t>> findCells(uint16_t ex, uint16_t ey) const override;
+
+    std::pair<uint16_t, uint16_t> getSize() const override;
+
+    std::pair<uint16_t, uint16_t> getCellSizes() const override;
 
     /**
-     * @brief Returns the size of the context
+     * @brief Average time surfaces over a cell
      * 
-     * @return {width, height}
-     */
-    std::pair<uint16_t, uint16_t> getSize() const;
-
-    /**
-     * @brief Get the number of the horizontal and vertical cells
+     * This function actually returns the time surface unmodified.
      * 
-     * @return {horizontal cells, vertical cells}
+     * @param ts new time surface computed
+     * @param cx x coordinate of the cell
+     * @param cy y coordinate of the cell
+     * @return averaged time surface
      */
-    std::pair<uint16_t, uint16_t> getCellSizes() const;
+    TimeSurfaceType averageTS(const TimeSurfaceType& ts, uint16_t cx, uint16_t cy) override;
 
     void toStream(std::ostream& out) const override;
 
@@ -248,14 +222,9 @@ public:
     SuperCellAverage(uint16_t width, uint16_t height, uint16_t K, uint16_t overlap = 0);
 
     /**
-     * @brief Average time surfaces over a cell
-     * 
-     * @param ts new time surface computed
-     * @param cx x coordinate of the cell
-     * @param cy y coordinate of the cell
-     * @return averaged time surface
+     * @copydoc interfaces::SuperCell::averageTS
      */
-    TimeSurfaceType averageTS(const TimeSurfaceType& ts, uint16_t cx, uint16_t cy);
+    TimeSurfaceType averageTS(const TimeSurfaceType& ts, uint16_t cx, uint16_t cy) override;
 
     void toStream(std::ostream& out) const override;
 
