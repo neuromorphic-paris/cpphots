@@ -1,10 +1,10 @@
-#include <cpphots/interfaces.h>
+#include <cpphots/interfaces/streamable.h>
 #include <sstream>
 
 #include <gtest/gtest.h>
 
 
-class StreamableTest : public cpphots::Streamable {
+class StreamableTest : public cpphots::interfaces::Streamable {
 
 public:
 

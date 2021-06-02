@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "time_surface.h"
-#include "interfaces.h"
+#include "interfaces/streamable.h"
 
 
 namespace cpphots {
@@ -19,7 +19,7 @@ namespace cpphots {
  * A remapper usually changes the coordinates or the polarity of an event,
  * withoud modifying the event timestamp.
  */
-struct EventRemapper : public virtual Streamable {
+struct EventRemapper : public virtual interfaces::Streamable {
 
     /**
      * @brief Remap event
@@ -103,7 +103,7 @@ private:
  * using cells of a fixed size, thus reducing the output dimensionality.
  * Cells may be overlapping, causing the layer to emit more than one event.
  */
-class SuperCell : public virtual Streamable {
+class SuperCell : public virtual interfaces::Streamable {
 
 public:
 

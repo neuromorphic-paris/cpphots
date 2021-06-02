@@ -6,7 +6,7 @@
 #define CPPHOTS_CLUSTERING_H
 
 #include "time_surface.h"
-#include "interfaces.h"
+#include "interfaces/streamable.h"
 
 
 namespace cpphots {
@@ -14,7 +14,7 @@ namespace cpphots {
 /**
  * @brief Interface for time surface clustering
  */
-class ClustererBase : public virtual Streamable {
+class ClustererBase : public virtual interfaces::Streamable {
 
 public:
     /**

@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-#include "cpphots/interfaces.h"
+#include "cpphots/interfaces/streamable.h"
 
 #ifdef CPPHOTS_WITH_PEREGRINE
 #include "cpphots/gmm_clustering.h"
@@ -13,7 +13,7 @@ namespace cpphots {
 
 TimeSurfacePtr loadTSFromStream(std::istream& in) {
 
-    auto metacmd = Streamable::getNextMetacommand(in);
+    auto metacmd = interfaces::Streamable::getNextMetacommand(in);
 
     if (metacmd == "LINEARTIMESURFACE") {
         LinearTimeSurface* ts = new LinearTimeSurface();
@@ -42,7 +42,7 @@ LayerPtr loadLayerFromStream(std::istream& in, const std::tuple<T...>& component
         throw std::runtime_error("An error occurred when loadin a layer from the input stream");
     }
 
-    auto cmd = Streamable::getNextMetacommand(in);
+    auto cmd = interfaces::Streamable::getNextMetacommand(in);
 
     if (cmd == "LAYERBEGIN") {
         return loadLayerFromStream(in, components);

@@ -15,7 +15,7 @@
 
 #include "layer.h"
 #include "events_utils.h"
-#include "interfaces.h"
+#include "interfaces/streamable.h"
 
 
 namespace cpphots {
@@ -27,7 +27,7 @@ namespace cpphots {
  * 
  * A Network owns no layers, only references to them.
  */
-class Network : public Streamable {
+class Network : public interfaces::Streamable {
 
 public:
 

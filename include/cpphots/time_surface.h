@@ -12,7 +12,7 @@
 #include <Eigen/Dense>
 
 #include "events_utils.h"
-#include "interfaces.h"
+#include "interfaces/streamable.h"
 
 
 namespace cpphots {
@@ -38,7 +38,7 @@ using TimeSurfaceScalarType = TimeSurfaceType::Scalar;
  * This class keeps track of the time context for the current stream of events,
  * but it's up to the suclasses to compute the time surfaces.
  */
-class TimeSurfaceBase : public virtual Streamable {
+class TimeSurfaceBase : public virtual interfaces::Streamable {
 
 public:
 
@@ -362,7 +362,7 @@ private:
  * events with different polarities to the appropriate time surface.
  * 
  */
-class TimeSurfacePool : public virtual Streamable {
+class TimeSurfacePool : public virtual interfaces::Streamable {
 
 public:
 

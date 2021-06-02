@@ -12,7 +12,7 @@
 #include "clustering.h"
 #include "layer_traits.h"
 #include "layer_modifiers.h"
-#include "interfaces.h"
+#include "interfaces/streamable.h"
 
 /**
  * @brief Main cpphots namespace
@@ -22,7 +22,7 @@ namespace cpphots {
 /**
  * @brief Interface for a generic layer
  */
-class LayerBase : public virtual Streamable {
+class LayerBase : public virtual interfaces::Streamable {
 
 public:
 
