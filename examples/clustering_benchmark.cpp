@@ -8,8 +8,8 @@
 
 #include <cpphots/time_surface.h>
 #include <cpphots/layer.h>
-#include <cpphots/clustering.h>
-#include <cpphots/gmm_clustering.h>
+#include <cpphots/clustering_cosine.h>
+#include <cpphots/clustering_gmm.h>
 #include <cpphots/run.h>
 
 #include "commons.h"
@@ -56,7 +56,7 @@ int main() {
 
     {
         auto layer = cpphots::create_layer(cpphots::create_pool<cpphots::LinearTimeSurface>(100, 100, 5, 5, 500., 1),
-                                           cpphots::HOTSClusterer(10));
+                                           cpphots::CosineClusterer(10));
         auto [tr, ex] = measure_times(layer, n_training, n_events);
         std::cout << "  HOTS | " << std::setw(9) << std::setprecision(5) << tr << " | " << std::setw(9) << std::setprecision(5) << ex << std::endl;
     }

@@ -2,8 +2,8 @@
  * @file gmm_clustering.h
  * @brief Clustering with variational gaussian mixture models
  */
-#ifndef CPPHOTS_GMM_CLUSTERING_H
-#define CPPHOTS_GMM_CLUSTERING_H
+#ifndef CPPHOTS_CLUSTERING_GMM_H
+#define CPPHOTS_CLUSTERING_GMM_H
 
 #include <memory>
 

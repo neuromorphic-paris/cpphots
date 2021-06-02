@@ -1,8 +1,8 @@
 #include <random>
 
-#include <cpphots/time_surface.h>
-#include <cpphots/gmm_clustering.h>
-#include <cpphots/clustering.h>
+#include <cpphots/types.h>
+#include <cpphots/clustering_gmm.h>
+#include <cpphots/clustering_utils.h>
 
 #include <gtest/gtest.h>
 

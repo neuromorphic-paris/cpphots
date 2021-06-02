@@ -5,7 +5,7 @@
 #include "cpphots/interfaces/streamable.h"
 
 #ifdef CPPHOTS_WITH_PEREGRINE
-#include "cpphots/gmm_clustering.h"
+#include "cpphots/clustering_gmm.h"
 #endif
 
 

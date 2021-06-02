@@ -2,6 +2,7 @@
 #include <cpphots/time_surface.h>
 #include <cpphots/events_utils.h>
 #include <cpphots/classification.h>
+#include <cpphots/clustering_cosine.h>
 
 #include <gtest/gtest.h>
 
@@ -17,7 +18,7 @@ bool operator==(const cpphots::Features& f1, const cpphots::Features& f2) {
 }
 
 
-void set_prototypes_nolearning(cpphots::HOTSClusterer& layer) {
+void set_prototypes_nolearning(cpphots::CosineClusterer& layer) {
 
     layer.clearPrototypes();
 
@@ -88,7 +89,7 @@ void set_prototypes_nolearning(cpphots::HOTSClusterer& layer) {
 }
 
 
-void set_prototpes_learning(cpphots::HOTSClusterer& layer) {
+void set_prototpes_learning(cpphots::CosineClusterer& layer) {
 
     layer.clearPrototypes();
 
@@ -166,12 +167,12 @@ protected:
     void SetUp() override {
         events = cpphots::loadFromFile("data/trcl0.es");
         layer = cpphots::create_layer(cpphots::create_pool<cpphots::LinearTimeSurface>(1, 32, 32, 2, 2, 1000),
-                                      cpphots::HOTSClusterer(8));
+                                      cpphots::CosineClusterer(8));
     }
 
     cpphots::Events events;
     cpphots::Layer<cpphots::TimeSurfacePool,
-                   cpphots::HOTSClusterer> layer;
+                   cpphots::CosineClusterer> layer;
 
 };
 
@@ -239,12 +240,12 @@ protected:
     void SetUp() override {
         events = cpphots::loadFromFile("data/trcl0.es");
         layer = cpphots::create_layer(cpphots::create_pool<cpphots::LinearTimeSurface>(2, 32, 32, 2, 2, 1000),
-                                      cpphots::HOTSClusterer(8));
+                                      cpphots::CosineClusterer(8));
     }
 
     cpphots::Events events;
     cpphots::Layer<cpphots::TimeSurfacePool,
-                   cpphots::HOTSClusterer> layer;
+                   cpphots::CosineClusterer> layer;
 
 };
 
@@ -296,7 +297,7 @@ TEST_F(TestLayerInitialization, Random) {
 TEST(TestLayer, NoInitialization) {
 
     auto layer = cpphots::create_layer(cpphots::create_pool<cpphots::LinearTimeSurface>(2, 32, 32, 2, 2, 1000),
-                                       cpphots::HOTSClusterer(8));
+                                       cpphots::CosineClusterer(8));
 
     ASSERT_THROW(layer.process({0, 0, 0, 0}, true), std::runtime_error);
 
@@ -308,7 +309,7 @@ TEST(TestLayer, SkipValidityCheck) {
     cpphots::Events events = cpphots::loadFromFile("data/trcl0.es");
 
     auto layer = cpphots::create_layer(cpphots::create_pool<cpphots::LinearTimeSurface>(2, 32, 32, 2, 2, 1000),
-                                       cpphots::HOTSClusterer(8));
+                                       cpphots::CosineClusterer(8));
 
     auto initializer = cpphots::ClustererRandomInitializer(5, 5);
     initializer(layer, {});
@@ -329,7 +330,7 @@ TEST(TestLayer, SkipValidityCheck) {
 TEST(TestLayer, WrongPolarity) {
 
     auto layer = cpphots::create_layer(cpphots::create_pool<cpphots::LinearTimeSurface>(2, 32, 32, 2, 2, 1000),
-                                       cpphots::HOTSClusterer(8));
+                                       cpphots::CosineClusterer(8));
 
     auto initializer = cpphots::ClustererRandomInitializer(5, 5);
     initializer(layer, {});
@@ -342,7 +343,7 @@ TEST(TestLayer, WrongPolarity) {
 TEST(TestLayer, TSAccess) {
 
     auto layer = cpphots::create_layer(cpphots::create_pool<cpphots::LinearTimeSurface>(2, 32, 32, 2, 2, 1000),
-                                       cpphots::HOTSClusterer(8));
+                                       cpphots::CosineClusterer(8));
 
     auto ts1 = layer.getSurface(0)->updateAndCompute(10, 2, 2);
     auto ts2 = layer.compute(10, 2, 2, 0);
@@ -395,7 +396,7 @@ TEST(TestLayer, CreateLayer) {
 
     {
         auto layer = cpphots::create_layer(cpphots::create_pool<cpphots::LinearTimeSurface>(8, 10, 20, 5, 5, 10000),
-                                           cpphots::HOTSClusterer(12));
+                                           cpphots::CosineClusterer(12));
         EXPECT_EQ(layer.getNumClusters(), 12);
     }
 

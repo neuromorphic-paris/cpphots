@@ -8,7 +8,8 @@ set(CPPHOTS_SOURCES
     network.cpp
     run.cpp
     time_surface.cpp
-    clustering.cpp
+    clustering_utils.cpp
+    clustering_cosine.cpp
     layer_modifiers.cpp
     load.cpp)
 
@@ -24,7 +25,8 @@ set(CPPHOTS_HEADERS
     "../include/cpphots/network.h"
     "../include/cpphots/run.h"
     "../include/cpphots/time_surface.h"
-    "../include/cpphots/clustering.h"
+    "../include/cpphots/clustering_utils.h"
+    "../include/cpphots/clustering_cosine.h"
     "../include/cpphots/load.h")
 
 if (BUILD_PLOTS)
@@ -35,8 +37,8 @@ if (BUILD_PLOTS)
 endif()
 
 if (WITH_PEREGRINE)
-    list(APPEND CPPHOTS_SOURCES gmm_clustering.cpp)
-    list(APPEND CPPHOTS_HEADERS "../include/cpphots/gmm_clustering.h")
+    list(APPEND CPPHOTS_SOURCES clustering_gmm.cpp)
+    list(APPEND CPPHOTS_HEADERS "../include/cpphots/clustering_gmm.h")
 endif()
 
 # add library and link to libraries

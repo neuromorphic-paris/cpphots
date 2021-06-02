@@ -9,7 +9,7 @@
 #include <memory>
 
 #include "types.h"
-#include "clustering.h"
+#include "clustering_utils.h"
 #include "layer_traits.h"
 #include "layer_modifiers.h"
 #include "interfaces/streamable.h"
