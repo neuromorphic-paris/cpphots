@@ -10,6 +10,7 @@
 #include <fstream>
 #include <chrono>
 
+#include <cpphots/time_surface.h>
 #include <cpphots/network.h>
 #include <cpphots/events_utils.h>
 #include <cpphots/classification.h>

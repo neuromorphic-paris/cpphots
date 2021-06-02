@@ -8,6 +8,7 @@
 #include <iomanip>
 #include <fstream>
 
+#include <cpphots/time_surface.h>
 #include <cpphots/layer.h>
 #include <cpphots/network.h>
 

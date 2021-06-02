@@ -6,6 +6,7 @@
 #include <chrono>
 #include <iomanip>
 
+#include <cpphots/time_surface.h>
 #include <cpphots/layer.h>
 #include <cpphots/clustering.h>
 #include <cpphots/gmm_clustering.h>

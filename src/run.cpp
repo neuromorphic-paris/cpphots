@@ -1,6 +1,7 @@
 #include "cpphots/run.h"
 
 #include "cpphots/events_utils.h"
+#include "cpphots/time_surface.h"
 
 
 namespace cpphots {

@@ -5,7 +5,7 @@
 #ifndef CPPHOTS_CLUSTERING_H
 #define CPPHOTS_CLUSTERING_H
 
-#include "time_surface.h"
+#include "types.h"
 #include "interfaces/streamable.h"
 
 

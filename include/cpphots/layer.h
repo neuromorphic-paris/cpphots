@@ -8,7 +8,7 @@
 #include <type_traits>
 #include <memory>
 
-#include "events_utils.h"
+#include "types.h"
 #include "clustering.h"
 #include "layer_traits.h"
 #include "layer_modifiers.h"

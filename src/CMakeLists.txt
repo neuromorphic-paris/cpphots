@@ -1,5 +1,6 @@
 # define file lists
 set(CPPHOTS_SOURCES
+    types.cpp
     interfaces/streamable.cpp
     classification.cpp
     events_utils.cpp
@@ -11,6 +12,7 @@ set(CPPHOTS_SOURCES
     load.cpp)
 
 set(CPPHOTS_HEADERS
+    "../include/cpphots/types.h"
     "../include/cpphots/interfaces/streamable.h"
     "../include/cpphots/classification.h"
     "../include/cpphots/events_utils.h"

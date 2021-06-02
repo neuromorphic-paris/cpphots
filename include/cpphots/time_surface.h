@@ -9,27 +9,11 @@
 #include <istream>
 #include <memory>
 
-#include <Eigen/Dense>
-
-#include "events_utils.h"
+#include "types.h"
 #include "interfaces/streamable.h"
 
 
 namespace cpphots {
-
-/**
- * @brief Alias type for a time surface
- */
-#ifdef CPPHOTS_DOUBLE_PRECISION
-using TimeSurfaceType = Eigen::ArrayXXd;  // using floating point instead of uint64_t for the initialization to -tau
-#else
-using TimeSurfaceType = Eigen::ArrayXXf;  // using floating point instead of uint64_t for the initialization to -tau
-#endif
-
-/**
- * @brief Alias type for time surface floating point type
- */
-using TimeSurfaceScalarType = TimeSurfaceType::Scalar;
 
 
 /**

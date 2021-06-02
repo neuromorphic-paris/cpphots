@@ -13,8 +13,8 @@
 #include <istream>
 #include <functional>
 
+#include "types.h"
 #include "layer.h"
-#include "events_utils.h"
 #include "interfaces/streamable.h"
 
 

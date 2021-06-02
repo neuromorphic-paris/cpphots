@@ -1,4 +1,5 @@
 #include <cpphots/layer.h>
+#include <cpphots/time_surface.h>
 #include <cpphots/events_utils.h>
 #include <cpphots/classification.h>
 

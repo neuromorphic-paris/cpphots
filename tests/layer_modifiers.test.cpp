@@ -1,5 +1,6 @@
 #include <cpphots/layer_modifiers.h>
 #include <cpphots/layer.h>
+#include <cpphots/time_surface.h>
 
 #include <gtest/gtest.h>
 
