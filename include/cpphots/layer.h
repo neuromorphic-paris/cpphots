@@ -11,10 +11,7 @@
 #include "types.h"
 #include "clustering_utils.h"
 #include "layer_traits.h"
-#include "layer_modifiers.h"
-#include "interfaces/streamable.h"
-#include "interfaces/clustering.h"
-#include "interfaces/layer_modifiers.h"
+#include "interfaces/all.h"
 
 
 /**

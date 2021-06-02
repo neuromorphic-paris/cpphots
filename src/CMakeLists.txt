@@ -15,6 +15,7 @@ set(CPPHOTS_SOURCES
 
 set(CPPHOTS_HEADERS
     "../include/cpphots/types.h"
+    "../include/cpphots/interfaces/all.h"
     "../include/cpphots/interfaces/streamable.h"
     "../include/cpphots/interfaces/clustering.h"
     "../include/cpphots/interfaces/time_surface.h"
