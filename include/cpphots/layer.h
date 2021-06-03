@@ -7,7 +7,6 @@
 
 #include "types.h"
 #include "clustering_utils.h"
-#include "layer_traits.h"
 #include "interfaces/all.h"
 
 
