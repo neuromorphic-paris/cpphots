@@ -48,46 +48,52 @@ Events Layer::process(uint64_t t, uint16_t x, uint16_t y, uint16_t p, bool skip_
         return Events{};
     }
 
+    // no-supercell
+    if (!supercell) {
+
+        uint16_t k = p;
+
+        // if there is a clustering algorithm we can use it
+        if (clusterer) {
+            k = clusterer->cluster(surface);
+        }
+
+        if (remapper) {
+            return {remapper->remapEvent(event{t, x, y, p}, k)};
+        } else {
+            return {{t, x, y, k}};  // default behaviour
+        }
+
+    }
+
+    // if there is a supercell modifier we use it
     std::vector<TimeSurfaceType> surfaces;
     std::vector<std::pair<uint16_t, uint16_t>> coords;
 
-    // check averaging
-    if (supercell) {
-        coords = supercell->findCells(x, y);
-        for (auto [cx, cy] : coords) {
-            surfaces.push_back(supercell->averageTS(surface, cx, cy));
-        }
-    } else {
-        surfaces.push_back(surface);
-        coords.push_back({x, y});
-    }
-
-    // if there is a clustering algorithm we can use it
-    if (clusterer) {
-
-        Events retevents;
-
-        for (size_t i = 0; i < surfaces.size(); i++) {
-
-            auto& surface = surfaces[i];
-            auto [x, y] = coords[i];
-
-            auto k = clusterer->cluster(surface);
-
-            if (remapper) {
-                retevents.push_back(remapper->remapEvent(event{t, x, y, p}, k));
-            } else {
-                retevents.push_back(event{t, x, y, k});
-            }
-
-        }
-
-        return retevents;
+    coords = supercell->findCells(x, y);
+    for (auto [cx, cy] : coords) {
+        surfaces.push_back(supercell->averageTS(surface, cx, cy));
     }
 
     Events retevents;
-    for (auto [ex, ey] : coords) {
-        retevents.push_back(event{t, ex, ey, p});
+
+    for (size_t i = 0; i < surfaces.size(); i++) {
+
+        auto& surface = surfaces[i];
+        auto [x, y] = coords[i];
+
+        uint16_t k = p;
+
+        if (clusterer) {
+            k = clusterer->cluster(surface);
+        }
+
+        if (remapper) {
+            retevents.push_back(remapper->remapEvent(event{t, x, y, p}, k));
+        } else {
+            retevents.push_back(event{t, x, y, k});
+        }
+
     }
 
     return retevents;
