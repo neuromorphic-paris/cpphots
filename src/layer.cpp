@@ -4,7 +4,9 @@
 #include "cpphots/time_surface.h"
 #include "cpphots/clustering_cosine.h"
 #include "cpphots/layer_modifiers.h"
+#ifdef CPPHOTS_WITH_PEREGRINE
 #include "cpphots/clustering_gmm.h"
+#endif
 
 
 namespace cpphots {
@@ -163,9 +165,12 @@ void Layer::fromStream(std::istream& in) {
         delete clusterer;
         if (cmd == "COSINECLUSTERER") {
             clusterer = new CosineClusterer();
-        } else {
+        }
+#ifdef CPPHOTS_WITH_PEREGRINE
+        else {
             clusterer = new GMMClusterer();
         }
+#endif
         clusterer->fromStream(in);
     }
 

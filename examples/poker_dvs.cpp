@@ -17,6 +17,8 @@
 #include <cpphots/run.h>
 #ifdef CPPHOTS_WITH_PEREGRINE
 #include "cpphots/clustering_gmm.h"
+#else
+#include "cpphots/clustering_cosine.h"
 #endif
 
 
@@ -180,7 +182,7 @@ std::tuple<double, double, double> test_training(const std::string& folder, bool
 #ifdef CPPHOTS_WITH_PEREGRINE
                         new cpphots::GMMClusterer(cpphots::GMMClusterer::S_GMM, 32, 5, 12, 20));
 #else
-                        newcpphots::CosineClusterer(32));
+                        new cpphots::CosineClusterer(32));
 #endif
 
     auto train_set = poker_dvs_trainset(folder);
