@@ -7,7 +7,14 @@ namespace cpphots {
 
 Network::Network() {}
 
-void Network::addLayer(LayerPtr layer) {
+void Network::createLayer(interfaces::TimeSurfacePoolCalculator* tspool,
+                          interfaces::Clusterer* clusterer,
+                          interfaces::EventRemapper* remapper,
+                          interfaces::SuperCell* supercell) {
+    layers.emplace_back(tspool, clusterer, remapper, supercell);
+}
+
+void Network::addLayer(const Layer& layer) {
     layers.push_back(layer);
 }
 
@@ -25,7 +32,7 @@ Events Network::process(const event& ev, bool skip_check) {
         Events next_evs;
 
         for (auto& nev : evs) {
-            Events pevs = layer->process(nev, skip_check);
+            Events pevs = layer.process(nev, skip_check);
             next_evs.insert(next_evs.end(), pevs.begin(), pevs.end());
         }
 
@@ -44,12 +51,28 @@ size_t Network::getNumLayers() const {
     return layers.size();
 }
 
-LayerBase& Network::operator[](size_t pos) {
-    return *layers[pos];
+Layer& Network::getLayer(size_t pos) {
+        return layers[pos];
+    }
+
+const Layer& Network::getLayer(size_t pos) const {
+    return layers[pos];
 }
 
-const LayerBase& Network::operator[](size_t pos) const {
-    return *layers[pos];
+Layer& Network::operator[](size_t pos) {
+    return layers[pos];
+}
+
+const Layer& Network::operator[](size_t pos) const {
+    return layers[pos];
+}
+
+Layer& Network::back() {
+    return layers.back();
+}
+
+const Layer& Network::back() const {
+    return layers.back();
 }
 
 Network Network::getSubnetwork(int start, int stop) const {
@@ -73,7 +96,7 @@ Network Network::getSubnetwork(int start, int stop) const {
 
 void Network::reset() {
     for (auto& l : layers) {
-        l->reset();
+        l.reset();
     }
 }
 
@@ -81,7 +104,7 @@ void Network::reset() {
 void Network::toStream(std::ostream& out) const {
     writeMetacommand(out, "NETWORKBEGIN");
     for (const auto& l : layers) {
-        l->toStream(out);
+        l.toStream(out);
         out << std::endl;
     }
     writeMetacommand(out, "NETWORKEND");
@@ -98,7 +121,9 @@ void Network::fromStream(std::istream& in) {
     while (cmd != "NETWORKEND") {
 
         if (cmd == "LAYERBEGIN") {
-            // addLayer(loadLayerFromStream(in));
+            Layer layer;
+            layer.fromStream(in);
+            layers.push_back(layer);
         }
 
         cmd = Streamable::getNextMetacommand(in);

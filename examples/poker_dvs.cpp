@@ -37,7 +37,7 @@ cpphots::Features process_file(cpphots::Network& network, const std::string& fil
         network.process(ev);
     }
 
-    auto feats = network.back<cpphots::interfaces::Clusterer>().getHistogram();
+    auto feats = network.back().getHistogram();
 
     return feats;
 
@@ -170,17 +170,17 @@ std::vector<std::pair<std::string, std::string>> poker_dvs_all(const std::string
 std::tuple<double, double, double> test_training(const std::string& folder, bool multi, const cpphots::ClustererInitializerType& initializer) {
 
     cpphots::Network network;
-    network.addLayer(cpphots::create_pool<cpphots::LinearTimeSurface>(2, 32, 32, 2, 2, 1000),
+    network.createLayer(cpphots::create_pool_ptr<cpphots::LinearTimeSurface>(2, 32, 32, 2, 2, 1000),
 #ifdef CPPHOTS_WITH_PEREGRINE
-                     cpphots::GMMClusterer(cpphots::GMMClusterer::S_GMM, 16, 5, 10, 20));
+                        new cpphots::GMMClusterer(cpphots::GMMClusterer::S_GMM, 16, 5, 10, 20));
 #else
-                     cpphots::HOTSClusterer(16));
+                        new cpphots::CosineClusterer(16));
 #endif
-    network.addLayer(cpphots::create_pool<cpphots::LinearTimeSurface>(16, 32, 32, 4, 4, 5000),
+    network.createLayer(cpphots::create_pool_ptr<cpphots::LinearTimeSurface>(16, 32, 32, 4, 4, 5000),
 #ifdef CPPHOTS_WITH_PEREGRINE
-                     cpphots::GMMClusterer(cpphots::GMMClusterer::S_GMM, 32, 5, 12, 20));
+                        new cpphots::GMMClusterer(cpphots::GMMClusterer::S_GMM, 32, 5, 12, 20));
 #else
-                     cpphots::HOTSClusterer(32));
+                        newcpphots::CosineClusterer(32));
 #endif
 
     auto train_set = poker_dvs_trainset(folder);

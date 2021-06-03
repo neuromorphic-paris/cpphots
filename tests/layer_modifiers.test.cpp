@@ -125,9 +125,11 @@ TEST(TestModifiers, SuperCell) {
 
 TEST(TestModifiersLayer, ArrayLayer) {
 
-    auto layer = cpphots::create_layer(cpphots::create_pool<cpphots::LinearTimeSurface>(2, 100, 100, 5, 5, 10000),
-                                       MockClusterer(10),
-                                       cpphots::ArrayLayer{});
+    // TODO: change this
+    auto pool = cpphots::create_pool<cpphots::LinearTimeSurface>(2, 100, 100, 5, 5, 10000);
+    cpphots::Layer layer(&pool);
+    layer.createClusterer<MockClusterer>(10);
+    layer.createRemapper<cpphots::ArrayLayer>();
 
     RandomEventGenerator reg(100, 100, 2);
 
@@ -144,9 +146,11 @@ TEST(TestModifiersLayer, ArrayLayer) {
 
 TEST(TestModifiersLayer, SerializingLayer) {
 
-    auto layer = cpphots::create_layer(cpphots::create_pool<cpphots::LinearTimeSurface>(2, 10, 10, 5, 5, 10000),
-                                       MockClusterer(10),
-                                       cpphots::SerializingLayer(10, 10));
+    // TODO: change this
+    auto pool = cpphots::create_pool<cpphots::LinearTimeSurface>(2, 10, 10, 5, 5, 10000);
+    cpphots::Layer layer(&pool);
+    layer.createClusterer<MockClusterer>(10);
+    layer.createRemapper<cpphots::SerializingLayer>(10, 10);
 
     RandomEventGenerator reg(10, 10, 2);
 
@@ -170,9 +174,11 @@ TEST(TestModifiersLayer, SerializingLayer) {
 
 TEST(TestModifiersLayer, SerializingLayerException) {
 
-    auto layer = cpphots::create_layer(cpphots::create_pool<cpphots::LinearTimeSurface>(2, 100, 100, 5, 5, 10000),
-                                       MockClusterer(10),
-                                       cpphots::SerializingLayer(100, 100));
+    // TODO: change this
+    auto pool = cpphots::create_pool<cpphots::LinearTimeSurface>(2, 100, 100, 5, 5, 10000);
+    cpphots::Layer layer(&pool);
+    layer.createClusterer<MockClusterer>(10);
+    layer.createRemapper<cpphots::SerializingLayer>(100, 100);
 
     RandomEventGenerator reg(100, 100, 2);
 
@@ -196,9 +202,11 @@ TEST(TestModifiersLayer, SerializingLayerException) {
 
 TEST(TestModifiersLayer, SuperCell) {
 
-    auto layer = cpphots::create_layer(cpphots::create_pool<cpphots::LinearTimeSurface>(2, 50, 50, 5, 5, 10000),
-                                       MockClusterer(10),
-                                       cpphots::SuperCell(50, 50, 5, 1));
+    // TODO: change this
+    auto pool = cpphots::create_pool<cpphots::LinearTimeSurface>(2, 50, 50, 5, 5, 10000);
+    cpphots::Layer layer(&pool);
+    layer.createClusterer<MockClusterer>(10);
+    layer.createSuperCell<cpphots::SuperCell>(50, 50, 5, 1);
 
     auto evts = layer.process(10, 8, 36, 0, true);
 

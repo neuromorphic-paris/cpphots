@@ -25,17 +25,6 @@ namespace cpphots {
  */
 TimeSurfacePtr loadTSFromStream(std::istream& in);
 
-/**
- * @brief Construct a layer from an input stream
- * 
- * This function can be used to load a layer from a stream,
- * without knowing a priori the components of the layer.
- * 
- * @param in input stream
- * @return pointer to the new layer
- */
-// LayerPtr loadLayerFromStream(std::istream& in);
-
 }
 
 #endif

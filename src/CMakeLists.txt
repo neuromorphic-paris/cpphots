@@ -5,6 +5,7 @@ set(CPPHOTS_SOURCES
     interfaces/clustering.cpp
     classification.cpp
     events_utils.cpp
+    layer.cpp
     network.cpp
     run.cpp
     time_surface.cpp

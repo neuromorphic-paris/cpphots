@@ -279,6 +279,31 @@ public:
 
     }
 
+    /**
+     * @brief Create pointer to a new time surface pool
+     * 
+     * This function creates a pool of time surfaces, Forwarding arguments to
+     * the time surface constructors.
+     * 
+     * @tparam TS time surface type
+     * @tparam TSArgs types of the time surface constructor arguments
+     * @param polarities numer of polarities (size of the pool)
+     * @param tsargs arguments forwarded to the time surface constructor
+     * @return pointer to the constructed pool
+     */
+    template <typename TS, typename... TSArgs>
+    static TimeSurfacePool* create_ptr(uint16_t polarities, TSArgs... tsargs) {
+
+        TimeSurfacePool* tsp = new TimeSurfacePool();
+
+        for (uint16_t i = 0; i < polarities; i++) {
+            tsp->surfaces.push_back(TimeSurfacePtr(new TS(std::forward<TSArgs>(tsargs)...)));
+        }
+
+        return tsp;
+
+    }
+
     void update(uint64_t t, uint16_t x, uint16_t y, uint16_t p) override {
         assert_polarity(p);
         surfaces[p]->update(t, x, y);
@@ -377,6 +402,20 @@ private:
 template <typename TS, typename... TSArgs>
 TimeSurfacePool create_pool(uint16_t polarities, TSArgs... tsargs) {
     return TimeSurfacePool::create<TS>(polarities, std::forward<TSArgs>(tsargs)...);
+}
+
+/**
+ * @brief Shorthand for TimeSurfacePool::create_ptr
+ * 
+ * @tparam TS time surface type
+ * @tparam TSArgs types of the time surface constructor arguments
+ * @param polarities numer of polarities (size of the pool)
+ * @param tsargs arguments forwarded to the time surface constructor
+ * @return pointer to the constructed pool
+ */
+template <typename TS, typename... TSArgs>
+TimeSurfacePool* create_pool_ptr(uint16_t polarities, TSArgs... tsargs) {
+    return TimeSurfacePool::create_ptr<TS>(polarities, std::forward<TSArgs>(tsargs)...);
 }
 
 }
