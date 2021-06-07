@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.11...3.18)
 
-project(cpphots VERSION 0.4.1
+project(cpphots VERSION 0.5.0
                 LANGUAGES CXX)
 
 # C++ version
