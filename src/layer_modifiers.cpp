@@ -115,6 +115,10 @@ std::pair<uint16_t, uint16_t> SuperCell::getCellSizes() const {
     return {wcell, hcell};
 }
 
+TimeSurfaceType SuperCell::averageTS(const TimeSurfaceType& ts, uint16_t cx, uint16_t cy) {
+    return ts;
+}
+
 void SuperCell::toStream(std::ostream& out) const {
     writeMetacommand(out, "SUPERCELL");
     out << width << " ";

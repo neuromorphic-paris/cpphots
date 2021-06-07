@@ -1,9 +1,11 @@
-#include "cpphots/interfaces.h"
+#include "cpphots/interfaces/streamable.h"
 
 #include <stdexcept>
 
 
 namespace cpphots {
+
+namespace interfaces {
 
 std::string to_upper(std::string str) {
 
@@ -85,6 +87,8 @@ std::ostream& operator<<(std::ostream& out, const Streamable& streamable) {
 std::istream& operator>>(std::istream& in, Streamable& streamable) {
     streamable.fromStream(in);
     return in;
+}
+
 }
 
 }

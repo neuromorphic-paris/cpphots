@@ -1,9 +1,9 @@
 /**
- * @file interfaces.h
- * @brief Common interfaces for library components
+ * @file interfaces/streamable.h
+ * @brief Common interfaces for components that can interact with streams
  */
-#ifndef CPPHOTS_INTERFACES_H
-#define CPPHOTS_INTERFACES_H
+#ifndef CPPHOTS_INTERFACES_STREAMABLE_H
+#define CPPHOTS_INTERFACES_STREAMABLE_H
 
 #include <ostream>
 #include <istream>
@@ -11,6 +11,8 @@
 
 
 namespace cpphots {
+
+namespace interfaces {
 
 /**
  * @brief Class that can be inserted to/read from a stream
@@ -107,6 +109,8 @@ std::ostream& operator<<(std::ostream& out, const Streamable& streamable);
  * @return input stream
  */
 std::istream& operator>>(std::istream& in, Streamable& streamable);
+
+}
 
 /**
  * @brief Create a Streamable object from an input stream

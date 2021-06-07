@@ -1,4 +1,4 @@
-#include "cpphots/clustering.h"
+#include "cpphots/clustering_utils.h"
 
 #include <random>
 #include <set>
@@ -8,156 +8,8 @@
 
 namespace cpphots {
 
-std::vector<uint32_t> ClustererBase::getHistogram() const {
-    return hist;
-}
 
-void ClustererBase::reset() {
-    hist.clear();
-    hist.resize(getNumClusters());
-}
-
-void ClustererBase::updateHistogram(uint16_t k) {
-    hist[k]++;
-}
-
-
-HOTSClusterer::HOTSClusterer() {}
-
-HOTSClusterer::HOTSClusterer(uint16_t clusters)
-    :clusters(clusters) {
-
-    reset();
-
-}
-
-uint16_t HOTSClusterer::cluster(const TimeSurfaceType& surface) {
-
-    if (!isInitialized()) {
-        throw std::runtime_error("Cannot process event: HOTSClusterer is not initialized.");
-    }
-
-    // find closest kernel
-    uint16_t k = -1;
-    TimeSurfaceScalarType mindist = std::numeric_limits<TimeSurfaceScalarType>::max();
-    for (uint i = 0; i < prototypes.size(); i++) {
-        TimeSurfaceScalarType d = (surface - prototypes[i]).matrix().norm();
-        if (d < mindist) {
-            mindist = d;
-            k = i;
-        }
-    }
-
-    // update histogram
-    updateHistogram(k);
-
-    if (learning) {
-
-        // increase kernel activation
-        prototypes_activations[k]++;
-
-        // beta
-        TimeSurfaceScalarType beta = prototypes[k].cwiseProduct(surface).sum() / prototypes[k].matrix().norm() / surface.matrix().norm();
-
-        // alpha
-        TimeSurfaceScalarType alpha = 1. / (1. + prototypes_activations[k]);
-
-        // update kernel
-        prototypes[k] += alpha * beta * (surface - prototypes[k]);
-
-    }
-
-    return k;
-
-}
-
-uint16_t HOTSClusterer::getNumClusters() const {
-    return clusters;
-}
-
-std::vector<TimeSurfaceType> HOTSClusterer::getPrototypes() const {
-    return prototypes;
-}
-
-bool HOTSClusterer::toggleLearning(bool enable) {
-    bool prev = learning;
-    learning = enable;
-    return prev;
-}
-
-void HOTSClusterer::clearPrototypes() {
-    prototypes.clear();
-    prototypes_activations.clear();
-}
-
-void HOTSClusterer::addPrototype(const TimeSurfaceType& proto) {
-    if (isInitialized()) {
-        throw std::runtime_error("Trying to add a prototype to an already initialized Layer.");
-    }
-    prototypes.push_back(proto);
-    prototypes_activations.push_back(0);
-}
-
-bool HOTSClusterer::isInitialized() const {
-    return (prototypes.size() == clusters) && (prototypes_activations.size() == clusters);
-}
-
-void HOTSClusterer::toStream(std::ostream& out) const {
-
-    writeMetacommand(out, "HOTSCLUSTERER");
-
-    out << clusters << " ";
-    out << learning << " ";
-
-    out << prototypes.size() << " ";
-    out << prototypes[0].rows() << " ";
-    out << prototypes[0].cols() << " ";
-
-    for (const auto& pa : prototypes_activations) {
-        out << pa << " ";
-    }
-    out << "\n";
-    for (const auto& p : prototypes) {
-        out << p << "\n";
-    }
-
-}
-
-void HOTSClusterer::fromStream(std::istream& in) {
-
-    matchMetacommandOptional(in, "HOTSCLUSTERER");
-
-    in >> clusters;
-    in >> learning;
-
-    size_t n_prototypes;
-    uint16_t wx, wy;
-    in >> n_prototypes;
-    in >> wy;
-    in >> wx;
-
-    prototypes_activations.clear();
-    prototypes_activations.resize(n_prototypes);
-    for (auto& pa : prototypes_activations) {
-        in >> pa;
-    }
-    prototypes.clear();
-    for (size_t i = 0; i < n_prototypes; i++) {
-        TimeSurfaceType p = TimeSurfaceType::Zero(wy, wx);
-        for (uint16_t y = 0; y < wy; y++) {
-            for (uint16_t x = 0; x < wx; x++) {
-                in >> p(y, x);
-            }
-        }
-        prototypes.push_back(p);
-    }
-
-    reset();
-
-}
-
-
-void ClustererUniformInitializer(ClustererBase& clusterer, const std::vector<TimeSurfaceType>& time_surfaces) {
+void ClustererUniformInitializer(interfaces::Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces) {
 
     std::vector<TimeSurfaceType> selected;
     std::sample(time_surfaces.begin(), time_surfaces.end(), std::back_inserter(selected), clusterer.getNumClusters(), std::mt19937{std::random_device{}()});
@@ -168,7 +20,7 @@ void ClustererUniformInitializer(ClustererBase& clusterer, const std::vector<Tim
 
 }
 
-void ClustererPlusPlusInitializer(ClustererBase& clusterer, const std::vector<TimeSurfaceType>& time_surfaces) {
+void ClustererPlusPlusInitializer(interfaces::Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces) {
 
     // chosen surfaces
     std::set<int> chosen;
@@ -229,7 +81,7 @@ void ClustererPlusPlusInitializer(ClustererBase& clusterer, const std::vector<Ti
 
 }
 
-void ClustererAFKMC2InitializerImpl(ClustererBase& clusterer, const std::vector<TimeSurfaceType>& time_surfaces, uint16_t chain) {
+void ClustererAFKMC2InitializerImpl(interfaces::Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces, uint16_t chain) {
 
     std::mt19937 mt{std::random_device{}()};
 
@@ -312,7 +164,7 @@ ClustererInitializerType ClustererAFKMC2Initializer(uint16_t chain) {
 
 }
 
-void ClustererRandomInitializerImpl(ClustererBase& clusterer, const std::vector<TimeSurfaceType>& time_surfaces, uint16_t width, uint16_t height) {
+void ClustererRandomInitializerImpl(interfaces::Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces, uint16_t width, uint16_t height) {
 
     std::srand((unsigned int) std::time(0));
 

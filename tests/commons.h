@@ -4,7 +4,7 @@
 #include <random>
 
 #include <cpphots/events_utils.h>
-#include <cpphots/clustering.h>
+#include <cpphots/interfaces/clustering.h>
 
 
 /**
@@ -82,7 +82,7 @@ private:
 /**
  * @brief Predictable clusterer
  */
-class MockClusterer : public cpphots::ClustererBase {
+class MockClusterer : public cpphots::interfaces::ClustererBase {
 
 public:
 

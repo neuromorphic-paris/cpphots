@@ -78,7 +78,7 @@ void perform_test_l(uint16_t sz, uint16_t r, cpphots::TimeSurfaceScalarType tau,
 
         auto event_gen = getRandomEventGenerator(sz, sz);
 
-        auto layer = cpphots::create_layer(cpphots::create_pool<cpphots::LinearTimeSurface>(1, sz, sz, r, r, tau));
+        cpphots::Layer layer(cpphots::create_pool_ptr<cpphots::LinearTimeSurface>(1, sz, sz, r, r, tau));
 
         auto start = std::chrono::system_clock::now();
         for (size_t i = 0; i < 1e6; i++) {
@@ -106,7 +106,7 @@ void perform_test_n(uint16_t sz, uint16_t r, cpphots::TimeSurfaceScalarType tau,
         auto event_gen = getRandomEventGenerator(sz, sz);
 
         cpphots::Network net;
-        net.addLayer(cpphots::create_pool<cpphots::LinearTimeSurface>(1, sz, sz, r, r, tau));
+        net.addLayer(cpphots::create_pool_ptr<cpphots::LinearTimeSurface>(1, sz, sz, r, r, tau));
 
         auto start = std::chrono::system_clock::now();
         for (size_t i = 0; i < 1e6; i++) {

@@ -8,8 +8,10 @@
 #include <iomanip>
 #include <fstream>
 
+#include <cpphots/time_surface.h>
 #include <cpphots/layer.h>
 #include <cpphots/network.h>
+#include <cpphots/clustering_cosine.h>
 
 #include "commons.h"
 
@@ -43,7 +45,7 @@ void save_results_csv(const std::string& filename, const std::vector<unsigned in
 double test_components(unsigned int num_layers, unsigned int num_events) {
 
     std::vector<cpphots::TimeSurfacePool> pools;
-    std::vector<cpphots::HOTSClusterer> clusts;
+    std::vector<cpphots::CosineClusterer> clusts;
 
     auto initializer = cpphots::ClustererRandomInitializer(5, 5);
 
@@ -51,7 +53,7 @@ double test_components(unsigned int num_layers, unsigned int num_events) {
 
     for (unsigned int l = 0; l < num_layers; l++) {
         pools.push_back(cpphots::create_pool<cpphots::LinearTimeSurface>(2, 50, 50, 2, 2, 100));
-        clusts.push_back(cpphots::HOTSClusterer(2));
+        clusts.push_back(cpphots::CosineClusterer(2));
         initializer(clusts.back(), {});
     }
 
@@ -75,16 +77,16 @@ double test_components(unsigned int num_layers, unsigned int num_events) {
 
 double test_layer(unsigned int num_layers, unsigned int num_events) {
 
-    std::vector<cpphots::LayerPtr> layers;
+    std::vector<cpphots::Layer> layers;
 
     auto initializer = cpphots::ClustererRandomInitializer(5, 5);
 
     auto evgen = getRandomEventGenerator(50, 50);
 
     for (unsigned int l = 0; l < num_layers; l++) {
-        auto layer = cpphots::create_layer_ptr(cpphots::create_pool<cpphots::LinearTimeSurface>(2, 50, 50, 2, 2, 100),
-                                               cpphots::HOTSClusterer(2));
-        initializer(*dynamic_cast<cpphots::ClustererBase*>(layer.get()), {});
+        cpphots::Layer layer(cpphots::create_pool_ptr<cpphots::LinearTimeSurface>(2, 50, 50, 2, 2, 100),
+                    new cpphots::CosineClusterer(2));
+        initializer(layer, {});
         layers.push_back(layer);
     }
 
@@ -93,7 +95,7 @@ double test_layer(unsigned int num_layers, unsigned int num_events) {
         auto ev = evgen();
 
         for (unsigned int l = 0; l < num_layers; l++) {
-            auto evts = layers[l]->process(ev, true);
+            auto evts = layers[l].process(ev, true);
             ev = evts[0];
         }
 
@@ -114,10 +116,9 @@ double test_network(unsigned int num_layers, unsigned int num_events) {
     auto evgen = getRandomEventGenerator(50, 50);
 
     for (unsigned int l = 0; l < num_layers; l++) {
-        auto layer = cpphots::create_layer_ptr(cpphots::create_pool<cpphots::LinearTimeSurface>(2, 50, 50, 2, 2, 100),
-                                               cpphots::HOTSClusterer(2));
-        initializer(*dynamic_cast<cpphots::ClustererBase*>(layer.get()), {});
-        network.addLayer(layer);
+        network.createLayer(cpphots::create_pool_ptr<cpphots::LinearTimeSurface>(2, 50, 50, 2, 2, 100),
+                            new cpphots::CosineClusterer(2));
+        initializer(network.back(), {});
     }
 
     auto start = std::chrono::system_clock::now();

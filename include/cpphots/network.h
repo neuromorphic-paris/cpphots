@@ -13,9 +13,9 @@
 #include <istream>
 #include <functional>
 
+#include "types.h"
 #include "layer.h"
-#include "events_utils.h"
-#include "interfaces.h"
+#include "interfaces/streamable.h"
 
 
 namespace cpphots {
@@ -27,7 +27,7 @@ namespace cpphots {
  * 
  * A Network owns no layers, only references to them.
  */
-class Network : public Streamable {
+class Network : public interfaces::Streamable {
 
 public:
 
@@ -41,21 +41,24 @@ public:
     /**
      * @brief Create a new layer and append it to the network
      * 
-     * Creates a new Layer by copying the components passed
+     * Creates a new Layer with the specified components.
      * 
-     * @param v layer components
+     * @param tspool time surface pool calculator
+     * @param clusterer clusterer
+     * @param remapper event remapper
+     * @param supercell supercell modifier
      */
-    template <typename... T>
-    void addLayer(T&&... v) {
-        layers.push_back(create_layer_ptr(std::forward<T>(v)...));
-    }
+    void createLayer(interfaces::TimeSurfacePoolCalculator* tspool = nullptr,
+                   interfaces::Clusterer* clusterer = nullptr,
+                   interfaces::EventRemapper* remapper = nullptr,
+                   interfaces::SuperCell* supercell = nullptr);
 
     /**
      * @brief Append a layer to the network
      * 
      * @param layer the layer to be added
      */
-    void addLayer(LayerPtr layer);
+    void addLayer(const Layer& layer);
 
     /**
      * @brief Process an event
@@ -94,32 +97,10 @@ public:
     /**
      * @brief Access a layer
      * 
-     * This function can be used to dynamically cast
-     * a layer into another type.
-     * 
-     * @tparam T type to cast the layer into
      * @param pos index of the layer to access
      * @return reference to the layer
      */
-    template <typename T = LayerBase>
-    T& getLayer(size_t pos) {
-        return dynamic_cast<T&>(*layers[pos]);
-    }
-
-    /**
-     * @brief Access a layer
-     * 
-     * This function can be used to dynamically cast
-     * a layer into another type.
-     * 
-     * @tparam T type to cast the layer into
-     * @param pos index of the layer to access
-     * @return reference to the layer
-     */
-    template <typename T = LayerBase>
-    const T& getLayer(size_t pos) const {
-        return dynamic_cast<const T&>(*layers[pos]);
-    }
+    Layer& getLayer(size_t pos);
 
     /**
      * @brief Access a layer
@@ -127,7 +108,7 @@ public:
      * @param pos index of the layer to access
      * @return reference to the layer
      */
-    LayerBase& operator[](size_t pos);
+    const Layer& getLayer(size_t pos) const;
 
     /**
      * @brief Access a layer
@@ -135,75 +116,29 @@ public:
      * @param pos index of the layer to access
      * @return reference to the layer
      */
-    const LayerBase& operator[](size_t pos) const;
+    Layer& operator[](size_t pos);
+
+    /**
+     * @brief Access a layer
+     * 
+     * @param pos index of the layer to access
+     * @return reference to the layer
+     */
+    const Layer& operator[](size_t pos) const;
 
     /**
      * @brief Access the last layer
      * 
-     * This function can be used to dynamically cast
-     * a layer into another type.
-     * 
-     * @tparam T type to cast the layer into
      * @return reference to the layer
      */
-    template <typename T = LayerBase>
-    T& back() {
-        return *(view<T>().back());
-    }
+    Layer& back();
 
     /**
      * @brief Access the last layer
      * 
-     * This function can be used to dynamically cast
-     * a layer into another type.
-     * 
-     * @tparam T type to cast the layer into
      * @return reference to the layer
      */
-    template <typename T = LayerBase>
-    const T& back() const {
-        return *(view<T>().back());
-    }
-
-    /**
-     * @brief Dynamically cast layers to a new pointer type
-     * 
-     * This function will return only pointers to layers for
-     * which the cast was successful.
-     * 
-     * @tparam T type to cast layers into
-     * @return vector of pointers to layers
-     */
-    template <typename T>
-    std::vector<T*> view() {
-        std::vector<T*> ret;
-        for (auto& l : layers) {
-            T* lp = dynamic_cast<T*>(l.get());
-            if (lp) {
-                ret.push_back(lp);
-            }
-        }
-        return ret;
-    }
-
-    /**
-     * @brief Dynamically cast all layers to a new pointer type
-     * 
-     * This function will return pointers to layers for
-     * which the cast was successful and nullptr for others,
-     * in the order that they are in the Network.
-     * 
-     * @tparam T type to cast layers into
-     * @return vector of pointers to layers
-     */
-    template <typename T>
-    std::vector<T*> viewFull() {
-        std::vector<T*> ret;
-        for (auto& l : layers) {
-            ret.push_back(dynamic_cast<T*>(l.get()));
-        }
-        return ret;
-    }
+    const Layer& back() const;
 
     /**
      * @brief Create a subnetwork of the current Network
@@ -225,21 +160,21 @@ public:
     void reset();
 
     /**
-     * @copydoc Streamable::toStream
+     * @copydoc interfaces::Streamable::toStream
      * 
      * Save all layers to the stream.
      */
     void toStream(std::ostream& out) const override;
 
     /**
-     * @copydoc Streamable::fromStream
+     * @copydoc interfaces::Streamable::fromStream
      * 
      * Load all layers to the stream.
      */
     void fromStream(std::istream& in) override;
 
 private:
-    std::vector<LayerPtr> layers;
+    std::vector<Layer> layers;
 
 };
 

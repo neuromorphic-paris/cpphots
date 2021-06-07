@@ -7,7 +7,9 @@
 
 #include <istream>
 
-#include "time_surface.h"
+#include "interfaces/time_surface.h"
+#include "interfaces/clustering.h"
+#include "interfaces/layer_modifiers.h"
 #include "layer.h"
 #include "network.h"
 
@@ -26,15 +28,36 @@ namespace cpphots {
 TimeSurfacePtr loadTSFromStream(std::istream& in);
 
 /**
- * @brief Construct a layer from an input stream
- * 
- * This function can be used to load a layer from a stream,
- * without knowing a priori the components of the layer.
+ * @brief Construct a time surface pool from an input stream
  * 
  * @param in input stream
- * @return pointer to the new layer
+ * @return pointer to the new time surface pool
  */
-LayerPtr loadLayerFromStream(std::istream& in);
+interfaces::TimeSurfacePoolCalculator* loadTSPoolFromStream(std::istream& in);
+
+/**
+ * @brief Construct a clusterer from an input stream
+ * 
+ * @param in input stream
+ * @return pointer to the new clusterer
+ */
+interfaces::Clusterer* loadClustererFromStream(std::istream& in);
+
+/**
+ * @brief Construct an event remapper from an input stream
+ * 
+ * @param in input stream
+ * @return pointer to the new event remapper
+ */
+interfaces::EventRemapper* loadRemapperFromStream(std::istream& in);
+
+/**
+ * @brief Construct a super cell modifier from an input stream
+ * 
+ * @param in input stream
+ * @return pointer to the new super cell modifier
+ */
+interfaces::SuperCell* loadSuperCellFromStream(std::istream& in);
 
 }
 

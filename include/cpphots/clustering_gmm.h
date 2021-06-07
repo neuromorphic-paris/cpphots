@@ -1,15 +1,15 @@
 /**
- * @file gmm_clustering.h
+ * @file clustering_gmm.h
  * @brief Clustering with variational gaussian mixture models
  */
-#ifndef CPPHOTS_GMM_CLUSTERING_H
-#define CPPHOTS_GMM_CLUSTERING_H
+#ifndef CPPHOTS_CLUSTERING_GMM_H
+#define CPPHOTS_CLUSTERING_GMM_H
 
 #include <memory>
 
 #include <blaze/Math.h>
 
-#include "clustering.h"
+#include "interfaces/clustering.h"
 
 
 // forward declarations from peregrine
@@ -37,7 +37,7 @@ using BlazeMatrix = blaze::DynamicMatrix<TimeSurfaceScalarType, blaze::rowMajor>
  * 
  * See https://github.com/OOub/peregrine for more details.
  */
-class GMMClusterer : public ClustererBase {
+class GMMClusterer : public interfaces::ClustererBase {
 
 public:
 
@@ -70,7 +70,7 @@ public:
     GMMClusterer(GMMType type, uint16_t clusters, uint16_t truncated_clusters, uint16_t clusters_considered, TimeSurfaceScalarType eps);
 
     /**
-     * @copydoc ClustererBase::cluster
+     * @copydoc interfaces::Clusterer::cluster
      * 
      * If learning is enabled the time surfaces will be stored in memory
      * and output will always be 0.
@@ -103,14 +103,14 @@ public:
     bool toggleLearning(bool enable = true) override;
 
     /**
-     * @copydoc Streamable::toStream
+     * @copydoc interfaces::Streamable::toStream
      * 
      * Insert parameters of the clusterer and prototypes on the stream.
      */
     void toStream(std::ostream& out) const override;
 
     /**
-     * @copydoc Streamable::fromStream
+     * @copydoc interfaces::Streamable::fromStream
      * 
      * Reads parameters and prototypes from the stream.
      */

@@ -5,7 +5,7 @@
 #ifndef CPPHOTS_PLOTS_H
 #define CPPHOTS_PLOTS_H
 
-#include "time_surface.h"
+#include "types.h"
 
 
 namespace cpphots {

@@ -9,27 +9,11 @@
 #include <istream>
 #include <memory>
 
-#include <Eigen/Dense>
-
-#include "events_utils.h"
-#include "interfaces.h"
+#include "types.h"
+#include "interfaces/time_surface.h"
 
 
 namespace cpphots {
-
-/**
- * @brief Alias type for a time surface
- */
-#ifdef CPPHOTS_DOUBLE_PRECISION
-using TimeSurfaceType = Eigen::ArrayXXd;  // using floating point instead of uint64_t for the initialization to -tau
-#else
-using TimeSurfaceType = Eigen::ArrayXXf;  // using floating point instead of uint64_t for the initialization to -tau
-#endif
-
-/**
- * @brief Alias type for time surface floating point type
- */
-using TimeSurfaceScalarType = TimeSurfaceType::Scalar;
 
 
 /**
@@ -38,7 +22,7 @@ using TimeSurfaceScalarType = TimeSurfaceType::Scalar;
  * This class keeps track of the time context for the current stream of events,
  * but it's up to the suclasses to compute the time surfaces.
  */
-class TimeSurfaceBase : public virtual Streamable {
+class TimeSurfaceBase : public virtual interfaces::TimeSurfaceCalculator {
 
 public:
 
@@ -67,143 +51,42 @@ public:
      */
     TimeSurfaceBase(uint16_t width, uint16_t height, uint16_t Rx, uint16_t Ry, TimeSurfaceScalarType tau);
 
-    /**
-     * @brief Update the time context with a new event
-     * 
-     * @param t time of the event
-     * @param x horizontal coordinate of the event
-     * @param y vertical coordinate of the event
-     */
-    void update(uint64_t t, uint16_t x, uint16_t y);
+    void update(uint64_t t, uint16_t x, uint16_t y) override;
 
-    /**
-     * @brief Update the time context with a new event
-     * 
-     * @param ev the new event
-     */
-    void update(const event& ev) {
+    void update(const event& ev) override {
         update(ev.t, ev.x, ev.y);
     }
 
-    /**
-     * @brief Compute the time surface for an event
-     * 
-     * This function does not update the time context.
-     * 
-     * A time surface is considered valid if there is a certain number of relevant events,
-     * determined using an heuristic extended from the one described in the paper.
-     * 
-     * @param t time of the event
-     * @param x horizontal coordinate of the event
-     * @param y vertical coordinate of the event
-     * @return a std::pair with the computed time surface and whether the surface is valid or not
-     */
-    virtual std::pair<TimeSurfaceType, bool> compute(uint64_t t, uint16_t x, uint16_t y) const = 0;
-
-    /**
-     * @brief Compute the time surface for an event
-     * 
-     * This function does not update the time context.
-     * 
-     * A time surface is considered valid if there is a certain number of relevant events,
-     * determined using an heuristic extended from the on described in the paper.
-     * 
-     * @param ev the event
-     * @return a std::pair with the computed time surface and whether the surface is valid or not
-     */
-    virtual std::pair<TimeSurfaceType, bool> compute(const event& ev) const = 0;
-
-    /**
-     * @brief Update the time context and compute the new surface
-     * 
-     * @param t time of the event
-     * @param x horizontal coordinate of the event
-     * @param y vertical coordinate of the event
-     * @return a std::pair with the computed time surface and whether the surface is valid or not
-     */
-    std::pair<TimeSurfaceType, bool> updateAndCompute(uint64_t t, uint16_t x, uint16_t y) {
+    std::pair<TimeSurfaceType, bool> updateAndCompute(uint64_t t, uint16_t x, uint16_t y) override {
         update(t, x, y);
         return compute(t, x, y);
     }
 
-    /**
-     * @brief Update the time context and compute the new surface
-     * 
-     * @param ev the event
-     * @return a std::pair with the computed time surface and whether the surface is valid or not
-     */
-    std::pair<TimeSurfaceType, bool> updateAndCompute(const event& ev) {
+    std::pair<TimeSurfaceType, bool> updateAndCompute(const event& ev) override {
         update(ev.t, ev.x, ev.y);
         return compute(ev.t, ev.x, ev.y);
     }
 
-    /**
-     * @brief Get the temporal context
-     * 
-     * This function returns the full temporal context (including padding)
-     * on which surfaces are computed.
-     * 
-     * You may want to use getContext() in normal circumnstances.
-     * 
-     * @return the temporal context
-     */
-    const TimeSurfaceType& getFullContext() const {
+    const TimeSurfaceType& getFullContext() const override {
         return context;
     }
 
-    /**
-     * @brief Get the temporal context
-     * 
-     * This function returns the whole temporal context on which surfaces are computed.
-     * 
-     * @return the temporal context
-     */
-    TimeSurfaceType getContext() const;
+    TimeSurfaceType getContext() const override;
 
-    /**
-     * @brief Sample and decay all temporal context
-     * 
-     * This functions applies the decay to the whole temporal context and returns it.
-     * 
-     * @param t sample time
-     * @return decayed temporal context
-     */
-    virtual TimeSurfaceType sampleContext(uint64_t t) const = 0;
+    void reset() override;
 
-    /**
-     * @brief Reset the time context
-     * 
-     * The time context is reset to -tau
-     */
-    void reset();
+    std::pair<uint16_t, uint16_t> getSize() const override;
 
-    /**
-     * @brief Returns the size of the context
-     * 
-     * @return {width, height}
-     */
-    std::pair<uint16_t, uint16_t> getSize() const;
-
-    /**
-     * @brief Get the horizontal size of the window
-     * 
-     * @return the horizontal size of the window
-     */
-    uint16_t getWx() const {
+    uint16_t getWx() const override {
         return Wx;
     }
 
-    /**
-     * @brief Get the vertical size of the window
-     * 
-     * @return the vertical size of the window
-     */
-    uint16_t getWy() const {
+    uint16_t getWy() const override {
         return Wy;
     }
 
     /**
-     * @copydoc Streamable::toStream
+     * @copydoc interfaces::Streamable::toStream
      * 
      * Does not save the current time context.
      */
@@ -259,11 +142,6 @@ protected:
     uint16_t min_events;
 
 };
-
-/**
- * @brief Alias for a pointer to a generic time surface
- */
-using TimeSurfacePtr = std::shared_ptr<TimeSurfaceBase>;
 
 
 /**
@@ -354,7 +232,6 @@ private:
 };
 
 
-
 /**
  * @brief Pool of time surface computations
  * 
@@ -362,7 +239,7 @@ private:
  * events with different polarities to the appropriate time surface.
  * 
  */
-class TimeSurfacePool : public virtual Streamable {
+class TimeSurfacePool : public virtual interfaces::TimeSurfacePoolCalculator {
 
 public:
 
@@ -403,144 +280,79 @@ public:
     }
 
     /**
-     * @brief Update the time context with a new event
+     * @brief Create pointer to a new time surface pool
      * 
-     * @param t time of the event
-     * @param x horizontal coordinate of the event
-     * @param y vertical coordinate of the event
-     * @param p polarity of the event
+     * This function creates a pool of time surfaces, Forwarding arguments to
+     * the time surface constructors.
+     * 
+     * @tparam TS time surface type
+     * @tparam TSArgs types of the time surface constructor arguments
+     * @param polarities numer of polarities (size of the pool)
+     * @param tsargs arguments forwarded to the time surface constructor
+     * @return pointer to the constructed pool
      */
-    void update(uint64_t t, uint16_t x, uint16_t y, uint16_t p) {
+    template <typename TS, typename... TSArgs>
+    static TimeSurfacePool* create_ptr(uint16_t polarities, TSArgs... tsargs) {
+
+        TimeSurfacePool* tsp = new TimeSurfacePool();
+
+        for (uint16_t i = 0; i < polarities; i++) {
+            tsp->surfaces.push_back(TimeSurfacePtr(new TS(std::forward<TSArgs>(tsargs)...)));
+        }
+
+        return tsp;
+
+    }
+
+    void update(uint64_t t, uint16_t x, uint16_t y, uint16_t p) override {
         assert_polarity(p);
         surfaces[p]->update(t, x, y);
     }
 
-    /**
-     * @brief Update the time context with a new event
-     * 
-     * @param ev the new event
-     */
-    void update(const event& ev) {
+    void update(const event& ev) override {
         update(ev.t, ev.x, ev.y, ev.p);
     }
 
-    /**
-     * @brief Compute the time surface for an event
-     * 
-     * This function does not update the time context.
-     * 
-     * A time surface is considered valid if there is a certain number of relevant events,
-     * determined using an heuristic extended from the one described in the paper.
-     * 
-     * @param t time of the event
-     * @param x horizontal coordinate of the event
-     * @param y vertical coordinate of the event
-     * @param p polarity of the event
-     * @return a std::pair with the computed time surface and whether the surface is valid or not
-     */
-    std::pair<TimeSurfaceType, bool> compute(uint64_t t, uint16_t x, uint16_t y, uint16_t p) const {
+    std::pair<TimeSurfaceType, bool> compute(uint64_t t, uint16_t x, uint16_t y, uint16_t p) const override {
         assert_polarity(p);
         return surfaces[p]->compute(t, x, y);
     }
 
-    /**
-     * @brief Compute the time surface for an event
-     * 
-     * This function does not update the time context.
-     * 
-     * A time surface is considered valid if there is a certain number of relevant events,
-     * determined using an heuristic extended from the on described in the paper.
-     * 
-     * @param ev the event
-     * @return a std::pair with the computed time surface and whether the surface is valid or not
-     */
-    std::pair<TimeSurfaceType, bool> compute(const event& ev) const {
+    std::pair<TimeSurfaceType, bool> compute(const event& ev) const override {
         return compute(ev.t, ev.x, ev.y, ev.p);
     }
 
-    /**
-     * @brief Update the time context and compute the new surface
-     * 
-     * @param t time of the event
-     * @param x horizontal coordinate of the event
-     * @param y vertical coordinate of the event
-     * @param p polarity of the event
-     * @return a std::pair with the computed time surface and whether the surface is valid or not
-     */
-    std::pair<TimeSurfaceType, bool> updateAndCompute(uint64_t t, uint16_t x, uint16_t y, uint16_t p) {
+    std::pair<TimeSurfaceType, bool> updateAndCompute(uint64_t t, uint16_t x, uint16_t y, uint16_t p) override {
         update(t, x, y, p);
         return compute(t, x, y, p);
     }
 
-    /**
-     * @brief Update the time context and compute the new surface
-     * 
-     * @param ev the event
-     * @return a std::pair with the computed time surface and whether the surface is valid or not
-     */
-    std::pair<TimeSurfaceType, bool> updateAndCompute(const event& ev){
+    std::pair<TimeSurfaceType, bool> updateAndCompute(const event& ev) override {
         update(ev.t, ev.x, ev.y, ev.p);
         return compute(ev.t, ev.x, ev.y, ev.p);
     }
 
-    /**
-     * @brief Returns the size of the context
-     * 
-     * @return {width, height}
-     */
-    std::pair<uint16_t, uint16_t> getSize() const {
+    std::pair<uint16_t, uint16_t> getSize() const override {
         return surfaces[0]->getSize();
     }
 
-    /**
-     * @brief Reset the time surfaces
-     * 
-     * This method resets the time surfaces.
-     * It should be called before every stream of events.
-     */
-    void reset() {
+    void reset() override {
         for (auto& ts : surfaces) {
             ts->reset();
         }
     }
 
-    /**
-     * @brief Access a time surface with boundaries check
-     * 
-     * This method will throw an invalid_argument exception if the index of the
-     * surfaces exceeds the number of actual time surfaces.
-     * 
-     * @param idx index of the time surface
-     * @return reference to the time surface
-     */
-    TimeSurfacePtr& getSurface(size_t idx) {
+    TimeSurfacePtr& getSurface(size_t idx) override {
         assert_polarity(idx);
         return surfaces[idx];
     }
 
-    /**
-     * @brief Access a time surface with boundaries check
-     * 
-     * This method will throw an invalid_argument exception if the index of the
-     * surfaces exceeds the number of actual time surfaces.
-     * 
-     * @param idx index of the time surface
-     * @return reference to the time surface
-     */
-    const TimeSurfacePtr& getSurface(size_t idx) const {
+    const TimeSurfacePtr& getSurface(size_t idx) const override {
         assert_polarity(idx);
         return surfaces[idx];
     }
 
-    /**
-     * @brief Sample and decay all temporal contexts from the pool
-     * 
-     * This functions applies the decay to the all temporal contexts and returns them.
-     * 
-     * @param t sample time
-     * @return vector of decayed temporal contexts
-     */
-    std::vector<TimeSurfaceType> sampleContexts(uint64_t t) {
+    std::vector<TimeSurfaceType> sampleContexts(uint64_t t) override {
         std::vector<TimeSurfaceType> ret;
         for (const auto& ts : surfaces) {
             ret.push_back(ts->sampleContext(t));
@@ -548,24 +360,19 @@ public:
         return ret;
     }
 
-    /**
-     * @brief Get the number of surfaces in the pool
-     * 
-     * @return number of surfaces
-     */
-    size_t getNumSurfaces() {
+    size_t getNumSurfaces() override {
         return surfaces.size();
     }
 
     /**
-     * @copydoc Streamable::toStream
+     * @copydoc interfaces::Streamable::toStream
      * 
      * Save paramaters for all time surfaces to the stream.
      */
     void toStream(std::ostream& out) const override;
 
     /**
-     * @copydoc Streamable::fromStream
+     * @copydoc interfaces::Streamable::fromStream
      * 
      * Load parameters for all time surfaces from the stream.
      */
@@ -595,6 +402,20 @@ private:
 template <typename TS, typename... TSArgs>
 TimeSurfacePool create_pool(uint16_t polarities, TSArgs... tsargs) {
     return TimeSurfacePool::create<TS>(polarities, std::forward<TSArgs>(tsargs)...);
+}
+
+/**
+ * @brief Shorthand for TimeSurfacePool::create_ptr
+ * 
+ * @tparam TS time surface type
+ * @tparam TSArgs types of the time surface constructor arguments
+ * @param polarities numer of polarities (size of the pool)
+ * @param tsargs arguments forwarded to the time surface constructor
+ * @return pointer to the constructed pool
+ */
+template <typename TS, typename... TSArgs>
+TimeSurfacePool* create_pool_ptr(uint16_t polarities, TSArgs... tsargs) {
+    return TimeSurfacePool::create_ptr<TS>(polarities, std::forward<TSArgs>(tsargs)...);
 }
 
 }
