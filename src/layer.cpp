@@ -1,12 +1,6 @@
 #include "cpphots/layer.h"
 
-// TODO: remove these
-#include "cpphots/time_surface.h"
-#include "cpphots/clustering_cosine.h"
-#include "cpphots/layer_modifiers.h"
-#ifdef CPPHOTS_WITH_PEREGRINE
-#include "cpphots/clustering_gmm.h"
-#endif
+#include "cpphots/load.h"
 
 
 namespace cpphots {
@@ -149,53 +143,29 @@ void Layer::toStream(std::ostream& out) const {
 
 void Layer::fromStream(std::istream& in) {
 
-    matchMetacommandOptional(in, "LAYERBEGIN");
-
     auto cmd = getNextMetacommand(in);
+
+    if (cmd == "LAYERBEGIN") {
+        cmd = getNextMetacommand(in);
+    }
+
     if (cmd == "POOL") {
-        // TODO: change these
-        delete tspool;
-        tspool = new TimeSurfacePool();
-        tspool->fromStream(in);
+        tspool = loadTSPoolFromStream(in);
     }
 
     cmd = getNextMetacommand(in);
     if (cmd == "CLUST") {
-        cmd = getNextMetacommand(in);
-        delete clusterer;
-        if (cmd == "COSINECLUSTERER") {
-            clusterer = new CosineClusterer();
-        }
-#ifdef CPPHOTS_WITH_PEREGRINE
-        else {
-            clusterer = new GMMClusterer();
-        }
-#endif
-        clusterer->fromStream(in);
+        clusterer = loadClustererFromStream(in);
     }
 
     cmd = getNextMetacommand(in);
     if (cmd == "REMAPPER") {
-        cmd = getNextMetacommand(in);
-        delete remapper;
-        if (cmd == "ARRAYLAYER") {
-            remapper = new ArrayLayer();
-        } else {
-            remapper = new SerializingLayer();
-        }
-        remapper->fromStream(in);
+        remapper = loadRemapperFromStream(in);
     }
 
     cmd = getNextMetacommand(in);
     if (cmd == "SUPERCELL") {
-        cmd = getNextMetacommand(in);
-        delete supercell;
-        if (cmd == "SUPERCELL") {
-            supercell = new SuperCell();
-        } else {
-            supercell = new SuperCellAverage();
-        }
-        supercell->fromStream(in);
+        supercell = loadSuperCellFromStream(in);
     }
 
     matchMetacommandOptional(in, "LAYEREND");
