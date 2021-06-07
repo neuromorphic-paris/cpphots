@@ -16,9 +16,49 @@ void Layer::addTSPool(interfaces::TimeSurfacePoolCalculator* tspool) {
     this->tspool = tspool;
 }
 
+interfaces::TimeSurfacePoolCalculator& Layer::getTSPool() {
+
+    if (tspool) {
+        return *tspool;
+    }
+
+    throw std::runtime_error("No time surface pool present in layer");
+
+}
+
+const interfaces::TimeSurfacePoolCalculator& Layer::getTSPool() const {
+    
+    if (tspool) {
+        return *tspool;
+    }
+
+    throw std::runtime_error("No time surface pool present in layer");
+
+}
+
 void Layer::addClusterer(interfaces::Clusterer* clusterer) {
     delete this->clusterer;
     this->clusterer = clusterer;
+}
+
+interfaces::Clusterer& Layer::getClusterer() {
+
+    if (clusterer) {
+        return *clusterer;
+    }
+
+    throw std::runtime_error("No clusterer present in layer");
+
+}
+
+const interfaces::Clusterer& Layer::getClusterer() const {
+
+    if (clusterer) {
+        return *clusterer;
+    }
+
+    throw std::runtime_error("No clusterer present in layer");
+
 }
 
 void Layer::addRemapper(interfaces::EventRemapper* remapper) {
@@ -26,9 +66,49 @@ void Layer::addRemapper(interfaces::EventRemapper* remapper) {
     this->remapper = remapper;
 }
 
+interfaces::EventRemapper& Layer::getRemapper() {
+
+    if (remapper) {
+        return *remapper;
+    }
+
+    throw std::runtime_error("No event remapper present in layer");
+
+}
+
+const interfaces::EventRemapper& Layer::getRemapper() const {
+
+    if (remapper) {
+        return *remapper;
+    }
+
+    throw std::runtime_error("No event remapper present in layer");
+
+}
+
 void Layer::addSuperCell(interfaces::SuperCell* supercell) {
     delete this->supercell;
     this->supercell = supercell;
+}
+
+interfaces::SuperCell& Layer::getSuperCell() {
+
+    if (supercell) {
+        return *supercell;
+    }
+
+    throw std::runtime_error("No supercell present in layer");
+
+}
+
+const interfaces::SuperCell& Layer::getSuperCell() const {
+
+    if (supercell) {
+        return *supercell;
+    }
+
+    throw std::runtime_error("No supercell present in layer");
+
 }
 
 Events Layer::process(uint64_t t, uint16_t x, uint16_t y, uint16_t p, bool skip_check) {

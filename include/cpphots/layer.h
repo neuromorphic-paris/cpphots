@@ -74,6 +74,24 @@ public:
     }
 
     /**
+     * @brief Get the time surfaces pool component, if present
+     * 
+     * If the component is not present, an exception will be raised.
+     * 
+     * @return the requested component
+     */
+    interfaces::TimeSurfacePoolCalculator& getTSPool();
+
+    /**
+     * @brief Get the time surfaces pool component, if present
+     * 
+     * If the component is not present, an exception will be raised.
+     * 
+     * @return the requested component
+     */
+    const interfaces::TimeSurfacePoolCalculator& getTSPool() const;
+
+    /**
      * @brief Add a clusterer
      * 
      * Old one is deleted. The Layer takes ownership of the component.
@@ -96,6 +114,24 @@ public:
         clusterer = new T(args...);
 
     }
+
+    /**
+     * @brief Get the clusterer component, if present
+     * 
+     * If the component is not present, an exception will be raised.
+     * 
+     * @return the requested component
+     */
+    interfaces::Clusterer& getClusterer();
+
+    /**
+     * @brief Get the clusterer component, if present
+     * 
+     * If the component is not present, an exception will be raised.
+     * 
+     * @return the requested component
+     */
+    const interfaces::Clusterer& getClusterer() const;
 
     /**
      * @brief Add a remapper modifier
@@ -122,6 +158,24 @@ public:
     }
 
     /**
+     * @brief Get the event remapper component, if present
+     * 
+     * If the component is not present, an exception will be raised.
+     * 
+     * @return the requested component
+     */
+    interfaces::EventRemapper& getRemapper();
+
+    /**
+     * @brief Get the event remapper component, if present
+     * 
+     * If the component is not present, an exception will be raised.
+     * 
+     * @return the requested component
+     */
+    const interfaces::EventRemapper& getRemapper() const;
+
+    /**
      * @brief Add a supercell modifier
      * 
      * Old one is deleted. The Layer takes ownership of the component.
@@ -144,6 +198,24 @@ public:
         supercell = new T(args...);
 
     }
+
+    /**
+     * @brief Get the supercell component, if present
+     * 
+     * If the component is not present, an exception will be raised.
+     * 
+     * @return the requested component
+     */
+    interfaces::SuperCell& getSuperCell();
+
+    /**
+     * @brief Get the supercell component, if present
+     * 
+     * If the component is not present, an exception will be raised.
+     * 
+     * @return the requested component
+     */
+    const interfaces::SuperCell& getSuperCell() const;
 
     /**
      * @brief Process an event and return zero or more events
