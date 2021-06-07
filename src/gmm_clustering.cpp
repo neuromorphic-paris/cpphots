@@ -264,6 +264,7 @@ bool GMMClusterer::toggleLearning(bool enable) {
 
         // delete set
         set = std::make_shared<dataset<TimeSurfaceScalarType>>();
+        last_data = 0;
 
     }
 

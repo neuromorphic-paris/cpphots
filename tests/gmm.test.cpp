@@ -66,3 +66,33 @@ TEST(GMMClustering, SaveLoad) {
     EXPECT_EQ(clusterer1.getHistogram(), clusterer2.getHistogram());
 
 }
+
+TEST(GMMClustering, Batches) {
+
+    cpphots::GMMClusterer clusterer(cpphots::GMMClusterer::U_S_GMM, 20, 5, 10, 10);
+
+    cpphots::ClustererRandomInitializer(3, 3)(clusterer, {});
+\
+    // first batch
+    clusterer.toggleLearning(true);
+
+    std::srand((unsigned int) std::time(0));
+
+    for (uint16_t i = 0; i < 500; i++) {
+        clusterer.cluster(cpphots::TimeSurfaceType::Random(3, 3) + 1.f /2.f);
+    }
+
+    clusterer.toggleLearning(false);
+
+    // second batch
+    clusterer.toggleLearning(true);
+
+    std::srand((unsigned int) std::time(0));
+
+    for (uint16_t i = 0; i < 500; i++) {
+        clusterer.cluster(cpphots::TimeSurfaceType::Random(3, 3) + 1.f /2.f);
+    }
+
+    clusterer.toggleLearning(false);
+
+}
