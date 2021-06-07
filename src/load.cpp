@@ -57,11 +57,13 @@ interfaces::Clusterer* loadClustererFromStream(std::istream& in) {
         return clust;
     }
 
+#ifdef CPPHOTS_WITH_PEREGRINE
     if (metacmd == "GMMCLUSTERER") {
         GMMClusterer* clust = new GMMClusterer();
         clust->fromStream(in);
         return clust;
     }
+#endif
 
     throw std::runtime_error("Unkown clusterer type " + metacmd);
 
