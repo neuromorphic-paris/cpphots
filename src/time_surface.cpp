@@ -143,6 +143,12 @@ std::pair<TimeSurfaceType, bool> WeightedLinearTimeSurface::compute(uint64_t t, 
 
     auto [ts, good] = LinearTimeSurface::compute(t, x, y);
 
+    // override for the full context
+    if (Rx == 0)
+        x = 0;
+    if (Ry == 0)
+        y = 0;
+
     TimeSurfaceType w = weights.block(y, x, Wy, Wx);
 
     ts = ts * w;

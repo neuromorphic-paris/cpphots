@@ -174,6 +174,23 @@ TEST(TestWeightedTimeSurface, Basic) {
 
 }
 
+TEST(TestWeightedTimeSurface, FullContext) {
+
+    size_t sz1 = 2600;
+    size_t sz2 = 20;
+
+    cpphots::TimeSurfaceType w = cpphots::TimeSurfaceType::Zero(1, sz1 + sz2);
+    w.block(0, 0, 1, sz1) = cpphots::TimeSurfaceType::Constant(1, sz1, 0.1);
+    w.block(0, sz1, 1, sz2) = cpphots::TimeSurfaceType::Constant(1, sz2, 0.9);
+
+    cpphots::WeightedLinearTimeSurface wts(sz1+sz2, 1, 0, 0, 25000., w);
+
+    auto ts = wts.updateAndCompute(2800022, 2606, 0);
+
+    EXPECT_NEAR(ts.first.sum(), 0.9f, 0.001f);
+
+}
+
 
 TEST(TestTimeSurfacePool, Processing) {
 
