@@ -129,7 +129,7 @@ void LinearTimeSurface::fromStream(std::istream& in) {
 WeightedLinearTimeSurface::WeightedLinearTimeSurface() {}
 
 WeightedLinearTimeSurface::WeightedLinearTimeSurface(uint16_t width, uint16_t height, uint16_t Rx, uint16_t Ry, TimeSurfaceScalarType tau, const TimeSurfaceType& weightmatrix)
-    :LinearTimeSurface(width, height, Rx, Ry, tau) {
+    :Clonable(width, height, Rx, Ry, tau) {
 
     if (weightmatrix.rows() != height || weightmatrix.cols() != width) {
         throw std::invalid_argument("Wrong size for time surface weight matrix, should be " + std::to_string(height) + "x" + std::to_string(width));
@@ -203,6 +203,45 @@ void WeightedLinearTimeSurface::fromStream(std::istream& in) {
 
 }
 
+TimeSurfacePool::~TimeSurfacePool() {
+    delete_surfaces();
+}
+
+TimeSurfacePool::TimeSurfacePool(const TimeSurfacePool& other) {
+
+    for (auto surf : other.surfaces) {
+        surfaces.push_back(surf->clone());
+    }
+
+}
+
+TimeSurfacePool::TimeSurfacePool(TimeSurfacePool&& other) {
+
+    surfaces = other.surfaces;
+    other.surfaces.clear();
+
+}
+
+TimeSurfacePool& TimeSurfacePool::operator=(const TimeSurfacePool& other) {
+
+    delete_surfaces();
+    for (auto surf : other.surfaces) {
+        surfaces.push_back(surf->clone());
+    }
+
+    return *this;
+
+}
+
+TimeSurfacePool& TimeSurfacePool::operator=(TimeSurfacePool&& other) {
+
+    surfaces = other.surfaces;
+    other.surfaces.clear();
+
+    return *this;
+
+}
+
 void TimeSurfacePool::toStream(std::ostream& out) const {
 
     writeMetacommand(out, "TIMESURFACEPOOL");
@@ -216,6 +255,8 @@ void TimeSurfacePool::toStream(std::ostream& out) const {
 
 void TimeSurfacePool::fromStream(std::istream& in) {
 
+    delete_surfaces();
+
     matchMetacommandOptional(in, "TIMESURFACEPOOL");
 
     surfaces.clear();
@@ -226,6 +267,13 @@ void TimeSurfacePool::fromStream(std::istream& in) {
         sur = loadTSFromStream(in);
     }
 
+}
+
+void TimeSurfacePool::delete_surfaces() {
+    for (size_t i = 0; i < surfaces.size(); i++) {
+        delete surfaces[i];
+    }
+    surfaces.clear();
 }
 
 }

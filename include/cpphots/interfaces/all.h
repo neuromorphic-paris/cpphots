@@ -9,6 +9,7 @@
 #include "layer_modifiers.h"
 #include "streamable.h"
 #include "time_surface.h"
+#include "clonable.h"
 
 
 namespace cpphots {

@@ -20,7 +20,7 @@ namespace cpphots {
  * {t, k, y, 0}
  * where k is the clustering output.
  */
-struct ArrayLayer : public interfaces::EventRemapper {
+struct ArrayLayer : public interfaces::Clonable<ArrayLayer, interfaces::EventRemapper> {
 
     event remapEvent(event ev, uint16_t k) override;
 
@@ -38,7 +38,7 @@ struct ArrayLayer : public interfaces::EventRemapper {
  * {t, w*h*k + w*y + x, 0, 0}
  * where k is the clustering output and w,h are the dimensions of the context.
  */
-class SerializingLayer : public interfaces::EventRemapper {
+class SerializingLayer : public interfaces::Clonable<SerializingLayer, interfaces::EventRemapper> {
 
 public:
 
@@ -84,7 +84,7 @@ private:
  * using cells of a fixed size, thus reducing the output dimensionality.
  * Cells may be overlapping, causing the layer to emit more than one event.
  */
-class SuperCell : public virtual interfaces::SuperCell {
+class SuperCell : public interfaces::Clonable<SuperCell, interfaces::SuperCell> {
 
 public:
 
@@ -199,7 +199,7 @@ protected:
  * 
  * If added to a layer, time surfaces will be averaged over supercells.
  */
-class SuperCellAverage : public SuperCell {
+class SuperCellAverage : public interfaces::Clonable<SuperCellAverage, SuperCell> {
 
 public:
 

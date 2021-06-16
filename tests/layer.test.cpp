@@ -400,3 +400,56 @@ TEST(TestLayer, CreateLayer) {
     }
 
 }
+
+
+class TimeLayerClone : public ::testing::Test {
+
+protected:
+
+    void SetUp() override {
+        orig_pool = cpphots::create_pool_ptr<cpphots::LinearTimeSurface>(2, 10, 10, 0, 0, 10);
+        orig_layer.addTSPool(orig_pool);
+    }
+
+    cpphots::interfaces::TimeSurfacePoolCalculator* orig_pool;
+    cpphots::Layer orig_layer;
+
+};
+
+TEST_F(TimeLayerClone, CopyConstructor) {
+
+    cpphots::Layer layer(orig_layer);
+    cpphots::interfaces::TimeSurfacePoolCalculator* pool = &layer.getTSPool();
+    EXPECT_NE(pool, nullptr);
+    EXPECT_NE(pool, orig_pool);
+
+}
+
+TEST_F(TimeLayerClone, MoveConstructor) {
+
+    cpphots::Layer layer(std::move(orig_layer));
+    cpphots::interfaces::TimeSurfacePoolCalculator* pool = &layer.getTSPool();
+    EXPECT_NE(pool, nullptr);
+    EXPECT_THROW(orig_layer.getTSPool(), std::runtime_error);
+
+}
+
+TEST_F(TimeLayerClone, CopyAssignment) {
+
+    cpphots::Layer layer;
+    layer = orig_layer;
+    cpphots::interfaces::TimeSurfacePoolCalculator* pool = &layer.getTSPool();
+    EXPECT_NE(pool, nullptr);
+    EXPECT_NE(pool, orig_pool);
+
+}
+
+TEST_F(TimeLayerClone, MoveAssignment) {
+
+    cpphots::Layer layer;
+    layer = std::move(orig_layer);
+    cpphots::interfaces::TimeSurfacePoolCalculator* pool = &layer.getTSPool();
+    EXPECT_NE(pool, nullptr);
+    EXPECT_THROW(orig_layer.getTSPool(), std::runtime_error);
+
+}

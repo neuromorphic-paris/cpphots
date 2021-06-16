@@ -274,3 +274,62 @@ TEST(TestTimeSurfacePool, FullContext) {
     EXPECT_NEAR(ctxs[1].sum(), 1.0, 0.001);
 
 }
+
+
+class TimeSurfacePoolClone : public ::testing::Test {
+
+protected:
+
+    void SetUp() override {
+        orig_pool = cpphots::create_pool<cpphots::LinearTimeSurface>(2, 10, 10, 0, 0, 10);
+        orig_ts = orig_pool.getSurface(0);
+    }
+
+    cpphots::TimeSurfacePool orig_pool;
+    cpphots::TimeSurfacePtr orig_ts;
+
+};
+
+TEST_F(TimeSurfacePoolClone, CopyConstructor) {
+
+    cpphots::TimeSurfacePool pool(orig_pool);
+    cpphots::TimeSurfacePtr ts = pool.getSurface(0);
+    EXPECT_EQ(pool.getNumSurfaces(), orig_pool.getNumSurfaces());
+    EXPECT_NE(ts, orig_ts);
+
+}
+
+TEST_F(TimeSurfacePoolClone, MoveConstructor) {
+
+    size_t n = orig_pool.getNumSurfaces();
+
+    cpphots::TimeSurfacePool pool(std::move(orig_pool));
+    cpphots::TimeSurfacePtr ts = pool.getSurface(0);
+    EXPECT_EQ(pool.getNumSurfaces(), n);
+    EXPECT_EQ(orig_pool.getNumSurfaces(), 0);
+    EXPECT_EQ(ts, orig_ts);
+
+}
+
+TEST_F(TimeSurfacePoolClone, CopyAssignment) {
+
+    cpphots::TimeSurfacePool pool;
+    pool = orig_pool;
+    cpphots::TimeSurfacePtr ts = pool.getSurface(0);
+    EXPECT_EQ(pool.getNumSurfaces(), orig_pool.getNumSurfaces());
+    EXPECT_NE(ts, orig_ts);
+
+}
+
+TEST_F(TimeSurfacePoolClone, MoveAssignment) {
+
+    size_t n = orig_pool.getNumSurfaces();
+
+    cpphots::TimeSurfacePool pool;
+    pool = std::move(orig_pool);
+    cpphots::TimeSurfacePtr ts = pool.getSurface(0);
+    EXPECT_EQ(pool.getNumSurfaces(), n);
+    EXPECT_EQ(orig_pool.getNumSurfaces(), 0);
+    EXPECT_EQ(ts, orig_ts);
+
+}

@@ -22,7 +22,7 @@ namespace cpphots {
  * This class keeps track of the time context for the current stream of events,
  * but it's up to the suclasses to compute the time surfaces.
  */
-class TimeSurfaceBase : public virtual interfaces::TimeSurfaceCalculator {
+class TimeSurfaceBase : public interfaces::TimeSurfaceCalculator {
 
 public:
 
@@ -152,11 +152,11 @@ protected:
  * 
  * The time surface has a linear activation as described in (Maro et al., 2020).
  */
-class LinearTimeSurface : public TimeSurfaceBase {
+class LinearTimeSurface : public interfaces::Clonable<LinearTimeSurface, TimeSurfaceBase> {
 
 public:
 
-    using TimeSurfaceBase::TimeSurfaceBase;
+    using Clonable::Clonable;
 
     std::pair<TimeSurfaceType, bool> compute(uint64_t t, uint16_t x, uint16_t y) const override;
 
@@ -181,7 +181,7 @@ public:
  * 
  * Output time surfaces and time context are weighted by a weight matrix.
  */
-class WeightedLinearTimeSurface : public LinearTimeSurface {
+class WeightedLinearTimeSurface : public interfaces::Clonable<WeightedLinearTimeSurface, LinearTimeSurface> {
 
 public:
 
@@ -239,7 +239,7 @@ private:
  * events with different polarities to the appropriate time surface.
  * 
  */
-class TimeSurfacePool : public virtual interfaces::TimeSurfacePoolCalculator {
+class TimeSurfacePool : public interfaces::Clonable<TimeSurfacePool, interfaces::TimeSurfacePoolCalculator> {
 
 public:
 
@@ -253,6 +253,39 @@ public:
      * See TimeSurfacePool::create.
      */
     TimeSurfacePool() {}
+
+    /**
+     * @brief Destroy the TimeSurfacePool
+     */
+    ~TimeSurfacePool();
+
+    /**
+     * @brief Copy constructor
+     * 
+     * @param other pool to be copied
+     */
+    TimeSurfacePool(const TimeSurfacePool& other);
+
+    /**
+     * @brief Move constructor
+     * 
+     * @param other pool to be copied
+     */
+    TimeSurfacePool(TimeSurfacePool&& other);
+
+    /**
+     * Copy assignment
+     * 
+     * @param other pool to be copied
+     */
+    TimeSurfacePool& operator=(const TimeSurfacePool& other);
+
+    /**
+     * Move assignment
+     * 
+     * @param other pool to be moved
+     */
+    TimeSurfacePool& operator=(TimeSurfacePool&& other);
 
     /**
      * @brief Create a time surface pool
@@ -386,6 +419,8 @@ private:
             throw std::invalid_argument("Polarity index exceeded: " + std::to_string(p) + ". Layer has only " + std::to_string(surfaces.size()) + " input polarities.");
         }
     }
+
+    void delete_surfaces();
 
 };
 

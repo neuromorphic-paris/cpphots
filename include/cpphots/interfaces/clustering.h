@@ -10,6 +10,7 @@
 
 #include "../types.h"
 #include "streamable.h"
+#include "clonable.h"
 
 
 namespace cpphots {
@@ -19,9 +20,15 @@ namespace interfaces {
 /**
  * @brief Interface for time surface clustering
  */
-class Clusterer : public virtual Streamable {
+class Clusterer : public virtual Streamable, public ClonableBase<Clusterer> {
 
 public:
+
+    /**
+     * @brief Destroy the Clusterer object
+     */
+    ~Clusterer() {}
+
     /**
      * @brief Performs clustering
      * 

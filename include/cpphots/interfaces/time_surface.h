@@ -11,6 +11,7 @@
 
 #include "../types.h"
 #include "streamable.h"
+#include "clonable.h"
 
 
 namespace cpphots {
@@ -20,9 +21,14 @@ namespace interfaces {
 /**
  * @brief Interface for that can compute time surfaces
  */
-class TimeSurfaceCalculator : public virtual interfaces::Streamable {
+class TimeSurfaceCalculator : public virtual interfaces::Streamable, public ClonableBase<TimeSurfaceCalculator> {
 
 public:
+
+    /**
+     * @brief Destroy the TimeSurfaceCalculator
+     */
+    virtual ~TimeSurfaceCalculator() {}
 
     /**
      * @brief Update the time context with a new event
@@ -152,7 +158,7 @@ public:
 /**
  * @brief Alias for a pointer to a generic time surface
  */
-using TimeSurfacePtr = std::shared_ptr<interfaces::TimeSurfaceCalculator>;
+using TimeSurfacePtr = interfaces::TimeSurfaceCalculator*;
 
 
 namespace interfaces {
@@ -164,9 +170,15 @@ namespace interfaces {
  * events with different polarities to the appropriate time surface.
  * 
  */
-class TimeSurfacePoolCalculator : public virtual interfaces::Streamable {
+class TimeSurfacePoolCalculator : public virtual interfaces::Streamable, public ClonableBase<TimeSurfacePoolCalculator> {
 
 public:
+
+    /**
+     * @brief Destroy the TimeSurfacePoolCalculator
+     * 
+     */
+    virtual ~TimeSurfacePoolCalculator() {}
 
     /**
      * @brief Update the time context with a new event

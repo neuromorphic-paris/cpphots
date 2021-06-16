@@ -7,6 +7,7 @@
 
 #include "../types.h"
 #include "streamable.h"
+#include "clonable.h"
 
 
 namespace cpphots{
@@ -19,7 +20,12 @@ namespace interfaces {
  * A remapper usually changes the coordinates or the polarity of an event,
  * withoud modifying the event timestamp.
  */
-struct EventRemapper : public virtual Streamable {
+struct EventRemapper : public virtual Streamable, public ClonableBase<EventRemapper> {
+
+    /**
+     * @brief Destroy the EventRemapper object
+     */
+    ~EventRemapper() {}
 
     /**
      * @brief Remap event
@@ -42,9 +48,14 @@ struct EventRemapper : public virtual Streamable {
  * 
  * Modifiers can also average time surfaces from the same cell.
  */
-class SuperCell : public virtual Streamable {
+class SuperCell : public virtual Streamable, public ClonableBase<SuperCell> {
 
 public:
+
+    /**
+     * @brief Destroy the SuperCell object
+     */
+    ~SuperCell() {}
 
     /**
      * @brief Find coordinates of cells that are over certain coordinates

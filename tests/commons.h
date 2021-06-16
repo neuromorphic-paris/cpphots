@@ -82,7 +82,7 @@ private:
 /**
  * @brief Predictable clusterer
  */
-class MockClusterer : public cpphots::interfaces::ClustererBase {
+class MockClusterer : public cpphots::interfaces::Clonable<MockClusterer, cpphots::interfaces::ClustererBase> {
 
 public:
 

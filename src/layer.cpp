@@ -11,6 +11,106 @@ Layer::Layer(interfaces::TimeSurfacePoolCalculator* tspool,
              interfaces::SuperCell* supercell)
           :tspool(tspool), clusterer(clusterer), remapper(remapper), supercell(supercell) {}
 
+Layer::~Layer() {
+    delete_components();
+}
+
+Layer::Layer(const Layer& other) {
+
+    if (other.tspool) {
+        tspool = other.tspool->clone();
+    } else {
+        tspool = nullptr;
+    }
+
+    if (other.clusterer) {
+        clusterer = other.clusterer->clone();
+    } else {
+        clusterer = nullptr;
+    }
+
+    if (other.remapper) {
+        remapper = other.remapper->clone();
+    } else {
+        remapper = nullptr;
+    }
+
+    if (other.supercell) {
+        supercell = other.supercell->clone();
+    } else {
+        supercell = nullptr;
+    }
+
+}
+
+Layer::Layer(Layer&& other) {
+
+    tspool = other.tspool;
+    other.tspool = nullptr;
+
+    clusterer = other.clusterer;
+    other.clusterer = nullptr;
+
+    remapper = other.remapper;
+    other.remapper = nullptr;
+
+    supercell = other.supercell;
+    other.supercell = nullptr;
+
+}
+
+Layer& Layer::operator=(const Layer& other) {
+
+    delete_components();
+
+    if (other.tspool) {
+        tspool = other.tspool->clone();
+    } else {
+        tspool = nullptr;
+    }
+
+    if (other.clusterer) {
+        clusterer = other.clusterer->clone();
+    } else {
+        clusterer = nullptr;
+    }
+
+    if (other.remapper) {
+        remapper = other.remapper->clone();
+    } else {
+        remapper = nullptr;
+    }
+
+    if (other.supercell) {
+        supercell = other.supercell->clone();
+    } else {
+        supercell = nullptr;
+    }
+
+    return *this;
+
+}
+
+Layer& Layer::operator=(Layer&& other) {
+
+    delete_components();
+
+    tspool = other.tspool;
+    other.tspool = nullptr;
+
+    clusterer = other.clusterer;
+    other.clusterer = nullptr;
+
+    remapper = other.remapper;
+    other.remapper = nullptr;
+
+    supercell = other.supercell;
+    other.supercell = nullptr;
+
+    return *this;
+
+}
+
 void Layer::addTSPool(interfaces::TimeSurfacePoolCalculator* tspool) {
     delete this->tspool;
     this->tspool = tspool;
@@ -223,6 +323,8 @@ void Layer::toStream(std::ostream& out) const {
 
 void Layer::fromStream(std::istream& in) {
 
+    delete_components();
+
     auto cmd = getNextMetacommand(in);
 
     if (cmd == "LAYERBEGIN") {
@@ -249,6 +351,26 @@ void Layer::fromStream(std::istream& in) {
     }
 
     matchMetacommandOptional(in, "LAYEREND");
+
+}
+
+Layer* Layer::clone() const {
+    return new Layer(*this);
+}
+
+void Layer::delete_components() {
+
+    delete tspool;
+    tspool = nullptr;
+
+    delete clusterer;
+    clusterer = nullptr;
+
+    delete remapper;
+    remapper = nullptr;
+
+    delete supercell;
+    supercell = nullptr;
 
 }
 

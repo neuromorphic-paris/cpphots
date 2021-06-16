@@ -50,6 +50,39 @@ public:
           interfaces::SuperCell* supercell = nullptr);
 
     /**
+     * @brief Destroy the Layer object, deleting its components
+     */
+    ~Layer();
+
+    /**
+     * Copy constructor
+     * 
+     * @param other layer to be copied
+     */
+    Layer(const Layer& other);
+
+    /**
+     * Move constructor
+     * 
+     * @param other objelayerct to be moved
+     */
+    Layer(Layer&& other);
+
+    /**
+     * Copy assignment
+     * 
+     * @param other layer to be copied
+     */
+    Layer& operator=(const Layer& other);
+
+    /**
+     * Move assignment
+     * 
+     * @param other layer to be moved
+     */
+    Layer& operator=(Layer&& other);
+
+    /**
      * @brief Add a time surfaces pool calculator
      * 
      * Old one is deleted. The Layer takes ownership of the component.
@@ -347,11 +380,15 @@ public:
      */
     void fromStream(std::istream& in) override;
 
+    Layer* clone() const override;
+
 private:
     interfaces::TimeSurfacePoolCalculator* tspool = nullptr;
     interfaces::Clusterer* clusterer = nullptr;
     interfaces::EventRemapper* remapper = nullptr;
     interfaces::SuperCell* supercell = nullptr;
+
+    void delete_components();
 
 };
 
