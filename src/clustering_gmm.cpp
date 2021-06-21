@@ -240,17 +240,20 @@ bool GMMClusterer::toggleLearning(bool enable) {
     if (!enable) {
         // create algorithm
 
+        // resize set
+        set->data.resize(last_data, set->data.columns());
+
         set->weight = blaze::uniform<blaze::rowVector>(set->data.rows(), 1.0);
         set->shape = {set->data.rows(), set->data.columns()};
 
         switch (type) {
 
         case S_GMM:
-            algo = std::make_shared<S_gmm<TimeSurfaceScalarType>>(*set, mean, truncated_clusters, 1, 1.0, clusters_considered, false);
+            algo = std::make_shared<S_gmm<TimeSurfaceScalarType>>(*set, mean, truncated_clusters, 1, 1.0, clusters_considered, 0);
             break;
 
         case U_S_GMM:
-            algo = std::make_shared<u_S_gmm<TimeSurfaceScalarType>>(*set, mean, truncated_clusters, 1, 1.0, clusters_considered, false);
+            algo = std::make_shared<u_S_gmm<TimeSurfaceScalarType>>(*set, mean, truncated_clusters, 1, 1.0, clusters_considered, 0);
             break;
 
         default:
@@ -274,11 +277,11 @@ bool GMMClusterer::toggleLearning(bool enable) {
 
 void GMMClusterer::fit() {
 
-    TimeSurfaceScalarType prv;
-    TimeSurfaceScalarType cur;
+    TimeSurfaceScalarType prv = 0.0;
+    TimeSurfaceScalarType cur = 0.0;
 
     int iterations = 0;
-    TimeSurfaceScalarType criterion_scaling;
+    TimeSurfaceScalarType criterion_scaling = 1.0;
 
     while (true) {
 
@@ -286,9 +289,9 @@ void GMMClusterer::fit() {
         ++iterations;
 
         cur = algo->get_free_energy();
-        if (iterations == 2) {
-            criterion_scaling = std::abs((cur - prv));
-        }
+        // if (iterations == 2) {
+        //     criterion_scaling = std::abs((cur - prv));
+        // }
 
         if (eps < 1) {
             if (iterations > 1) {
@@ -310,17 +313,6 @@ void GMMClusterer::fit() {
 }
 
 uint16_t GMMClusterer::predict(const BlazeVector& vec, int top_k) {
-
-    blaze::DynamicMatrix<int,blaze::rowMajor> labels;
-
-    blaze::DynamicMatrix<TimeSurfaceScalarType, blaze::rowMajor> inv_covariance;
-
-    // invert covariance matrix via cholesky if using a tied covariance model
-    if (!blaze::isEmpty(algo->get_covariance())) {
-        inv_covariance = algo->get_covariance();
-        blaze::invert<blaze::byLLH>(inv_covariance);
-    }
-
 
     size_t M = mean.rows();
     size_t D = mean.columns();
@@ -362,6 +354,14 @@ uint16_t GMMClusterer::predict(const BlazeVector& vec, int top_k) {
     } else if (blaze::isEmpty(algo->get_alpha()) && !blaze::isEmpty(algo->get_covariance())) {
 
         // condition for algorithms with uniform priors and tied covariances
+        blaze::DynamicMatrix<TimeSurfaceScalarType, blaze::rowMajor> inv_covariance;
+
+        // invert covariance matrix via cholesky if using a tied covariance model
+        if (!blaze::isEmpty(algo->get_covariance())) {
+            inv_covariance = algo->get_covariance();
+            blaze::invert<blaze::byLLH>(inv_covariance);
+        }
+
         BlazeVector errors(M);
         for (int m = 0; m < M; m++) {
             blaze::DynamicVector<TimeSurfaceScalarType, blaze::rowVector> error = vec - blaze::row(mean, m);

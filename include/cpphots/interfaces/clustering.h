@@ -112,9 +112,9 @@ class ClustererBase : public virtual Clusterer {
 
 public:
 
-    std::vector<uint32_t> getHistogram() const;
+    std::vector<uint32_t> getHistogram() const override;
 
-    void reset();
+    void reset() override;
 
 protected:
     /**

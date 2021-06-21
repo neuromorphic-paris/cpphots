@@ -174,13 +174,13 @@ std::tuple<double, double, double> test_training(const std::string& folder, bool
     cpphots::Network network;
     network.createLayer(cpphots::create_pool_ptr<cpphots::LinearTimeSurface>(2, 32, 32, 2, 2, 1000),
 #ifdef CPPHOTS_WITH_PEREGRINE
-                        new cpphots::GMMClusterer(cpphots::GMMClusterer::S_GMM, 16, 5, 10, 20));
+                        new cpphots::GMMClusterer(cpphots::GMMClusterer::U_S_GMM, 16, 5, 10, 0.001));
 #else
                         new cpphots::CosineClusterer(16));
 #endif
     network.createLayer(cpphots::create_pool_ptr<cpphots::LinearTimeSurface>(16, 32, 32, 4, 4, 5000),
 #ifdef CPPHOTS_WITH_PEREGRINE
-                        new cpphots::GMMClusterer(cpphots::GMMClusterer::S_GMM, 32, 5, 12, 20));
+                        new cpphots::GMMClusterer(cpphots::GMMClusterer::U_S_GMM, 32, 5, 12, 0.001));
 #else
                         new cpphots::CosineClusterer(32));
 #endif
@@ -263,7 +263,7 @@ int main(int argc, char* argv[]) {
 
     } else {
 
-        auto res = test_training(datafolder, true, cpphots::ClustererPlusPlusInitializer);
+        auto res = test_training(datafolder, true, cpphots::ClustererAFKMC2Initializer(3));
         std::cout << "acc1 = " << std::get<0>(res) << ", acc2 = " << std::get<1>(res) << ", acc3 = " << std::get<2>(res) << std::endl;
 
     }
