@@ -279,13 +279,14 @@ void GMMClusterer::fit() {
 
     TimeSurfaceScalarType prv = 0.0;
     TimeSurfaceScalarType cur = 0.0;
+    TimeSurfaceScalarType change = 0.0;
 
     int iterations = 0;
     TimeSurfaceScalarType criterion_scaling = 1.0;
 
     while (true) {
 
-        algo->em(iterations, 0);
+        algo->em(iterations, 0, eps, change);
         ++iterations;
 
         cur = algo->get_free_energy();
@@ -293,10 +294,11 @@ void GMMClusterer::fit() {
         //     criterion_scaling = std::abs((cur - prv));
         // }
 
+        change = std::abs((cur - prv) / cur);
         if (eps < 1) {
             if (iterations > 1) {
                 // free energy convergence criterion
-                if ((std::abs((cur - prv) / cur) < eps * criterion_scaling)) {
+                if (change < eps * criterion_scaling) {
                     break;
                 }
             }
