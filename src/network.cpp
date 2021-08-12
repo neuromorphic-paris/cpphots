@@ -132,4 +132,28 @@ void Network::fromStream(std::istream& in) {
 
 }
 
+Network::iterator Network::begin() noexcept {
+    return layers.begin();
+}
+
+Network::const_iterator Network::begin() const noexcept {
+    return layers.begin();
+}
+
+Network::const_iterator Network::cbegin() const noexcept {
+    return layers.cbegin();
+}
+
+Network::iterator Network::end() noexcept {
+    return layers.end();
+}
+
+Network::const_iterator Network::end() const noexcept {
+    return layers.end();
+}
+
+Network::const_iterator Network::cend() const noexcept {
+    return layers.cend();
+}
+
 }

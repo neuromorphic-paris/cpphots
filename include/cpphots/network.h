@@ -173,6 +173,58 @@ public:
      */
     void fromStream(std::istream& in) override;
 
+    /**
+     * @brief Iterator over layers
+     */
+    using iterator = std::vector<Layer>::iterator;
+
+    /**
+     * @brief Const iterator over layers
+     */
+    using const_iterator = std::vector<Layer>::const_iterator;
+
+    /**
+     * @brief Returns an iterator to the first layer
+     * 
+     * @return iterator
+     */
+    iterator begin() noexcept;
+
+    /**
+     * @brief Returns an iterator to the first layer
+     * 
+     * @return iterator
+     */
+    const_iterator begin() const noexcept;
+
+    /**
+     * @brief Returns an iterator to the first layer
+     * 
+     * @return iterator
+     */
+    const_iterator cbegin() const noexcept;
+
+    /**
+     * @brief Returns an iterator to the layer following the last layer
+     * 
+     * @return iterator
+     */
+    iterator end() noexcept;
+
+    /**
+     * @brief Returns an iterator to the layer following the last layer
+     * 
+     * @return iterator
+     */
+    const_iterator end() const noexcept;
+
+    /**
+     * @brief Returns an iterator to the layer following the last layer
+     * 
+     * @return iterator
+     */
+    const_iterator cend() const noexcept;
+
 private:
     std::vector<Layer> layers;
 
