@@ -34,6 +34,7 @@ add_new_test(test_layer layer.test.cpp)
 add_new_test(test_network network.test.cpp)
 add_new_test(test_saveload saveload.test.cpp)
 add_new_test(test_layer_modifiers layer_modifiers.test.cpp)
+add_new_test(test_run run.test.cpp)
 
 if(WITH_PEREGRINE)
     add_new_test(test_gmm gmm.test.cpp)

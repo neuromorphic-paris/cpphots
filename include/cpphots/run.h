@@ -29,13 +29,16 @@ namespace cpphots {
  * @tparam P processor type
  * @param processor the processor
  * @param events sequence of events
+ * @param reset true if processor.reset() should be called
  * @param skip_check if true consider all events as valid
  * @return events emitted by the processor
  */
 template<typename P>
-Events process(P& processor, const Events& events, bool skip_check = false) {
+Events process(P& processor, const Events& events, bool reset = true, bool skip_check = false) {
 
-    processor.reset();
+    if (reset) {
+        processor.reset();
+    }
 
     Events ret;
     for (const auto& ev : events) {
@@ -60,16 +63,17 @@ Events process(P& processor, const Events& events, bool skip_check = false) {
  * @tparam P processor type
  * @param processor the processor
  * @param events sequences of events
+ * @param reset true if processor.reset() should be called
  * @param skip_check if true consider all events as valid
  * @return corresponding sequences of events emitted by the processor
  */
 template<typename P>
-std::vector<Events> process(P& processor, const std::vector<Events>& events, bool skip_check = false) {
+std::vector<Events> process(P& processor, const std::vector<Events>& events, bool reset = true, bool skip_check = false) {
 
     std::vector<Events> ret;
 
     for (const auto& evts : events) {
-        ret.push_back(process(processor, evts, skip_check));
+        ret.push_back(process(processor, evts, reset, skip_check));
     }
 
     return ret;
@@ -82,8 +86,6 @@ std::vector<Events> process(P& processor, const std::vector<Events>& events, boo
  * 
  * This function initializes the prototypes of each layer and then train the layer with the events,
  * in a layer-by-layer sequence.
- * 
- * The layers in the network must inherit from both Classifier and TimeSurfacePool.
  * 
  * @param network the newtork
  * @param training_events events
@@ -98,8 +100,6 @@ Events train(Network& network, Events training_events, const ClustererInitialize
  * 
  * This function initializes the prototypes of each layer and then train the layer with the events,
  * in a layer-by-layer sequence.
- * 
- * The layers in the network must inherit from both Classifier and TimeSurfacePool.
  * 
  * @param network the newtork
  * @param training_events sequences of events
