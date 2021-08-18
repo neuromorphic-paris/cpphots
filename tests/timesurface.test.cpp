@@ -62,6 +62,18 @@ TEST(TestTimeSurface, Processing) {
 
 }
 
+#ifdef CPPHOTS_ASSERTS
+TEST(TestTimeSurface, WrongCoordinates) {
+
+    cpphots::LinearTimeSurface ts(20, 10, 2, 2, 10);
+
+    EXPECT_DEATH({
+        ts.compute({0, 30, 30, 0});
+    }, "Assertion");
+
+}
+#endif
+
 TEST(TestTimeSurface, FullContext) {
 
     {
@@ -274,6 +286,18 @@ TEST(TestTimeSurfacePool, FullContext) {
     EXPECT_NEAR(ctxs[1].sum(), 1.0, 0.001);
 
 }
+
+#ifdef CPPHOTS_ASSERTS
+TEST(TestTimeSurfacePool, WrongPolarity) {
+
+    auto tsp = cpphots::create_pool<cpphots::LinearTimeSurface>(2, 10, 10, 0, 0, 10);
+
+    EXPECT_DEATH({
+        tsp.updateAndCompute({0, 0, 0, 2});
+    }, "Assertion");
+
+}
+#endif
 
 
 class TimeSurfacePoolClone : public ::testing::Test {

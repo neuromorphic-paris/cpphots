@@ -213,9 +213,7 @@ const interfaces::SuperCell& Layer::getSuperCell() const {
 
 Events Layer::process(uint64_t t, uint16_t x, uint16_t y, uint16_t p, bool skip_check) {
 
-    if (!tspool) {
-        throw std::runtime_error("Pool must be set in order to process events");
-    }
+    cpphots_assert(tspool != nullptr);
 
     auto [surface, good] = tspool->updateAndCompute(t, x, y, p);
 
@@ -282,7 +280,8 @@ bool Layer::canCluster() const {
 
 void Layer::reset() {
     tspool->reset();
-    clusterer->reset();
+    if (clusterer)
+        clusterer->reset();
 }
 
 void Layer::toStream(std::ostream& out) const {

@@ -16,7 +16,7 @@ before_install:
 before_script:
   # configure
   - mkdir build && cd build
-  - cmake -DBUILD_TEST=ON -DBUILD_EXAMPLES=ON ..
+  - cmake -DBUILD_TEST=ON -DBUILD_EXAMPLES=ON -DCMAKE_BUILD_TYPE=Debug ..
 
 script:
   # build

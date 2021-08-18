@@ -325,17 +325,27 @@ TEST(TestLayer, SkipValidityCheck) {
 }
 
 
-TEST(TestLayer, WrongPolarity) {
+#ifdef CPPHOTS_ASSERTS
+TEST(TestLayer, AssertPool) {
 
-    cpphots::Layer layer(cpphots::create_pool_ptr<cpphots::LinearTimeSurface>(2, 32, 32, 2, 2, 1000),
-                         new cpphots::CosineClusterer(8));
+    cpphots::Layer layer;
 
-    auto initializer = cpphots::ClustererRandomInitializer(5, 5);
-    initializer(layer, {});
-
-    ASSERT_THROW(layer.process({0, 0, 0, 2}), std::invalid_argument);
+    ASSERT_DEATH({
+        layer.process({0, 0, 0, 0});
+    }, "Assertion");
 
 }
+
+TEST(TestLayer, AssertClustering) {
+
+    cpphots::Layer layer(cpphots::create_pool_ptr<cpphots::LinearTimeSurface>(2, 32, 32, 2, 2, 1000));
+
+    ASSERT_DEATH({
+        layer.getNumClusters();
+    }, "Assertion");
+
+}
+#endif
 
 
 TEST(TestLayer, TSAccess) {

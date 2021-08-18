@@ -9,6 +9,7 @@
 #include <istream>
 #include <memory>
 
+#include "assert.h"
 #include "types.h"
 #include "interfaces/time_surface.h"
 
@@ -338,7 +339,7 @@ public:
     }
 
     void update(uint64_t t, uint16_t x, uint16_t y, uint16_t p) override {
-        assert_polarity(p);
+        cpphots_assert(p < surfaces.size());
         surfaces[p]->update(t, x, y);
     }
 
@@ -347,7 +348,7 @@ public:
     }
 
     std::pair<TimeSurfaceType, bool> compute(uint64_t t, uint16_t x, uint16_t y, uint16_t p) const override {
-        assert_polarity(p);
+        cpphots_assert(p < surfaces.size());
         return surfaces[p]->compute(t, x, y);
     }
 
@@ -376,12 +377,12 @@ public:
     }
 
     TimeSurfacePtr& getSurface(size_t idx) override {
-        assert_polarity(idx);
+        cpphots_assert(idx < surfaces.size());
         return surfaces[idx];
     }
 
     const TimeSurfacePtr& getSurface(size_t idx) const override {
-        assert_polarity(idx);
+        cpphots_assert(idx < surfaces.size());
         return surfaces[idx];
     }
 
@@ -413,12 +414,6 @@ public:
 
 private:
     std::vector<TimeSurfacePtr> surfaces;
-
-    void assert_polarity(uint16_t p) const {
-        if (p >= surfaces.size()) {
-            throw std::invalid_argument("Polarity index exceeded: " + std::to_string(p) + ". Layer has only " + std::to_string(surfaces.size()) + " input polarities.");
-        }
-    }
 
     void delete_surfaces();
 

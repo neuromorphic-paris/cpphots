@@ -46,6 +46,13 @@ option(BUILD_PLOTS "Build plots utilities" ON)
 # option for precision
 option(DOUBLE_PRECISION "Enable double precision" OFF)
 
+# option for asserts, enabled by default in debug mode
+option(ENABLE_ASSERTS "Enable asserts" OFF)
+message(STATUS ${CMAKE_BUILD_TYPE})
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+  set(ENABLE_ASSERTS ON)
+endif()
+
 # option for peregrine
 option(WITH_PEREGRINE "Enable GMM support" OFF)
 

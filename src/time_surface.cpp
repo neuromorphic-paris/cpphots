@@ -36,6 +36,8 @@ TimeSurfaceBase::TimeSurfaceBase(uint16_t width, uint16_t height, uint16_t Rx, u
 
 void TimeSurfaceBase::update(uint64_t t, uint16_t x, uint16_t y) {
 
+    cpphots_assert(x < width && y < height);
+
     context(y+Ry, x+Rx) = t;
 
 }
@@ -82,6 +84,8 @@ void TimeSurfaceBase::fromStream(std::istream& in) {
 
 
 std::pair<TimeSurfaceType, bool> LinearTimeSurface::compute(uint64_t t, uint16_t x, uint16_t y) const {
+
+    cpphots_assert(x < width && y < height);
 
     // override for the full context
     if (Rx == 0)
@@ -140,6 +144,8 @@ WeightedLinearTimeSurface::WeightedLinearTimeSurface(uint16_t width, uint16_t he
 }
 
 std::pair<TimeSurfaceType, bool> WeightedLinearTimeSurface::compute(uint64_t t, uint16_t x, uint16_t y) const {
+
+    cpphots_assert(x < width && y < height);
 
     auto [ts, good] = LinearTimeSurface::compute(t, x, y);
 

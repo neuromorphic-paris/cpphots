@@ -5,6 +5,7 @@
 #ifndef CPPHOTS_LAYER_H
 #define CPPHOTS_LAYER_H
 
+#include "assert.h"
 #include "types.h"
 #include "clustering_utils.h"
 #include "interfaces/all.h"
@@ -328,34 +329,42 @@ public:
 
     // interfaces::Clusterer
     uint16_t cluster(const TimeSurfaceType& surface) override {
+        cpphots_assert(clusterer != nullptr);
         return clusterer->cluster(surface);
     }
 
     uint16_t getNumClusters() const override {
+        cpphots_assert(clusterer != nullptr);
         return clusterer->getNumClusters();
     }
 
     void addPrototype(const TimeSurfaceType& proto) override {
+        cpphots_assert(clusterer != nullptr);
         clusterer->addPrototype(proto);
     }
 
     std::vector<TimeSurfaceType> getPrototypes() const override {
+        cpphots_assert(clusterer != nullptr);
         return clusterer->getPrototypes();
     }
 
     void clearPrototypes() override {
+        cpphots_assert(clusterer != nullptr);
         return clusterer->clearPrototypes();
     }
 
     bool isInitialized() const override {
+        cpphots_assert(clusterer != nullptr);
         return clusterer->isInitialized();
     }
 
-    bool toggleLearning(bool enable = true) override {
+    bool toggleLearning(bool enable = true) override {\
+        cpphots_assert(clusterer != nullptr);
         return clusterer->toggleLearning(enable);
     }
 
     std::vector<uint32_t> getHistogram() const override {
+        cpphots_assert(clusterer != nullptr);
         return clusterer->getHistogram();
     }
 

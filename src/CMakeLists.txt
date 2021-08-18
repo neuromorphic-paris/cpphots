@@ -12,7 +12,8 @@ set(CPPHOTS_SOURCES
     clustering_utils.cpp
     clustering_cosine.cpp
     layer_modifiers.cpp
-    load.cpp)
+    load.cpp
+    assert.cpp)
 
 if (BUILD_PLOTS)
     file(READ ../python/tsplot.py PYTHON_PLOT_CODE)
@@ -42,8 +43,13 @@ target_include_directories(cpphots PRIVATE "${sepia_SOURCE_DIR}/source")
 
 target_link_libraries(cpphots pthread Eigen3::Eigen)
 
+# add flags
 if (DOUBLE_PRECISION)
     target_compile_definitions(cpphots PUBLIC CPPHOTS_DOUBLE_PRECISION)
+endif()
+
+if (ENABLE_ASSERTS)
+    target_compile_definitions(cpphots PUBLIC CPPHOTS_ASSERTS)
 endif()
 
 if (BUILD_PLOTS)
