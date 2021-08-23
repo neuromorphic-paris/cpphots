@@ -41,7 +41,8 @@ def plot_ts_2d(ts, ax=None, color=None):
     x = np.arange(ts.shape[0])
     y = np.arange(ts.shape[1])
     x, y, = np.meshgrid(x, y)
-    ax.plot_surface(x, y, ts, color=color)  # , cmap=cm.coolwarm, linewidth=0, antialiased=False)
+    # we need to transpose the ts, otherwise it will not work when is not sqared
+    ax.plot_surface(x, y, ts.transpose(), color=color)
     ax.set_xlabel("x")
     ax.set_ylabel("y")
     ax.set_zlim(0.0, 1.0)
