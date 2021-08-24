@@ -137,7 +137,7 @@ class ControlToolbar(QtWidgets.QToolBar):
 
 class TSDialog(QtWidgets.QDialog):
     """
-    Dialog to ask the user the shape of the time surfaces
+    Dialog to ask the user information on the time surfaces
     """
 
     def __init__(self, parent=None):
@@ -160,6 +160,21 @@ class TSDialog(QtWidgets.QDialog):
         spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
         shapelayout.addWidget(spacer)
 
+        # times
+        self._times_cb = QtWidgets.QCheckBox("First column are times")
+
+        # delimiter
+        seplayout = QtWidgets.QHBoxLayout()
+        seplayout.addWidget(QtWidgets.QLabel("Delimiter: "))
+
+        self._sep_le = QtWidgets.QLineEdit("", parent=self)
+        self._sep_le.setMaximumWidth(40)
+        seplayout.addWidget(self._sep_le)
+
+        spacer = QtWidgets.QWidget()
+        spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
+        seplayout.addWidget(spacer)
+
         # buttons
         btnlayout = QtWidgets.QHBoxLayout()
         spacer = QtWidgets.QWidget()
@@ -174,6 +189,8 @@ class TSDialog(QtWidgets.QDialog):
         self.setLayout(QtWidgets.QVBoxLayout())
         self.layout().addWidget(QtWidgets.QLabel("Please enter time surfaces shape:"))
         self.layout().addLayout(shapelayout)
+        self.layout().addLayout(seplayout)
+        self.layout().addWidget(self._times_cb)
         self.layout().addLayout(btnlayout)
 
     def get_shape(self):
@@ -187,16 +204,36 @@ class TSDialog(QtWidgets.QDialog):
             return None
         return (r, c)
 
+    def get_hastimes(self):
+        """
+        Return true if the user has specified that the times are in the file
+        """
+        return self._times_cb.isChecked()
+
+    def get_delimiter(self):
+        """
+        Return the delimiter specified by the user
+        """
+        if self._sep_le.text() == "":
+            return None
+        return self._sep_le.text()
+
 
 class TSVisualizer(QtWidgets.QMainWindow):
     """
     Main window doing the plots
     """
 
-    def __init__(self, datapath=None, subplots=(2, 2), shape=None):
+    def __init__(self, datapath=None, subplots=(2, 2), shape=None, hastimes=False, delimiter=None):
         super().__init__()
 
         self._ctrltb = None
+
+        self._data = None
+        self._ndata = 0
+        self._x = None
+        self._y = None
+        self._times = None
 
         # create central widget and layout
         self._main = QtWidgets.QWidget()
@@ -207,7 +244,7 @@ class TSVisualizer(QtWidgets.QMainWindow):
         self._canvas = FigureCanvas(Figure())  # figsize=(5, 3)))
         layout.addWidget(self._canvas)
 
-        self.change_data(datapath, replot=False, shape=shape)
+        self.change_data(datapath, replot=False, shape=shape, hastimes=hastimes, delimiter=delimiter)
 
         self.rearrange_plots(subplots)
 
@@ -246,7 +283,7 @@ class TSVisualizer(QtWidgets.QMainWindow):
         if datapath != "":
             self.change_data(datapath, replot=True)
 
-    def change_data(self, datapath, shape=None, replot=False):
+    def change_data(self, datapath, shape=None, replot=False, hastimes=False, delimiter=None):
         """
         Change data displayed
 
@@ -257,6 +294,7 @@ class TSVisualizer(QtWidgets.QMainWindow):
             self._ndata = 0
             self._x = None
             self._y = None
+            self._times = None
             return
 
         with open(datapath) as datafile:
@@ -265,7 +303,10 @@ class TSVisualizer(QtWidgets.QMainWindow):
                 line = line.split(" ")
                 rows = int(line[1])
                 cols = int(line[2])
+                if "TIMES" in line:
+                    hastimes = True
                 skipheader = 1
+                delimiter = None
             else:
 
                 if shape is None:
@@ -275,9 +316,14 @@ class TSVisualizer(QtWidgets.QMainWindow):
                     res = diag.exec()
 
                     if res == QtWidgets.QDialog.Rejected or diag.get_shape() is None:
-                        quit()
+                        if self._data is None:
+                            quit()
+                        else:
+                            return
                     rows = diag.get_shape()[0]
                     cols = diag.get_shape()[1]
+                    hastimes = diag.get_hastimes()
+                    delimiter = diag.get_delimiter()
 
                 else:
                     rows = shape[0]
@@ -287,7 +333,15 @@ class TSVisualizer(QtWidgets.QMainWindow):
                     rows, cols = cols, rows
 
                 skipheader = 0
-        self._data = np.genfromtxt(datapath, skip_header=skipheader)
+        self._data = np.genfromtxt(datapath, skip_header=skipheader, delimiter=delimiter)
+
+        # times
+        if hastimes:
+            self._times = self._data[:, 0]
+            self._data = self._data[:, 1:]
+        else:
+            self._times = None
+
         if cols > 1:
             self._data = self._data.reshape(-1, rows, cols)
 
@@ -380,7 +434,10 @@ class TSVisualizer(QtWidgets.QMainWindow):
                 ax.clear()
                 plot_ts_2d(ts, ax)
 
-            ax.set_title(data_idx + 1)
+            if self._times is None:
+                ax.set_title(data_idx + 1)
+            else:
+                ax.set_title(self._times[data_idx])
 
         self._canvas.draw()
 
@@ -482,6 +539,8 @@ def main():
     parser.add_argument("-c", "--cols", type=int, default=2, help="columns of plots")
     parser.add_argument("-tw", "--width", type=int, help="width of the TSs")
     parser.add_argument("-th", "--height", type=int, help="height of the TSs")
+    parser.add_argument("-t", "--times", action="store_true", help="if set, times are expected in the file")
+    parser.add_argument("-d", "--delimiter", type=str, default=None, help="string used to separate values")
     parser.add_argument("filepath", type=str, nargs="?", help="file to visualize")
 
     args = parser.parse_args()
@@ -500,7 +559,9 @@ def main():
     # create main window
     app = TSVisualizer(datapath=args.filepath,
                        subplots=(args.rows, args.cols),
-                       shape=shape)
+                       shape=shape,
+                       hastimes=args.times,
+                       delimiter=args.delimiter)
     app.show()
     app.activateWindow()
     app.raise_()
