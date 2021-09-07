@@ -11,9 +11,9 @@ TEST(GMMClustering, Processing) {
 
     cpphots::GMMClusterer clusterer(cpphots::GMMClusterer::S_GMM, 20, 5, 10, 10);
 
-    cpphots::ClustererRandomInitializer(3, 3)(clusterer, {});
+    cpphots::ClustererRandomSeeding(3, 3)(clusterer, {});
 
-    EXPECT_TRUE(clusterer.isInitialized());
+    EXPECT_TRUE(clusterer.hasCentroids());
 
     // train
     std::srand((unsigned int) std::time(0));
@@ -38,7 +38,7 @@ TEST(GMMClustering, SaveLoad) {
 
     cpphots::GMMClusterer clusterer1(cpphots::GMMClusterer::U_S_GMM, 20, 5, 10, 10);
 
-    cpphots::ClustererRandomInitializer(3, 3)(clusterer1, {});
+    cpphots::ClustererRandomSeeding(3, 3)(clusterer1, {});
 
     std::srand((unsigned int) std::time(0));
 
@@ -56,7 +56,7 @@ TEST(GMMClustering, SaveLoad) {
 
     istream >> clusterer2;
 
-    EXPECT_TRUE(clusterer2.isInitialized());
+    EXPECT_TRUE(clusterer2.hasCentroids());
 
     for (uint16_t i = 0; i < 1000; i++) {
         cpphots::TimeSurfaceType ts = cpphots::TimeSurfaceType::Random(3, 3) + 1.f /2.f;
@@ -72,7 +72,7 @@ TEST(GMMClustering, Batches) {
 
     cpphots::GMMClusterer clusterer(cpphots::GMMClusterer::U_S_GMM, 20, 5, 10, 10);
 
-    cpphots::ClustererRandomInitializer(3, 3)(clusterer, {});
+    cpphots::ClustererRandomSeeding(3, 3)(clusterer, {});
 \
     // first batch
     clusterer.toggleLearning(true);

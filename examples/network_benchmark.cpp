@@ -47,14 +47,14 @@ double test_components(unsigned int num_layers, unsigned int num_events) {
     std::vector<cpphots::TimeSurfacePool> pools;
     std::vector<cpphots::CosineClusterer> clusts;
 
-    auto initializer = cpphots::ClustererRandomInitializer(5, 5);
+    auto seeding = cpphots::ClustererRandomSeeding(5, 5);
 
     auto evgen = getRandomEventGenerator(50, 50);
 
     for (unsigned int l = 0; l < num_layers; l++) {
         pools.push_back(cpphots::create_pool<cpphots::LinearTimeSurface>(2, 50, 50, 2, 2, 100));
         clusts.push_back(cpphots::CosineClusterer(2));
-        initializer(clusts.back(), {});
+        seeding(clusts.back(), {});
     }
 
     auto start = std::chrono::system_clock::now();
@@ -79,14 +79,14 @@ double test_layer(unsigned int num_layers, unsigned int num_events) {
 
     std::vector<cpphots::Layer> layers;
 
-    auto initializer = cpphots::ClustererRandomInitializer(5, 5);
+    auto seeding = cpphots::ClustererRandomSeeding(5, 5);
 
     auto evgen = getRandomEventGenerator(50, 50);
 
     for (unsigned int l = 0; l < num_layers; l++) {
         cpphots::Layer layer(cpphots::create_pool_ptr<cpphots::LinearTimeSurface>(2, 50, 50, 2, 2, 100),
                     new cpphots::CosineClusterer(2));
-        initializer(layer, {});
+        seeding(layer, {});
         layers.push_back(layer);
     }
 
@@ -111,14 +111,14 @@ double test_network(unsigned int num_layers, unsigned int num_events) {
 
     cpphots::Network network;
 
-    auto initializer = cpphots::ClustererRandomInitializer(5, 5);
+    auto seeding = cpphots::ClustererRandomSeeding(5, 5);
 
     auto evgen = getRandomEventGenerator(50, 50);
 
     for (unsigned int l = 0; l < num_layers; l++) {
         network.createLayer(cpphots::create_pool_ptr<cpphots::LinearTimeSurface>(2, 50, 50, 2, 2, 100),
                             new cpphots::CosineClusterer(2));
-        initializer(network.back(), {});
+        seeding(network.back(), {});
     }
 
     auto start = std::chrono::system_clock::now();

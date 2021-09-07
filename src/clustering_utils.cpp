@@ -9,28 +9,28 @@
 namespace cpphots {
 
 
-void ClustererUniformInitializer(interfaces::Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces) {
+void ClustererUniformSeeding(interfaces::Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces) {
 
     std::vector<TimeSurfaceType> selected;
     std::sample(time_surfaces.begin(), time_surfaces.end(), std::back_inserter(selected), clusterer.getNumClusters(), std::mt19937{std::random_device{}()});
 
-    for (auto& p : selected) {
-        clusterer.addPrototype(p);
+    for (auto& c : selected) {
+        clusterer.addCentroid(c);
     }
 
 }
 
-void ClustererPlusPlusInitializer(interfaces::Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces) {
+void ClustererPlusPlusSeeding(interfaces::Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces) {
 
     // chosen surfaces
     std::set<int> chosen;
-    std::vector<TimeSurfaceType> prototypes;
+    std::vector<TimeSurfaceType> centroids;
 
     // choose first time surface at random
     std::mt19937 gen{std::random_device{}()};
     std::uniform_int_distribution<> idist(0, time_surfaces.size()-1);
     int first = idist(gen);
-    prototypes.push_back(time_surfaces[first]);
+    centroids.push_back(time_surfaces[first]);
     chosen.insert(first);
 
     std::vector<TimeSurfaceScalarType> distances(time_surfaces.size());
@@ -44,8 +44,8 @@ void ClustererPlusPlusInitializer(interfaces::Clusterer& clusterer, const std::v
         for (size_t ts = 0; ts < time_surfaces.size(); ts++) {
 
             TimeSurfaceScalarType mindist = std::numeric_limits<TimeSurfaceScalarType>::max();
-            for (const auto& p : prototypes) {
-                TimeSurfaceScalarType d = (p - time_surfaces[ts]).matrix().squaredNorm();
+            for (const auto& c : centroids) {
+                TimeSurfaceScalarType d = (c - time_surfaces[ts]).matrix().squaredNorm();
                 if (d < mindist)
                     mindist = d;
             }
@@ -62,7 +62,7 @@ void ClustererPlusPlusInitializer(interfaces::Clusterer& clusterer, const std::v
 
         for (size_t ts = 0; ts < time_surfaces.size(); ts++) {
             if (x < currdist + distances[ts]) {
-                prototypes.push_back(time_surfaces[ts]);
+                centroids.push_back(time_surfaces[ts]);
                 chosen.insert(ts);
                 break;
             }
@@ -72,16 +72,16 @@ void ClustererPlusPlusInitializer(interfaces::Clusterer& clusterer, const std::v
     }
 
     if (chosen.size() != clusterer.getNumClusters()) {
-        throw std::runtime_error("Something went wrong with the plusplus initialization.");
+        throw std::runtime_error("Something went wrong with the plusplus seeding.");
     }
 
-    for (const auto& p : prototypes) {
-        clusterer.addPrototype(p);
+    for (const auto& c : centroids) {
+        clusterer.addCentroid(c);
     }
 
 }
 
-void ClustererAFKMC2InitializerImpl(interfaces::Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces, uint16_t chain) {
+void ClustererAFKMC2SeedingImpl(interfaces::Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces, uint16_t chain) {
 
     std::mt19937 mt{std::random_device{}()};
 
@@ -153,30 +153,30 @@ void ClustererAFKMC2InitializerImpl(interfaces::Clusterer& clusterer, const std:
     }
 
     for (auto& c : centroids) {
-        clusterer.addPrototype(c);
+        clusterer.addCentroid(c);
     }
 
 }
 
-ClustererInitializerType ClustererAFKMC2Initializer(uint16_t chain) {
+ClustererSeedingType ClustererAFKMC2Seeding(uint16_t chain) {
 
-    return std::bind(ClustererAFKMC2InitializerImpl, std::placeholders::_1, std::placeholders::_2, chain);
+    return std::bind(ClustererAFKMC2SeedingImpl, std::placeholders::_1, std::placeholders::_2, chain);
 
 }
 
-void ClustererRandomInitializerImpl(interfaces::Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces, uint16_t width, uint16_t height) {
+void ClustererRandomSeedingImpl(interfaces::Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces, uint16_t width, uint16_t height) {
 
     std::srand((unsigned int) std::time(0));
 
     for (uint16_t i = 0; i < clusterer.getNumClusters(); i++) {
-        clusterer.addPrototype(TimeSurfaceType::Random(height, width) + 1.f /2.f);
+        clusterer.addCentroid(TimeSurfaceType::Random(height, width) + 1.f /2.f);
     }
 
 }
 
-ClustererInitializerType ClustererRandomInitializer(uint16_t width, uint16_t height) {
+ClustererSeedingType ClustererRandomSeeding(uint16_t width, uint16_t height) {
 
-    return std::bind(ClustererRandomInitializerImpl, std::placeholders::_1, std::placeholders::_2, width, height);
+    return std::bind(ClustererRandomSeedingImpl, std::placeholders::_1, std::placeholders::_2, width, height);
 
 }
 

@@ -26,7 +26,7 @@ std::pair<double, double> measure_times(cpphots::Layer& layer, size_t n_training
     }
 
     auto start = std::chrono::system_clock::now();
-    cpphots::layerInitializePrototypes(cpphots::ClustererAFKMC2Initializer(5), layer, training_evs, false);
+    cpphots::layerSeedCentroids(cpphots::ClustererAFKMC2Seeding(5), layer, training_evs, false);
     layer.toggleLearning(true);
     for (const auto& ev : training_evs) {
         layer.process(ev, true);

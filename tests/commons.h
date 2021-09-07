@@ -110,15 +110,15 @@ public:
         return *std::max_element(ks.begin(), ks.end()) + 1;
     }
 
-    void addPrototype(const cpphots::TimeSurfaceType& proto) override {}
+    void addCentroid(const cpphots::TimeSurfaceType& centroid) override {}
 
-    std::vector<cpphots::TimeSurfaceType> getPrototypes() const override {
+    std::vector<cpphots::TimeSurfaceType> getCentroids() const override {
         return {};
     }
 
-    void clearPrototypes() override {}
+    void clearCentroids() override {}
 
-    bool isInitialized() const override {
+    bool hasCentroids() const override {
         return true;
     }
 

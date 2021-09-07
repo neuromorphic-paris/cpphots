@@ -12,48 +12,49 @@
 namespace cpphots {
 
 /**
- * @brief Signature of clustering initialization algorithms
+ * @brief Signature of clustering seeding algorithms
  */
-using ClustererInitializerType = std::function<void(interfaces::Clusterer&, const std::vector<TimeSurfaceType>&)>;
+using ClustererSeedingType = std::function<void(interfaces::Clusterer&, const std::vector<TimeSurfaceType>&)>;
 
 /**
- * @brief Uniformly initialize the layer
+ * @brief Uniformly seed the layer
  * 
- * Initializes the prototypes by simply choosing random time surfaces,
+ * Seed the centroids by simply choosing random time surfaces,
  * among those provided, with uniform probabilities.
  */
-void ClustererUniformInitializer(interfaces::Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces);
+void ClustererUniformSeeding(interfaces::Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces);
 
 /**
- * @brief k-means++ initialization
+ * @brief k-means++ seeding
  * 
- * This function implements the initialization algorithm of k-means++ to choose the prototypes
+ * This function implements the seeding algorithm of k-means++ to choose the centroids
  * among the time surfaces provided.
  */
-void ClustererPlusPlusInitializer(interfaces::Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces);
+void ClustererPlusPlusSeeding(interfaces::Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces);
 
 /**
- * @brief AFK-MC2 clustering initialization
+ * @brief AFK-MC2 clustering seeding
  * 
- * Return a function implementing AFK-MC2 clustering initialization as described in 
- * O. Bachem, M. Lucic, H. Hassani, and A. Krause. Fast and provably good seedings for k-means. In Proc. Advances in Neural Information Processing Systems, pages 55–63, 2016a
+ * Return a function implementing AFK-MC2 clustering seeding as described in 
+ * O. Bachem, M. Lucic, H. Hassani, and A. Krause. Fast and provably good seedings for k-means.
+ * In Proc. Advances in Neural Information Processing Systems, pages 55–63, 2016a
  * 
  * @param chain length of the Markov chain
- * @return the actual initialization function
+ * @return the actual seeding function
  */
-ClustererInitializerType ClustererAFKMC2Initializer(uint16_t chain);
+ClustererSeedingType ClustererAFKMC2Seeding(uint16_t chain);
 
 /**
- * @brief Random clustering initialization
+ * @brief Random clustering seeding
  * 
- * Return a function that initializes the prototypes of the layer with random time surfaces.
+ * Return a function that seeds the centroids of the layer with random time surfaces.
  * This may be useful for debugging purposes.
  * 
- * @param width width of the prototypes
- * @param height height of the prototypes
- * @return the actual initialization function
+ * @param width width of the centroids
+ * @param height height of the centroids
+ * @return the actual seeding function
  */
-ClustererInitializerType ClustererRandomInitializer(uint16_t width, uint16_t height);
+ClustererSeedingType ClustererRandomSeeding(uint16_t width, uint16_t height);
 
 }
 

@@ -32,7 +32,7 @@ public:
     /**
      * @brief Construct a new CosineClusterer
      * 
-     * The constructor will not initialize the prototypes.
+     * The constructor will not seed the centroids.
      * 
      * @param clusters number of clusters
      */
@@ -41,25 +41,25 @@ public:
     /**
      * @copydoc interfaces::Clusterer::cluster
      * 
-     * If learning is enabled, this will update the prototypes.
+     * If learning is enabled, this will update the centroids.
      */
     uint16_t cluster(const TimeSurfaceType& surface) override;
 
     // inherited methods
     uint16_t getNumClusters() const override;
 
-    void addPrototype(const TimeSurfaceType& proto) override;
+    void addCentroid(const TimeSurfaceType& centroid) override;
 
-    std::vector<TimeSurfaceType> getPrototypes() const override;
+    std::vector<TimeSurfaceType> getCentroids() const override;
 
-    void clearPrototypes() override;
+    void clearCentroids() override;
 
-    bool isInitialized() const override;
+    bool hasCentroids() const override;
 
     /**
      * @copydoc interfaces::Clusterer::toggleLearning
      * 
-     * If learning is enabled prototypes will be updatad online until
+     * If learning is enabled centroids will be updatad online until
      * learning is disabled.
      */
     bool toggleLearning(bool enable = true) override;
@@ -67,20 +67,20 @@ public:
     /**
      * @copydoc interfaces::Streamable::toStream
      * 
-     * Insert parameters of the clusterer and prototypes on the stream.
+     * Insert parameters of the clusterer and centroids on the stream.
      */
     void toStream(std::ostream& out) const override;
 
     /**
      * @copydoc interfaces::Streamable::fromStream
      * 
-     * Reads parameters and prototypes from the stream.
+     * Reads parameters and centroids from the stream.
      */
     void fromStream(std::istream& in) override;
 
 private:
-    std::vector<TimeSurfaceType> prototypes;
-    std::vector<uint32_t> prototypes_activations;
+    std::vector<TimeSurfaceType> centroids;
+    std::vector<uint32_t> centroids_activations;
     uint16_t clusters;
     bool learning = true;
 

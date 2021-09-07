@@ -196,40 +196,40 @@ uint16_t GMMClusterer::getNumClusters() const {
     return clusters;
 }
 
-void GMMClusterer::addPrototype(const TimeSurfaceType& proto) {
+void GMMClusterer::addCentroid(const TimeSurfaceType& centroid) {
 
     // resize blaze matrix if necessary
     if (mean.rows() == 0) {
-        mean.resize(clusters, proto.size());
+        mean.resize(clusters, centroid.size());
     }
 
     // update shape if necessary
     if (ts_shape.first == 0) {
-        ts_shape = {proto.rows(), proto.cols()};
+        ts_shape = {centroid.rows(), centroid.cols()};
     }
 
-    blaze::row(mean, last_proto) = tsToVector(proto);
-    last_proto++;
+    blaze::row(mean, last_centroid) = tsToVector(centroid);
+    last_centroid++;
 
 }
 
-std::vector<TimeSurfaceType> GMMClusterer::getPrototypes() const {
+std::vector<TimeSurfaceType> GMMClusterer::getCentroids() const {
 
-    std::vector<TimeSurfaceType> prototypes;
+    std::vector<TimeSurfaceType> centroids;
 
     for (size_t i = 0; i < clusters; i++) {
-        prototypes.push_back(vectorToTS(blaze::row(mean, i), ts_shape.first, ts_shape.second));
+        centroids.push_back(vectorToTS(blaze::row(mean, i), ts_shape.first, ts_shape.second));
     }
 
-    return prototypes;
+    return centroids;
 }
 
-void GMMClusterer::clearPrototypes() {
-    last_proto = 0;
+void GMMClusterer::clearCentroids() {
+    last_centroid = 0;
 }
 
-bool GMMClusterer::isInitialized() const {
-    return last_proto == clusters;
+bool GMMClusterer::hasCentroids() const {
+    return last_centroid == clusters;
 }
 
 bool GMMClusterer::toggleLearning(bool enable) {
@@ -396,7 +396,7 @@ void GMMClusterer::toStream(std::ostream& out) const {
     out << clusters_considered << " ";
     out << truncated_clusters << " ";
     out << last_data << " ";
-    out << last_proto << " ";
+    out << last_centroid << " ";
     out << learning << " ";
     out << std::setprecision(std::numeric_limits<TimeSurfaceScalarType>::max_digits10) << eps << " ";
     out << ts_shape.first << " ";
@@ -428,7 +428,7 @@ void GMMClusterer::fromStream(std::istream& in) {
     in >> clusters_considered;
     in >> truncated_clusters;
     in >> last_data;
-    in >> last_proto;
+    in >> last_centroid;
     in >> learning;
     in >> eps;
     in >> ts_shape.first;

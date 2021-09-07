@@ -96,7 +96,7 @@ std::vector<double> compute_accuracy(cpphots::Network& network, const std::vecto
 }
 
 // shorthand for training
-void train(cpphots::Network& network, const std::vector<std::string>& training_set, const cpphots::ClustererInitializerType& initializer, bool use_all = true) {
+void train(cpphots::Network& network, const std::vector<std::string>& training_set, const cpphots::ClustererSeedingType& seeding, bool use_all = true) {
 
     // load all traning set
     std::vector<cpphots::Events> training_events;
@@ -104,7 +104,7 @@ void train(cpphots::Network& network, const std::vector<std::string>& training_s
         training_events.push_back(cpphots::loadFromFile(filename));
     }
 
-    cpphots::train(network, training_events, initializer, use_all);
+    cpphots::train(network, training_events, seeding, use_all);
 
 }
 
@@ -169,7 +169,7 @@ std::vector<std::pair<std::string, std::string>> poker_dvs_all(const std::string
 }
 
 
-std::tuple<double, double, double> test_training(const std::string& folder, bool multi, const cpphots::ClustererInitializerType& initializer) {
+std::tuple<double, double, double> test_training(const std::string& folder, bool multi, const cpphots::ClustererSeedingType& seeding) {
 
     cpphots::Network network;
     network.createLayer(cpphots::create_pool_ptr<cpphots::LinearTimeSurface>(2, 32, 32, 2, 2, 1000),
@@ -193,7 +193,7 @@ std::tuple<double, double, double> test_training(const std::string& folder, bool
            train_set[1].first,
            train_set[2].first,
            train_set[3].first},
-          initializer,
+          seeding,
           multi);
 
     // prepare classifiers
@@ -236,16 +236,16 @@ int main(int argc, char* argv[]) {
             n_trainings = 100;
         }
 
-        const std::vector<std::tuple<std::string, std::string, bool, cpphots::ClustererInitializerType>> test_cases{
+        const std::vector<std::tuple<std::string, std::string, bool, cpphots::ClustererSeedingType>> test_cases{
         
-            {"afkmc2_sequential.csv", "seq", false, cpphots::ClustererAFKMC2Initializer(5)},
-            {"afkmc2_sequential_multi.csv", "seq-multi", true, cpphots::ClustererAFKMC2Initializer(5)},
+            {"afkmc2_sequential.csv", "seq", false, cpphots::ClustererAFKMC2Seeding(5)},
+            {"afkmc2_sequential_multi.csv", "seq-multi", true, cpphots::ClustererAFKMC2Seeding(5)},
 
-            {"unif_sequential.csv", "seq", false, cpphots::ClustererUniformInitializer},
-            {"unif_sequential_multi.csv", "seq-multi", true, cpphots::ClustererUniformInitializer},
+            {"unif_sequential.csv", "seq", false, cpphots::ClustererUniformSeeding},
+            {"unif_sequential_multi.csv", "seq-multi", true, cpphots::ClustererUniformSeeding},
         
-            {"pp_sequential.csv", "seq", false, cpphots::ClustererPlusPlusInitializer},
-            {"pp_sequential_multi.csv", "seq-multi", true, cpphots::ClustererPlusPlusInitializer},
+            {"pp_sequential.csv", "seq", false, cpphots::ClustererPlusPlusSeeding},
+            {"pp_sequential_multi.csv", "seq-multi", true, cpphots::ClustererPlusPlusSeeding},
         
         };
 
@@ -263,7 +263,7 @@ int main(int argc, char* argv[]) {
 
     } else {
 
-        auto res = test_training(datafolder, true, cpphots::ClustererAFKMC2Initializer(3));
+        auto res = test_training(datafolder, true, cpphots::ClustererAFKMC2Seeding(3));
         std::cout << "acc1 = " << std::get<0>(res) << ", acc2 = " << std::get<1>(res) << ", acc3 = " << std::get<2>(res) << std::endl;
 
     }

@@ -7,7 +7,7 @@
 
 namespace cpphots {
 
-Events train(Network& network, Events training_events, const ClustererInitializerType& initializer, bool skip_check) {
+Events train(Network& network, Events training_events, const ClustererSeedingType& seeding, bool skip_check) {
 
     for (size_t l = 0; l < network.getNumLayers(); l++) {
 
@@ -15,8 +15,8 @@ Events train(Network& network, Events training_events, const ClustererInitialize
 
         if (layer.canCluster()) {
 
-            // learn prototypes for this layer
-            layerInitializePrototypes(initializer, layer, training_events, !skip_check);
+            // seed centroids for this layer
+            layerSeedCentroids(seeding, layer, training_events, !skip_check);
 
             // train
             layer.toggleLearning(true);
@@ -34,7 +34,7 @@ Events train(Network& network, Events training_events, const ClustererInitialize
 
 }
 
-std::vector<Events> train(Network& network, std::vector<Events> training_events, const ClustererInitializerType& initializer, bool use_all, bool skip_check) {
+std::vector<Events> train(Network& network, std::vector<Events> training_events, const ClustererSeedingType& seeding, bool use_all, bool skip_check) {
 
     for (size_t l = 0; l < network.getNumLayers(); l++) {
 
@@ -42,11 +42,11 @@ std::vector<Events> train(Network& network, std::vector<Events> training_events,
 
         if (layer.canCluster()) {
 
-            // learn prototypes for this layer
+            // seed centroids for this layer
             if (use_all)
-                layerInitializePrototypes(initializer, layer, training_events, !skip_check);
+                layerSeedCentroids(seeding, layer, training_events, !skip_check);
             else
-                layerInitializePrototypes(initializer, layer, training_events[0], !skip_check);
+                layerSeedCentroids(seeding, layer, training_events[0], !skip_check);
 
             // train
             layer.toggleLearning(true);

@@ -338,24 +338,24 @@ public:
         return clusterer->getNumClusters();
     }
 
-    void addPrototype(const TimeSurfaceType& proto) override {
+    void addCentroid(const TimeSurfaceType& centroid) override {
         cpphots_assert(clusterer != nullptr);
-        clusterer->addPrototype(proto);
+        clusterer->addCentroid(centroid);
     }
 
-    std::vector<TimeSurfaceType> getPrototypes() const override {
+    std::vector<TimeSurfaceType> getCentroids() const override {
         cpphots_assert(clusterer != nullptr);
-        return clusterer->getPrototypes();
+        return clusterer->getCentroids();
     }
 
-    void clearPrototypes() override {
+    void clearCentroids() override {
         cpphots_assert(clusterer != nullptr);
-        return clusterer->clearPrototypes();
+        return clusterer->clearCentroids();
     }
 
-    bool isInitialized() const override {
+    bool hasCentroids() const override {
         cpphots_assert(clusterer != nullptr);
-        return clusterer->isInitialized();
+        return clusterer->hasCentroids();
     }
 
     bool toggleLearning(bool enable = true) override {\
@@ -403,25 +403,25 @@ private:
 
 
 /**
- * @brief Initialize prototypes from a stream of events
+ * @brief Seed centroids from a stream of events
  * 
- * @param initializer the initialization algorithm
- * @param layer Layer to be initialized
+ * @param seeding the seeding algorithm
+ * @param layer Layer to be seeded
  * @param events the stream of events to be used
- * @param valid_only use only valid time surfaces for the initialization
+ * @param valid_only use only valid time surfaces for the seeding
  */
-void layerInitializePrototypes(const ClustererInitializerType& initializer, Layer& layer, const Events& events, bool valid_only = true);
+void layerSeedCentroids(const ClustererSeedingType& seeding, Layer& layer, const Events& events, bool valid_only = true);
 
 
 /**
- * @brief Initialize prototypes from a vector of streams of events
+ * @brief Seed centroids from a vector of streams of events
  * 
- * @param initializer the initialization algorithm
- * @param layer layer to be initialized
+ * @param seeding the seeding algorithm
+ * @param layer layer to be seeded
  * @param event_streams the vector of streams of events to be used
- * @param valid_only use only valid time surfaces for the initialization
+ * @param valid_only use only valid time surfaces for the seeding
  */
-void layerInitializePrototypes(const ClustererInitializerType& initializer, Layer& layer, const std::vector<Events>& event_streams, bool valid_only = true);
+void layerSeedCentroids(const ClustererSeedingType& seeding, Layer& layer, const std::vector<Events>& event_streams, bool valid_only = true);
 
 }
 

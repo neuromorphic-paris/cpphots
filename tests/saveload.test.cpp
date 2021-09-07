@@ -153,8 +153,8 @@ TEST(TestSaveLoad, LSaveLoad) {
     cpphots::Layer layer1(cpphots::create_pool_ptr<cpphots::LinearTimeSurface>(2, 32, 32, 1, 2, 1000),
                           new cpphots::CosineClusterer(8));
 
-    auto initializer = cpphots::ClustererRandomInitializer(3, 5);
-    initializer(layer1, {});
+    auto seeding = cpphots::ClustererRandomSeeding(3, 5);
+    seeding(layer1, {});
 
     std::stringstream outstream;
     outstream << layer1;
@@ -170,7 +170,7 @@ TEST(TestSaveLoad, LSaveLoad) {
     ASSERT_EQ(surface->getWx(), 3);
     ASSERT_EQ(surface->getWy(), 5);
 
-    ASSERT_TRUE(layer2.isInitialized());
+    ASSERT_TRUE(layer2.hasCentroids());
 
 }
 
@@ -185,10 +185,10 @@ TEST(TestLoad, Network) {
     // auto pools1 = net1.viewFull<cpphots::TimeSurfacePool>();
     // auto clust1 = net1.viewFull<cpphots::interfaces::Clusterer>();
 
-    auto initializer1 = cpphots::ClustererRandomInitializer(3, 5);
-    initializer1(net1[0], {});
-    auto initializer2 = cpphots::ClustererRandomInitializer(5, 9);
-    initializer2(net1[1], {});
+    auto seeding1 = cpphots::ClustererRandomSeeding(3, 5);
+    seeding1(net1[0], {});
+    auto seeding2 = cpphots::ClustererRandomSeeding(5, 9);
+    seeding2(net1[1], {});
 
     std::stringstream outstream;
     outstream << net1;
@@ -218,8 +218,8 @@ TEST(TestLoad, Network) {
         EXPECT_EQ(surface->getWy(), 9);
     }
 
-    EXPECT_TRUE(net2[0].isInitialized());
-    EXPECT_TRUE(net2[1].isInitialized());
+    EXPECT_TRUE(net2[0].hasCentroids());
+    EXPECT_TRUE(net2[1].hasCentroids());
 
 }
 

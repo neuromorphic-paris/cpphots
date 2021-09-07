@@ -18,7 +18,7 @@ namespace cpphots {
 namespace interfaces {
 
 /**
- * @brief Interface for time surface clustering
+ * @brief Interface for time surface clustering based on centroids
  */
 class Clusterer : public virtual Streamable, public ClonableBase<Clusterer> {
 
@@ -45,42 +45,42 @@ public:
     virtual uint16_t getNumClusters() const = 0;
 
     /**
-     * @brief Add a new prototype to the layer
+     * @brief Add a new centroid to the clusterer
      * 
-     * This function should not be used manually, initialization should be done via a ClustererInitialize function.
+     * This function should not be used manually, seeding should be done via a ClustererSeeding function.
      * 
-     * If the HOTSClusterer is already initialized, an exception is raised.
+     * If the Clusterer already has enough centroids, an exception is raised.
      * 
-     * @param proto the prototype to add
+     * @param centroid the centroid to add
      */
-    virtual void addPrototype(const TimeSurfaceType& proto) = 0;
+    virtual void addCentroid(const TimeSurfaceType& centroid) = 0;
 
     /**
-     * @brief Get the list of prototypes
+     * @brief Get the list of centroids
      * 
-     * @return the list of prototypes
+     * @return the list of centroids
      */
-    virtual std::vector<TimeSurfaceType> getPrototypes() const = 0;
+    virtual std::vector<TimeSurfaceType> getCentroids() const = 0;
 
     /**
-     * @brief Removes all prototypes
+     * @brief Remove all centroids
      */
-    virtual void clearPrototypes() = 0;
+    virtual void clearCentroids() = 0;
 
     /**
-     * @brief Check prototype initialization
+     * @brief Check if clusterer has enough centroids
      * 
-     * Prototypes are initialized if there is a number of prototypes equal to the number of clusters.
+     * A clusterer has centroids if there is a number of centroids equal to the number of clusters.
      * 
-     * @return true if prototypes are initialized
+     * @return true if clusterer has centroids
      * @return false otherwise
      */
-    virtual bool isInitialized() const = 0;
+    virtual bool hasCentroids() const = 0;
 
     /**
      * @brief Enable or disable learning
      * 
-     * This affects whether the prototypes are updated when Clusterer::cluster is called or not.
+     * This affects whether the centroids are updated when Clusterer::cluster is called or not.
      * 
      * During the learning phase, output of Clusterer::cluster may be undefined, depending
      * on the implementaton.
@@ -91,7 +91,7 @@ public:
     virtual bool toggleLearning(bool enable = true) = 0;
 
     /**
-     * @brief Get the histogram of prototypes activations
+     * @brief Get the histogram of centroids activations
      * 
      * @return the histogram of activations
      */

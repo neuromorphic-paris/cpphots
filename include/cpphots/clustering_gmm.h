@@ -79,13 +79,13 @@ public:
 
     uint16_t getNumClusters() const override;
 
-    void addPrototype(const TimeSurfaceType& proto) override;
+    void addCentroid(const TimeSurfaceType& centroid) override;
 
-    std::vector<TimeSurfaceType> getPrototypes() const override;
+    std::vector<TimeSurfaceType> getCentroids() const override;
 
-    void clearPrototypes() override;
+    void clearCentroids() override;
 
-    bool isInitialized() const override;
+    bool hasCentroids() const override;
 
     /**
      * @brief Enable or disable learning
@@ -105,14 +105,14 @@ public:
     /**
      * @copydoc interfaces::Streamable::toStream
      * 
-     * Insert parameters of the clusterer and prototypes on the stream.
+     * Insert parameters of the clusterer and centroids on the stream.
      */
     void toStream(std::ostream& out) const override;
 
     /**
      * @copydoc interfaces::Streamable::fromStream
      * 
-     * Reads parameters and prototypes from the stream.
+     * Reads parameters and centroids from the stream.
      */
     void fromStream(std::istream& in) override;
 
@@ -123,7 +123,7 @@ private:
     BlazeMatrix mean;
     std::shared_ptr<dataset<TimeSurfaceScalarType>> set;
     size_t last_data = 0;
-    size_t last_proto = 0;
+    size_t last_centroid = 0;
     bool learning = true;
     TimeSurfaceScalarType eps;
     std::pair<uint16_t, uint16_t> ts_shape;

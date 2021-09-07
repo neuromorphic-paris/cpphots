@@ -374,7 +374,7 @@ void Layer::delete_components() {
 }
 
 
-void layerInitializePrototypes(const ClustererInitializerType& initializer, Layer& layer, const Events& events, bool valid_only) {
+void layerSeedCentroids(const ClustererSeedingType& seeding, Layer& layer, const Events& events, bool valid_only) {
 
     // store all time surfaces
     layer.reset();
@@ -389,14 +389,14 @@ void layerInitializePrototypes(const ClustererInitializerType& initializer, Laye
     }
 
     if (time_surfaces.size() < layer.getNumClusters()) {
-        throw std::runtime_error("Not enough good events to initialize prototypes.");
+        throw std::runtime_error("Not enough good events to seed centroids.");
     }
 
-    initializer(layer, time_surfaces);
+    seeding(layer, time_surfaces);
 
 }
 
-void layerInitializePrototypes(const ClustererInitializerType& initializer, Layer& layer, const std::vector<Events>& event_streams, bool valid_only) {
+void layerSeedCentroids(const ClustererSeedingType& seeding, Layer& layer, const std::vector<Events>& event_streams, bool valid_only) {
 
     // store all time surfaces
     std::vector<TimeSurfaceType> time_surfaces;
@@ -413,10 +413,10 @@ void layerInitializePrototypes(const ClustererInitializerType& initializer, Laye
     }
 
     if (time_surfaces.size() < layer.getNumClusters()) {
-        throw std::runtime_error("Not enough good events to initialize prototypes.");
+        throw std::runtime_error("Not enough good events to seed centroids.");
     }
 
-    initializer(layer, time_surfaces);
+    seeding(layer, time_surfaces);
 
 }
 
