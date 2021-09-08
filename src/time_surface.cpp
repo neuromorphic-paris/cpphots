@@ -133,7 +133,7 @@ void LinearTimeSurface::fromStream(std::istream& in) {
 WeightedLinearTimeSurface::WeightedLinearTimeSurface() {}
 
 WeightedLinearTimeSurface::WeightedLinearTimeSurface(uint16_t width, uint16_t height, uint16_t Rx, uint16_t Ry, TimeSurfaceScalarType tau, const TimeSurfaceType& weightmatrix)
-    :Clonable(width, height, Rx, Ry, tau) {
+    :TimeSurfaceBase(width, height, Rx, Ry, tau) {
 
     if (weightmatrix.rows() != height || weightmatrix.cols() != width) {
         throw std::invalid_argument("Wrong size for time surface weight matrix, should be " + std::to_string(height) + "x" + std::to_string(width));

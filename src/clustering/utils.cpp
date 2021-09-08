@@ -8,16 +8,16 @@
 
 namespace cpphots {
 
-std::vector<uint32_t> ClustererBase::getHistogram() const {
+std::vector<uint32_t> ClustererHistogramMixin::getHistogram() const {
     return hist;
 }
 
-void ClustererBase::reset() {
+void ClustererHistogramMixin::reset() {
     hist.clear();
     hist.resize(getNumClusters());
 }
 
-void ClustererBase::updateHistogram(uint16_t k) {
+void ClustererHistogramMixin::updateHistogram(uint16_t k) {
     hist[k]++;
 }
 

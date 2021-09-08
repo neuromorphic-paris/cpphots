@@ -1,6 +1,6 @@
 /**
  * @file clustering_utils.h
- * @brief Utility functions for time surface clustering
+ * @brief Utility functions and class mixins for time surface clustering
  */
 #ifndef CPPHOTS_CLUSTERING_UTILS_H
 #define CPPHOTS_CLUSTERING_UTILS_H
@@ -12,9 +12,9 @@
 namespace cpphots {
 
 /**
- * @brief Base class that can manage the histogram
+ * @brief Mixin for clusterer that can manage the histogram
  */
-class ClustererBase : public virtual interfaces::Clusterer {
+class ClustererHistogramMixin : public virtual interfaces::Clusterer {
 
 public:
 

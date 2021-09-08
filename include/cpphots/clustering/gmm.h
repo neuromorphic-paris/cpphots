@@ -39,7 +39,7 @@ using BlazeMatrix = blaze::DynamicMatrix<TimeSurfaceScalarType, blaze::rowMajor>
  * 
  * See https://github.com/OOub/peregrine for more details.
  */
-class GMMClusterer : public interfaces::Clonable<GMMClusterer, ClustererBase> {
+class GMMClusterer : public interfaces::Clonable<GMMClusterer, interfaces::Clusterer>, public ClustererHistogramMixin {
 
 public:
 

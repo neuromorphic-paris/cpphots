@@ -17,7 +17,7 @@ namespace cpphots {
  * 
  * Clusters time surface according to the HOTS formulation (cosine rule).
  */
-class CosineClusterer : public interfaces::Clonable<CosineClusterer, ClustererBase> {
+class CosineClusterer : public interfaces::Clonable<CosineClusterer, interfaces::Clusterer>, public ClustererHistogramMixin {
 
 public:
 

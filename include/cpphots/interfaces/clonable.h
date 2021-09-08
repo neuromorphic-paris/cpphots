@@ -38,7 +38,7 @@ struct ClonableBase {
  * @tparam Base interface class
  */
 template <class Derived, class Base>
-struct Clonable : Base {
+struct Clonable : public virtual Base {
 
     /**
      * @brief Clone the object
