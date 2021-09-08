@@ -2,7 +2,7 @@
 #include <cpphots/time_surface.h>
 #include <cpphots/events_utils.h>
 #include <cpphots/classification.h>
-#include <cpphots/clustering_cosine.h>
+#include <cpphots/clustering/cosine.h>
 
 #include <gtest/gtest.h>
 

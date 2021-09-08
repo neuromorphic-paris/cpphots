@@ -1,4 +1,4 @@
-#include "cpphots/clustering_utils.h"
+#include "cpphots/clustering/utils.h"
 
 #include <random>
 #include <set>

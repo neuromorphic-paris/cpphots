@@ -9,7 +9,8 @@
 
 #include <blaze/Math.h>
 
-#include "interfaces/clustering.h"
+#include "../types.h"
+#include "../interfaces/clustering.h"
 
 
 // forward declarations from peregrine

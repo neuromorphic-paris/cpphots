@@ -1,4 +1,4 @@
-#include "cpphots/clustering_gmm.h"
+#include "cpphots/clustering/gmm.h"
 
 #include <iomanip>
 

@@ -9,8 +9,8 @@ set(CPPHOTS_SOURCES
     network.cpp
     run.cpp
     time_surface.cpp
-    clustering_utils.cpp
-    clustering_cosine.cpp
+    clustering/utils.cpp
+    clustering/cosine.cpp
     layer_modifiers.cpp
     load.cpp
     assert.cpp)
@@ -25,7 +25,7 @@ else()
 endif()
 
 if (WITH_PEREGRINE)
-    list(APPEND CPPHOTS_SOURCES clustering_gmm.cpp)
+    list(APPEND CPPHOTS_SOURCES clustering/gmm.cpp)
     set(PEREGRINE_EXCLUDE "")
 else()
     set(PEREGRINE_EXCLUDE "*gmm.h")

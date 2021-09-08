@@ -16,9 +16,9 @@
 #include <cpphots/classification.h>
 #include <cpphots/run.h>
 #ifdef CPPHOTS_WITH_PEREGRINE
-#include "cpphots/clustering_gmm.h"
+#include "cpphots/clustering/gmm.h"
 #else
-#include "cpphots/clustering_cosine.h"
+#include "cpphots/clustering/cosine.h"
 #endif
 
 

@@ -7,7 +7,7 @@
 
 #include "assert.h"
 #include "types.h"
-#include "clustering_utils.h"
+#include "clustering/utils.h"
 #include "interfaces/all.h"
 
 

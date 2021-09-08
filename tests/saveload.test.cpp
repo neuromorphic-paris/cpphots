@@ -5,7 +5,7 @@
 #include <cpphots/network.h>
 #include <cpphots/load.h>
 #include <cpphots/events_utils.h>
-#include <cpphots/clustering_cosine.h>
+#include <cpphots/clustering/cosine.h>
 #include <cpphots/layer_modifiers.h>
 
 #include <gtest/gtest.h>

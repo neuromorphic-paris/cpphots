@@ -1,4 +1,4 @@
-#include "cpphots/clustering_cosine.h"
+#include "cpphots/clustering/cosine.h"
 
 #include "cpphots/assert.h"
 

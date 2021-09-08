@@ -8,8 +8,8 @@
 
 #include <cpphots/time_surface.h>
 #include <cpphots/layer.h>
-#include <cpphots/clustering_cosine.h>
-#include <cpphots/clustering_gmm.h>
+#include <cpphots/clustering/cosine.h>
+#include <cpphots/clustering/gmm.h>
 #include <cpphots/run.h>
 
 #include "commons.h"

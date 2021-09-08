@@ -5,8 +5,8 @@
 #ifndef CPPHOTS_CLUSTERING_UTILS_H
 #define CPPHOTS_CLUSTERING_UTILS_H
 
-#include "types.h"
-#include "interfaces/clustering.h"
+#include "../types.h"
+#include "../interfaces/clustering.h"
 
 
 namespace cpphots {

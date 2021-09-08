@@ -4,9 +4,9 @@
 
 #include "cpphots/interfaces/streamable.h"
 #include "cpphots/time_surface.h"
-#include "cpphots/clustering_cosine.h"
+#include "cpphots/clustering/cosine.h"
 #ifdef CPPHOTS_WITH_PEREGRINE
-#include "cpphots/clustering_gmm.h"
+#include "cpphots/clustering/gmm.h"
 #endif
 #include "cpphots/layer_modifiers.h"
 
