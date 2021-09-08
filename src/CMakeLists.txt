@@ -2,7 +2,6 @@
 set(CPPHOTS_SOURCES
     types.cpp
     interfaces/streamable.cpp
-    interfaces/clustering.cpp
     classification.cpp
     events_utils.cpp
     layer.cpp

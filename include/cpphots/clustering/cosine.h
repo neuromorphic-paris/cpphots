@@ -7,6 +7,7 @@
 
 #include "../types.h"
 #include "../interfaces/clustering.h"
+#include "utils.h"
 
 
 namespace cpphots {
@@ -16,7 +17,7 @@ namespace cpphots {
  * 
  * Clusters time surface according to the HOTS formulation (cosine rule).
  */
-class CosineClusterer : public interfaces::Clonable<CosineClusterer, interfaces::ClustererBase> {
+class CosineClusterer : public interfaces::Clonable<CosineClusterer, ClustererBase> {
 
 public:
 

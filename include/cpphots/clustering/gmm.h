@@ -11,6 +11,7 @@
 
 #include "../types.h"
 #include "../interfaces/clustering.h"
+#include "utils.h"
 
 
 // forward declarations from peregrine
@@ -38,7 +39,7 @@ using BlazeMatrix = blaze::DynamicMatrix<TimeSurfaceScalarType, blaze::rowMajor>
  * 
  * See https://github.com/OOub/peregrine for more details.
  */
-class GMMClusterer : public interfaces::Clonable<GMMClusterer, interfaces::ClustererBase> {
+class GMMClusterer : public interfaces::Clonable<GMMClusterer, ClustererBase> {
 
 public:
 

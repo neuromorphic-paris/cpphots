@@ -104,34 +104,6 @@ public:
 
 };
 
-
-/**
- * @brief Base class that can manage the histogram
- */
-class ClustererBase : public virtual Clusterer {
-
-public:
-
-    std::vector<uint32_t> getHistogram() const override;
-
-    void reset() override;
-
-protected:
-    /**
-     * @brief Updated the histogram of activations
-     * 
-     * This function should be called by subclasses in their cluster implementation.
-     * 
-     * @param k the latest cluster id emitted
-     */
-    void updateHistogram(uint16_t k);
-
-private:
-
-    std::vector<uint32_t> hist;
-
-};
-
 }
 
 

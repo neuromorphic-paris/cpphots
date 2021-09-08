@@ -8,6 +8,19 @@
 
 namespace cpphots {
 
+std::vector<uint32_t> ClustererBase::getHistogram() const {
+    return hist;
+}
+
+void ClustererBase::reset() {
+    hist.clear();
+    hist.resize(getNumClusters());
+}
+
+void ClustererBase::updateHistogram(uint16_t k) {
+    hist[k]++;
+}
+
 
 void ClustererUniformSeeding(interfaces::Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces) {
 
