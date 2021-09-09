@@ -39,7 +39,7 @@ using BlazeMatrix = blaze::DynamicMatrix<TimeSurfaceScalarType, blaze::rowMajor>
  * 
  * See https://github.com/OOub/peregrine for more details.
  */
-class GMMClusterer : public interfaces::Clonable<GMMClusterer, interfaces::Clusterer>, public ClustererHistogramMixin {
+class GMMClusterer : public interfaces::Clonable<GMMClusterer, interfaces::Clusterer>, public ClustererHistogramMixin, public ClustererOfflineMixin {
 
 public:
 
@@ -89,20 +89,7 @@ public:
 
     bool hasCentroids() const override;
 
-    /**
-     * @brief Enable or disable learning
-     * 
-     * When learning is enabled, time surfaces will be stored in memory until it is disabled.
-     * 
-     * When learning is disabled, the clusters centroids are computed using the algorithm
-     * chosen and the data stored.
-     * 
-     * During the learning phase, output of GMMClusterer::cluster is always 0.
-     * 
-     * @param enable true if learning should be active, false otherwise
-     * @return the previous learning state
-     */
-    bool toggleLearning(bool enable = true) override;
+    void train(const std::vector<TimeSurfaceType>& tss) override;
 
     /**
      * @copydoc interfaces::Streamable::toStream
@@ -124,7 +111,6 @@ private:
     uint16_t clusters, truncated_clusters, clusters_considered;
     BlazeMatrix mean;
     std::shared_ptr<dataset<TimeSurfaceScalarType>> set;
-    size_t last_data = 0;
     size_t last_centroid = 0;
     bool learning = true;
     TimeSurfaceScalarType eps;

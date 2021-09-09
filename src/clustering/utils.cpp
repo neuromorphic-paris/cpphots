@@ -22,6 +22,50 @@ void ClustererHistogramMixin::updateHistogram(uint16_t k) {
 }
 
 
+bool ClustererOnlineMixin::isOnline() const {
+    return true;
+}
+
+void ClustererOnlineMixin::train(const std::vector<TimeSurfaceType>& tss) {
+    toggleLearning(true);
+    for (const auto& ts : tss) {
+        cluster(ts);
+    }
+    toggleLearning(false);
+}
+
+
+uint16_t ClustererOfflineMixin::cluster(const TimeSurfaceType& surface) {
+    if (learning) {
+        learning_tss.push_back(surface);
+    }
+    return 0;
+}
+
+bool ClustererOfflineMixin::isOnline() const {
+    return false;
+}
+
+bool ClustererOfflineMixin::toggleLearning(bool enable) {
+
+    bool prev = learning;
+    learning = enable;
+
+    if (!learning) {
+        train(learning_tss);
+    }
+
+    learning_tss.clear();
+
+    return prev;
+
+}
+
+bool ClustererOfflineMixin::isLearning() const {
+    return learning;
+}
+
+
 void ClustererUniformSeeding(interfaces::Clusterer& clusterer, const std::vector<TimeSurfaceType>& time_surfaces) {
 
     std::vector<TimeSurfaceType> selected;

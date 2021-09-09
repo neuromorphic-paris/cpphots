@@ -40,6 +40,65 @@ private:
 
 
 /**
+ * @brief Mixin for online clusterers
+ */
+class ClustererOnlineMixin : public virtual interfaces::Clusterer {
+
+public:
+
+    bool isOnline() const final;
+
+    /**
+     * @copydoc interfaces::Clusterer::train
+     * 
+     * Enable learning, call cluster on every element and disable learning.
+     */
+    void train(const std::vector<TimeSurfaceType>& tss) override;
+
+};
+
+
+/**
+ * @brief Mixin for offline clusterers
+ * 
+ * Classes using this mixin must call cluster in order to have it working correctly.
+ */
+class ClustererOfflineMixin : public virtual interfaces::Clusterer {
+
+public:
+
+    /**
+     * @brief Performs clustering
+     * 
+     * If learning is enabled store the time surface.
+     * If learning is disabled do nothing.
+     * 
+     * @param surface the timesurface to cluster
+     * @return 0
+     */
+    uint16_t cluster(const TimeSurfaceType& surface) override;
+
+    bool isOnline() const final;
+
+    /**
+     * @copydoc interfaces::Clusterer::toggleLearning
+     * 
+     * If learning is enabled start to store time surfaces.
+     * If learning is disabled call train with stored time surfaces.
+     */
+    bool toggleLearning(bool enable = true) override;
+
+protected:
+    bool isLearning() const;
+
+private:
+    std::vector<TimeSurfaceType> learning_tss;
+    bool learning = false;
+
+};
+
+
+/**
  * @brief Signature of clustering seeding algorithms
  */
 using ClustererSeedingType = std::function<void(interfaces::Clusterer&, const std::vector<TimeSurfaceType>&)>;

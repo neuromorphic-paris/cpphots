@@ -32,6 +32,8 @@ public:
     /**
      * @brief Performs clustering
      * 
+     * In case of online clustering algorithms, also updates the clusters, if learning is enabled.
+     * 
      * @param surface the timesurface to cluster
      * @return id of the cluster
      */
@@ -78,6 +80,14 @@ public:
     virtual bool hasCentroids() const = 0;
 
     /**
+     * @brief Check if clusterer can perform online cluster updates or not
+     * 
+     * @return true if it can
+     * @return false otherwise
+     */
+    virtual bool isOnline() const = 0;
+
+    /**
      * @brief Enable or disable learning
      * 
      * This affects whether the centroids are updated when Clusterer::cluster is called or not.
@@ -89,6 +99,15 @@ public:
      * @return the previous learning state
      */
     virtual bool toggleLearning(bool enable = true) = 0;
+
+    /**
+     * @brief Fit a set of time surfaces
+     * 
+     * Udpate the centroids by clustering the set of time surfaces.
+     * 
+     * @param tss set of time surfaces
+     */
+    virtual void train(const std::vector<TimeSurfaceType>& tss) = 0;
 
     /**
      * @brief Get the histogram of centroids activations

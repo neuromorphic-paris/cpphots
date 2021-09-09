@@ -18,6 +18,8 @@ TEST(GMMClustering, Processing) {
     // train
     std::srand((unsigned int) std::time(0));
 
+    clusterer.toggleLearning(true);
+
     for (uint16_t i = 0; i < 500; i++) {
         clusterer.cluster(cpphots::TimeSurfaceType::Random(3, 3) + 1.f /2.f);
     }
@@ -41,6 +43,8 @@ TEST(GMMClustering, SaveLoad) {
     cpphots::ClustererRandomSeeding(3, 3)(clusterer1, {});
 
     std::srand((unsigned int) std::time(0));
+
+    clusterer1.toggleLearning(true);
 
     for (uint16_t i = 0; i < 500; i++) {
         clusterer1.cluster(cpphots::TimeSurfaceType::Random(3, 3) + 1.f /2.f);
@@ -73,7 +77,7 @@ TEST(GMMClustering, Batches) {
     cpphots::GMMClusterer clusterer(cpphots::GMMClusterer::U_S_GMM, 20, 5, 10, 10);
 
     cpphots::ClustererRandomSeeding(3, 3)(clusterer, {});
-\
+
     // first batch
     clusterer.toggleLearning(true);
 

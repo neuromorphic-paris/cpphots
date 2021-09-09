@@ -7,6 +7,8 @@
 #include <gmm_algorithms/u_s_gmm.hpp>
 #include <data_types.hpp>
 
+#include "cpphots/assert.h"
+
 
 namespace cpphots {
 
@@ -167,25 +169,14 @@ GMMClusterer::GMMClusterer(GMMType type, uint16_t clusters, uint16_t truncated_c
 
 uint16_t GMMClusterer::cluster(const TimeSurfaceType& surface) {
 
-    // if learning we just add it to the dataset
-    if (learning) {
+    ClustererOfflineMixin::cluster(surface);
 
-        if (set->data.rows() == 0) {
-            set->data.resize(100, surface.size());
-        }
-
-        if (last_data >= set->data.rows()) {
-            set->data.resize(2*set->data.rows(), surface.size());
-        }
-
-        blaze::row(set->data, last_data) = tsToVector(surface);
-        last_data++;
-
-        return 0;  // not valid
-
+    if (isLearning()) {
+        return 0;
     }
 
     // otherwise we cluster
+    cpphots_assert(algo);
     uint16_t k = predict(tsToVector(surface));
     updateHistogram(k);
     return k;
@@ -232,46 +223,42 @@ bool GMMClusterer::hasCentroids() const {
     return last_centroid == clusters;
 }
 
-bool GMMClusterer::toggleLearning(bool enable) {
+void GMMClusterer::train(const std::vector<TimeSurfaceType>& tss) {
 
-    bool old_learning = learning;
-    learning = enable;
-
-    if (!enable) {
-        // create algorithm
-
-        // resize set
-        set->data.resize(last_data, set->data.columns());
-
-        set->weight = blaze::uniform<blaze::rowVector>(set->data.rows(), 1.0);
-        set->shape = {set->data.rows(), set->data.columns()};
-
-        switch (type) {
-
-        case S_GMM:
-            algo = std::make_shared<S_gmm<TimeSurfaceScalarType>>(*set, mean, truncated_clusters, 1, 1.0, clusters_considered, 0);
-            break;
-
-        case U_S_GMM:
-            algo = std::make_shared<u_S_gmm<TimeSurfaceScalarType>>(*set, mean, truncated_clusters, 1, 1.0, clusters_considered, 0);
-            break;
-
-        default:
-            throw std::runtime_error("Wrong GMM type");
-        }
-
-        algo->set_variance(std::pow(blaze::stddev(set->data), 2));
-
-        // fit
-        fit();
-
-        // delete set
-        set = std::make_shared<dataset<TimeSurfaceScalarType>>();
-        last_data = 0;
-
+    if (tss.size() == 0) {
+        return;
     }
 
-    return old_learning;
+    // convert to blaze
+    set->data.resize(tss.size(), tss[0].size());
+    for (size_t i = 0; i < tss.size(); i++) {
+        blaze::row(set->data, i) = tsToVector(tss[i]);
+    }
+
+    set->weight = blaze::uniform<blaze::rowVector>(set->data.rows(), 1.0);
+    set->shape = {set->data.rows(), set->data.columns()};
+
+    switch (type) {
+
+    case S_GMM:
+        algo = std::make_shared<S_gmm<TimeSurfaceScalarType>>(*set, mean, truncated_clusters, 1, 1.0, clusters_considered, 0);
+        break;
+
+    case U_S_GMM:
+        algo = std::make_shared<u_S_gmm<TimeSurfaceScalarType>>(*set, mean, truncated_clusters, 1, 1.0, clusters_considered, 0);
+        break;
+
+    default:
+        throw std::runtime_error("Wrong GMM type");
+    }
+
+    algo->set_variance(std::pow(blaze::stddev(set->data), 2));
+
+    // fit
+    fit();
+
+    // delete set
+    set = std::make_shared<dataset<TimeSurfaceScalarType>>();
 
 }
 
@@ -395,7 +382,6 @@ void GMMClusterer::toStream(std::ostream& out) const {
     out << clusters << " ";
     out << clusters_considered << " ";
     out << truncated_clusters << " ";
-    out << last_data << " ";
     out << last_centroid << " ";
     out << learning << " ";
     out << std::setprecision(std::numeric_limits<TimeSurfaceScalarType>::max_digits10) << eps << " ";
@@ -427,7 +413,6 @@ void GMMClusterer::fromStream(std::istream& in) {
     in >> clusters;
     in >> clusters_considered;
     in >> truncated_clusters;
-    in >> last_data;
     in >> last_centroid;
     in >> learning;
     in >> eps;

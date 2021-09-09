@@ -358,9 +358,19 @@ public:
         return clusterer->hasCentroids();
     }
 
-    bool toggleLearning(bool enable = true) override {\
+    bool isOnline() const override {
+        cpphots_assert(clusterer != nullptr);
+        return clusterer->isOnline();
+    }
+
+    bool toggleLearning(bool enable = true) override {
         cpphots_assert(clusterer != nullptr);
         return clusterer->toggleLearning(enable);
+    }
+
+    void train(const std::vector<TimeSurfaceType>& tss) {
+        cpphots_assert(clusterer != nullptr);
+        return clusterer->train(tss);
     }
 
     std::vector<uint32_t> getHistogram() const override {
