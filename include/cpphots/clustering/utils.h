@@ -1,5 +1,5 @@
 /**
- * @file clustering_utils.h
+ * @file clustering/utils.h
  * @brief Utility functions and class mixins for time surface clustering
  */
 #ifndef CPPHOTS_CLUSTERING_UTILS_H
@@ -89,6 +89,12 @@ public:
     bool toggleLearning(bool enable = true) override;
 
 protected:
+    /**
+     * @brief Check if learning is active
+     * 
+     * @return true if learning is active
+     * @return false otherwise
+     */
     bool isLearning() const;
 
 private:

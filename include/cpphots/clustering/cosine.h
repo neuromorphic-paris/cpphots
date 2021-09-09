@@ -1,5 +1,5 @@
 /**
- * @file clustering_cosine.h
+ * @file clustering/cosine.h
  * @brief Clustering based on cosine similarity
  */
 #ifndef CPPHOTS_CLUSTERING_COSINE_H

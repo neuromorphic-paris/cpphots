@@ -1,5 +1,5 @@
 /**
- * @file clustering_gmm.h
+ * @file clustering/gmm.h
  * @brief Clustering with variational gaussian mixture models
  */
 #ifndef CPPHOTS_CLUSTERING_GMM_H
