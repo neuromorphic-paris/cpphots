@@ -19,9 +19,14 @@ Events train(Network& network, Events training_events, const ClustererSeedingTyp
             layerSeedCentroids(seeding, layer, training_events, !skip_check);
 
             // train
-            layer.toggleLearning(true);
-            process(layer, training_events, skip_check);
-            layer.toggleLearning(false);
+            if (layer.isOnline()) {
+                layer.toggleLearning(true);
+                process(layer, training_events, true, skip_check);
+                layer.toggleLearning(false);
+            } else {
+                auto tss = generateTS(layer, training_events, true, skip_check);
+                layer.train(tss);
+            }
 
         }
 
@@ -49,14 +54,21 @@ std::vector<Events> train(Network& network, std::vector<Events> training_events,
                 layerSeedCentroids(seeding, layer, training_events[0], !skip_check);
 
             // train
-            layer.toggleLearning(true);
-            process(layer, training_events, skip_check);
-            layer.toggleLearning(false);
+            if (layer.isOnline()) {
+                layer.toggleLearning(true);
+                process(layer, training_events, true, skip_check);
+                layer.toggleLearning(false);
+            } else {
+                auto tssvec = generateTS(layer, training_events, true, skip_check);
+                for (const auto& tss : tssvec) {
+                    layer.train(tss);
+                }
+            }
 
         }
 
         // genereate events for the next layer
-        training_events = process(layer, training_events, skip_check);
+        training_events = process(layer, training_events, true, skip_check);
 
     }
 

@@ -21,14 +21,16 @@ namespace cpphots {
  * 
  * Process a sequence of events using a generic processor class.
  * 
- * A processor is somenthing with the following methods:
+ * A processor is something with the following methods:
  * 
  *   - void reset()
  *   - Events process(const event&, bool)
  * 
+ * Both Layer and Network satisfy the requirements.
+ * 
  * @tparam P processor type
  * @param processor the processor
- * @param events sequence of events
+ * @param events events
  * @param reset true if processor.reset() should be called
  * @param skip_check if true consider all events as valid
  * @return events emitted by the processor
@@ -55,10 +57,12 @@ Events process(P& processor, const Events& events, bool reset = true, bool skip_
  * 
  * Process a sequence of events using a generic processor class.
  * 
- * A processor is somenthing with the following methods:
+ * A processor is something with the following methods:
  * 
  *   - void reset()
  *   - Events process(const event&, bool)
+ * 
+ * Both Layer and Network satisfy the requirements.
  * 
  * @tparam P processor type
  * @param processor the processor
@@ -74,6 +78,78 @@ std::vector<Events> process(P& processor, const std::vector<Events>& events, boo
 
     for (const auto& evts : events) {
         ret.push_back(process(processor, evts, reset, skip_check));
+    }
+
+    return ret;
+
+}
+
+
+/**
+ * @brief Generate all possible time surface from a list of events
+ * 
+ * Events are processed in order and the times surfaces generate correspond to that order.
+ * 
+ * A time surface calculator is something with the following methods:
+ * 
+ *   - void reset()
+ *   - std::pair<TimeSurfaceType, bool> updateAndCompute(const event& ev)
+ * 
+ * TimeSurfaceCalculator, TimeSurfacePoolCalculator and Layer satisfy the requirements.
+ * 
+ * @tparam TSC time surface calculator type
+ * @param calculator time surface calculator
+ * @param events sequence of events
+ * @param reset true if calculator.reset() should be called
+ * @param skip_check if true consider all events as valid
+ * @return time surfaces computed
+ */
+template <typename TSC>
+std::vector<TimeSurfaceType> generateTS(TSC& calculator, const Events& events, bool reset = true, bool skip_check = false) {
+
+    if (reset) {
+        calculator.reset();
+    }
+
+    std::vector<TimeSurfaceType> ret;
+
+    for (const auto& ev : events) {
+        auto [ts, good] = calculator.updateAndCompute(ev);
+        if (good || skip_check) {
+            ret.push_back(ts);
+        }
+    }
+
+    return ret;
+
+}
+
+/**
+ * @brief Generate all possible time surface from sequences of events
+ * 
+ * Events are processed in order and the times surfaces generate correspond to that order.
+ * 
+ * A time surface calculator is something with the following methods:
+ * 
+ *   - void reset()
+ *   - std::pair<TimeSurfaceType, bool> updateAndCompute(const event& ev)
+ * 
+ * TimeSurfaceCalculator, TimeSurfacePoolCalculator and Layer satisfy the requirements.
+ * 
+ * @tparam TSC time surface calculator type
+ * @param calculator time surface calculator
+ * @param events sequences of events
+ * @param reset true if calculator.reset() should be called
+ * @param skip_check if true consider all events as valid
+ * @return corresponding sequences of time surfaces computed
+ */
+template <typename TSC>
+std::vector<std::vector<TimeSurfaceType>> generateTS(TSC& calculator, const std::vector<Events>& events, bool reset = true, bool skip_check = false) {
+
+    std::vector<std::vector<TimeSurfaceType>> ret;
+
+    for (const auto& evts : events) {
+        ret.push_back(generateTS(calculator, evts, reset, skip_check));
     }
 
     return ret;
