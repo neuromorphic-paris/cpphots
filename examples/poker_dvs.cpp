@@ -15,11 +15,7 @@
 #include <cpphots/events_utils.h>
 #include <cpphots/classification.h>
 #include <cpphots/run.h>
-#ifdef CPPHOTS_WITH_PEREGRINE
-#include "cpphots/clustering/gmm.h"
-#else
-#include "cpphots/clustering/cosine.h"
-#endif
+#include "cpphots/clustering/kmeans.h"
 
 
 cpphots::Features process_file(cpphots::Network& network, const std::string& filename) {
@@ -173,17 +169,9 @@ std::tuple<double, double, double> test_training(const std::string& folder, bool
 
     cpphots::Network network;
     network.createLayer(cpphots::create_pool_ptr<cpphots::LinearTimeSurface>(2, 32, 32, 2, 2, 1000),
-#ifdef CPPHOTS_WITH_PEREGRINE
-                        new cpphots::GMMClusterer(cpphots::GMMClusterer::U_S_GMM, 16, 5, 10, 0.001));
-#else
-                        new cpphots::CosineClusterer(16));
-#endif
+                        new cpphots::KMeansClusterer(16));
     network.createLayer(cpphots::create_pool_ptr<cpphots::LinearTimeSurface>(16, 32, 32, 4, 4, 5000),
-#ifdef CPPHOTS_WITH_PEREGRINE
-                        new cpphots::GMMClusterer(cpphots::GMMClusterer::U_S_GMM, 32, 5, 12, 0.001));
-#else
-                        new cpphots::CosineClusterer(32));
-#endif
+                        new cpphots::KMeansClusterer(32));
 
     auto train_set = poker_dvs_trainset(folder);
 

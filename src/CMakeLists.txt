@@ -10,6 +10,7 @@ set(CPPHOTS_SOURCES
     time_surface.cpp
     clustering/utils.cpp
     clustering/cosine.cpp
+    clustering/kmeans.cpp
     layer_modifiers.cpp
     load.cpp
     assert.cpp)
