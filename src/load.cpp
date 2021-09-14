@@ -8,6 +8,7 @@
 #ifdef CPPHOTS_WITH_PEREGRINE
 #include "cpphots/clustering/gmm.h"
 #endif
+#include "cpphots/clustering/kmeans.h"
 #include "cpphots/layer_modifiers.h"
 
 
@@ -64,6 +65,12 @@ interfaces::Clusterer* loadClustererFromStream(std::istream& in) {
         return clust;
     }
 #endif
+
+    if (metacmd == "KMEANSCLUSTERER") {
+        KMeansClusterer* clust = new KMeansClusterer();
+        clust->fromStream(in);
+        return clust;
+    }
 
     throw std::runtime_error("Unkown clusterer type " + metacmd);
 

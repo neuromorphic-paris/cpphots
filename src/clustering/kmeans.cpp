@@ -176,7 +176,7 @@ void KMeansClusterer::toStream(std::ostream& out) const {
 
 void KMeansClusterer::fromStream(std::istream& in) {
 
-    matchMetacommandOptional(in, "COSINECLUSTERER");
+    matchMetacommandOptional(in, "KMEANSCLUSTERER");
 
     in >> clusters;
     in >> max_iterations;

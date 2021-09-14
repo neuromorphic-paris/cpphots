@@ -6,7 +6,8 @@
 
 #include <gtest/gtest.h>
 
-TEST(TestKmeans, Train) {
+
+TEST(TestKMeans, Train) {
 
     cpphots::KMeansClusterer clust(4);
 
@@ -36,5 +37,41 @@ TEST(TestKmeans, Train) {
     }
 
     EXPECT_EQ(_cent, std::vector<int>({25, 50, 75, 100}));
+
+}
+
+TEST(TestKMeans, SaveLoad) {
+
+    cpphots::KMeansClusterer clusterer1(20);
+
+    cpphots::ClustererRandomSeeding(3, 3)(clusterer1, {});
+
+    std::srand((unsigned int) std::time(0));
+
+    clusterer1.toggleLearning(true);
+
+    for (uint16_t i = 0; i < 500; i++) {
+        clusterer1.cluster(cpphots::TimeSurfaceType::Random(3, 3) + 1.f /2.f);
+    }
+
+    clusterer1.toggleLearning(false);
+
+    std::ostringstream ostream;
+    ostream << clusterer1;
+
+    std::istringstream istream(ostream.str());
+    cpphots::KMeansClusterer clusterer2;
+
+    istream >> clusterer2;
+
+    EXPECT_TRUE(clusterer2.hasCentroids());
+
+    for (uint16_t i = 0; i < 1000; i++) {
+        cpphots::TimeSurfaceType ts = cpphots::TimeSurfaceType::Random(3, 3) + 1.f /2.f;
+        clusterer1.cluster(ts);
+        clusterer2.cluster(ts);
+    }
+
+    EXPECT_EQ(clusterer1.getHistogram(), clusterer2.getHistogram());
 
 }
