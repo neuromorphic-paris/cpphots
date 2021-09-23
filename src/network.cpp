@@ -156,4 +156,18 @@ Network::const_iterator Network::cend() const noexcept {
     return layers.cend();
 }
 
+
+Network operator+(const Network& n1, const Network& n2) {
+
+    Network ret = n1;
+
+    for (auto& l : n2) {
+        ret.addLayer(l);
+    }
+
+    return ret;
+
+}
+
+
 }

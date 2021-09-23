@@ -71,3 +71,27 @@ TEST_F(TestNetwork, Iterator) {
     EXPECT_EQ(hist_it, hist_proc);
 
 }
+
+TEST_F(TestNetwork, Subnetworks) {
+
+    for (auto& ev : evs) {
+        network.process(ev, true);
+    }
+    auto hist1 = network.back().getHistogram();
+
+    auto snet1 = network.getSubnetwork(0, 1);
+    auto snet2 = network.getSubnetwork(1, 2);
+
+    auto network2 = snet1 + snet2;
+    network2.reset();
+
+    EXPECT_EQ(network2.getNumLayers(), 2);
+
+    for (auto& ev : evs) {
+        network2.process(ev, true);
+    }
+    auto hist2 = network2.back().getHistogram();
+
+    EXPECT_EQ(hist1, hist2);
+
+}

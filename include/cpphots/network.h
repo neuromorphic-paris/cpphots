@@ -230,6 +230,8 @@ private:
 
 };
 
+Network operator+(const Network& n1, const Network& n2);
+
 }
 
 #endif
