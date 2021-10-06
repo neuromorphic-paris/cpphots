@@ -70,7 +70,7 @@ public:
      * @param eps precision convergence criterion
      * @param max_iterations maximum number of iterations for convergence
      */
-    GMMClusterer(GMMType type, uint16_t clusters, uint16_t truncated_clusters, uint16_t clusters_considered, TimeSurfaceScalarType eps, unsigned int max_iterations);
+    GMMClusterer(GMMType type, uint16_t clusters, uint16_t truncated_clusters, uint16_t clusters_considered, TimeSurfaceScalarType eps, unsigned int max_iterations=100);
 
     /**
      * @copydoc interfaces::Clusterer::cluster
