@@ -63,14 +63,14 @@ int main() {
 
     {
         cpphots::Layer layer(cpphots::create_pool_ptr<cpphots::LinearTimeSurface>(100, 100, 5, 5, 500., 1),
-                             new cpphots::GMMClusterer(cpphots::GMMClusterer::S_GMM, 10, 5, 8, 20));
+                             new cpphots::GMMClusterer(cpphots::GMMClusterer::S_GMM, 10, 5, 8, 0.01, 20));
         auto [tr, ex] = measure_times(layer, n_training, n_events);
         std::cout << " S-GMM | " << std::setw(9) << std::setprecision(5) << tr << " | " << std::setw(9) << std::setprecision(5) << ex << std::endl;
     }
 
     {
         cpphots::Layer layer(cpphots::create_pool_ptr<cpphots::LinearTimeSurface>(100, 100, 5, 5, 500., 1),
-                             new cpphots::GMMClusterer(cpphots::GMMClusterer::U_S_GMM, 10, 5, 8, 20));
+                             new cpphots::GMMClusterer(cpphots::GMMClusterer::U_S_GMM, 10, 5, 8, 0.01, 20));
         auto [tr, ex] = measure_times(layer, n_training, n_events);
         std::cout << "uS-GMM | " << std::setw(9) << std::setprecision(5) << tr << " | " << std::setw(9) << std::setprecision(5) << ex << std::endl;
     }

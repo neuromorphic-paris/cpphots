@@ -67,9 +67,10 @@ public:
      * @param clusters number of clusters
      * @param truncated_clusters number of truncated clusters
      * @param clusters_considered number of neighboring clusters considered
-     * @param eps convergence criterion, precision if < 1, number of epochs if > 1
+     * @param eps precision convergence criterion
+     * @param max_iterations maximum number of iterations for convergence
      */
-    GMMClusterer(GMMType type, uint16_t clusters, uint16_t truncated_clusters, uint16_t clusters_considered, TimeSurfaceScalarType eps);
+    GMMClusterer(GMMType type, uint16_t clusters, uint16_t truncated_clusters, uint16_t clusters_considered, TimeSurfaceScalarType eps, unsigned int max_iterations);
 
     /**
      * @copydoc interfaces::Clusterer::cluster
@@ -114,6 +115,7 @@ private:
     size_t last_centroid = 0;
     bool learning = true;
     TimeSurfaceScalarType eps;
+    unsigned int max_iterations;
     std::pair<uint16_t, uint16_t> ts_shape;
 
     void fit();

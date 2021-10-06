@@ -9,7 +9,7 @@
 
 TEST(GMMClustering, Processing) {
 
-    cpphots::GMMClusterer clusterer(cpphots::GMMClusterer::S_GMM, 20, 5, 10, 10);
+    cpphots::GMMClusterer clusterer(cpphots::GMMClusterer::S_GMM, 20, 5, 10, 0.01, 10);
 
     cpphots::ClustererRandomSeeding(3, 3)(clusterer, {});
 
@@ -38,7 +38,7 @@ TEST(GMMClustering, Processing) {
 
 TEST(GMMClustering, SaveLoad) {
 
-    cpphots::GMMClusterer clusterer1(cpphots::GMMClusterer::U_S_GMM, 20, 5, 10, 10);
+    cpphots::GMMClusterer clusterer1(cpphots::GMMClusterer::U_S_GMM, 20, 5, 10, 0.01, 10);
 
     cpphots::ClustererRandomSeeding(3, 3)(clusterer1, {});
 
@@ -74,7 +74,7 @@ TEST(GMMClustering, SaveLoad) {
 
 TEST(GMMClustering, Batches) {
 
-    cpphots::GMMClusterer clusterer(cpphots::GMMClusterer::U_S_GMM, 20, 5, 10, 10);
+    cpphots::GMMClusterer clusterer(cpphots::GMMClusterer::U_S_GMM, 20, 5, 10, 0.01, 10);
 
     cpphots::ClustererRandomSeeding(3, 3)(clusterer, {});
 

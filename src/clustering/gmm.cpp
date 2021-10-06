@@ -158,8 +158,8 @@ TimeSurfaceType vectorToTS(const BlazeVector& vec, size_t r, size_t c) {
 
 GMMClusterer::GMMClusterer() {}
 
-GMMClusterer::GMMClusterer(GMMType type, uint16_t clusters, uint16_t truncated_clusters, uint16_t clusters_considered, TimeSurfaceScalarType eps)
-    :type(type), clusters(clusters), truncated_clusters(truncated_clusters), clusters_considered(clusters_considered), eps(eps) {
+GMMClusterer::GMMClusterer(GMMType type, uint16_t clusters, uint16_t truncated_clusters, uint16_t clusters_considered, TimeSurfaceScalarType eps, unsigned int max_iterations)
+    :type(type), clusters(clusters), truncated_clusters(truncated_clusters), clusters_considered(clusters_considered), eps(eps), max_iterations(max_iterations) {
 
     set = std::make_shared<dataset<TimeSurfaceScalarType>>();
 
@@ -269,7 +269,6 @@ void GMMClusterer::fit() {
     TimeSurfaceScalarType change = 0.0;
 
     int iterations = 0;
-    TimeSurfaceScalarType criterion_scaling = 1.0;
 
     while (true) {
 
@@ -277,24 +276,18 @@ void GMMClusterer::fit() {
         ++iterations;
 
         cur = algo->get_free_energy();
-        // if (iterations == 2) {
-        //     criterion_scaling = std::abs((cur - prv));
-        // }
 
+        // free energy convergence criterion
         change = std::abs((cur - prv) / cur);
-        if (eps < 1) {
-            if (iterations > 1) {
-                // free energy convergence criterion
-                if (change < eps * criterion_scaling) {
-                    break;
-                }
-            }
-        } else {
-            // epochs
-            if (iterations >= eps) {
-                break;
-            }
+        if (iterations > 1 && change < eps) {
+            break;
         }
+
+        // epochs
+        if (iterations >= max_iterations) {
+            break;
+        }
+
         prv = cur;
 
     }
@@ -385,6 +378,7 @@ void GMMClusterer::toStream(std::ostream& out) const {
     out << last_centroid << " ";
     out << learning << " ";
     out << std::setprecision(std::numeric_limits<TimeSurfaceScalarType>::max_digits10) << eps << " ";
+    out << max_iterations << " ";
     out << ts_shape.first << " ";
     out << ts_shape.second << std::endl;
 
@@ -416,6 +410,7 @@ void GMMClusterer::fromStream(std::istream& in) {
     in >> last_centroid;
     in >> learning;
     in >> eps;
+    in >> max_iterations;
     in >> ts_shape.first;
     in >> ts_shape.second;
 
