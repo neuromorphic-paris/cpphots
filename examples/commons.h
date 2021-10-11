@@ -13,8 +13,8 @@ std::function<cpphots::event()> getRandomEventGenerator(uint16_t w, uint16_t h, 
 
     uint64_t lastt = 0;
 
-    std::uniform_int_distribution<uint16_t> distx(0, w);
-    std::uniform_int_distribution<uint16_t> disty(0, h);
+    std::uniform_int_distribution<uint16_t> distx(0, w-1);
+    std::uniform_int_distribution<uint16_t> disty(0, h-1);
     std::uniform_int_distribution<uint64_t> distt(1, 10);
 
     return [gen, lastt, distx, disty, distt] () mutable {

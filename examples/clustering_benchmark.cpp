@@ -55,10 +55,10 @@ int main() {
     size_t n_training = 10000;
     size_t n_events = 10e6;
 
-    std::cout << "       |  training | execution" << std::endl;
+    std::cout << "        |  training | execution" << std::endl;
 
     {
-        cpphots::Layer layer(cpphots::create_pool_ptr<cpphots::LinearTimeSurface>(100, 100, 5, 5, 500., 1),
+        cpphots::Layer layer(cpphots::create_pool_ptr<cpphots::LinearTimeSurface>(1, 100, 100, 5, 5, 500.),
                              new cpphots::CosineClusterer(10));
         auto [tr, ex] = measure_times(layer, n_training, n_events);
         std::cout << " cosine | " << std::setw(9) << std::setprecision(5) << tr << " | " << std::setw(9) << std::setprecision(5) << ex << std::endl;
@@ -67,14 +67,14 @@ int main() {
     #ifdef CPPHOTS_WITH_PEREGRINE
 
     {
-        cpphots::Layer layer(cpphots::create_pool_ptr<cpphots::LinearTimeSurface>(100, 100, 5, 5, 500., 1),
+        cpphots::Layer layer(cpphots::create_pool_ptr<cpphots::LinearTimeSurface>(1, 100, 100, 5, 5, 500.),
                              new cpphots::GMMClusterer(cpphots::GMMClusterer::S_GMM, 10, 5, 8, 0.01, 20));
         auto [tr, ex] = measure_times(layer, n_training, n_events);
         std::cout << "  S-GMM | " << std::setw(9) << std::setprecision(5) << tr << " | " << std::setw(9) << std::setprecision(5) << ex << std::endl;
     }
 
     {
-        cpphots::Layer layer(cpphots::create_pool_ptr<cpphots::LinearTimeSurface>(100, 100, 5, 5, 500., 1),
+        cpphots::Layer layer(cpphots::create_pool_ptr<cpphots::LinearTimeSurface>(1, 100, 100, 5, 5, 500.),
                              new cpphots::GMMClusterer(cpphots::GMMClusterer::U_S_GMM, 10, 5, 8, 0.01, 20));
         auto [tr, ex] = measure_times(layer, n_training, n_events);
         std::cout << " uS-GMM | " << std::setw(9) << std::setprecision(5) << tr << " | " << std::setw(9) << std::setprecision(5) << ex << std::endl;
@@ -83,7 +83,7 @@ int main() {
     #endif
 
     {
-        cpphots::Layer layer(cpphots::create_pool_ptr<cpphots::LinearTimeSurface>(100, 100, 5, 5, 500., 1),
+        cpphots::Layer layer(cpphots::create_pool_ptr<cpphots::LinearTimeSurface>(1, 100, 100, 5, 5, 500.),
                              new cpphots::KMeansClusterer(10, 20));
         auto [tr, ex] = measure_times(layer, n_training, n_events);
         std::cout << "k-means | " << std::setw(9) << std::setprecision(5) << tr << " | " << std::setw(9) << std::setprecision(5) << ex << std::endl;
