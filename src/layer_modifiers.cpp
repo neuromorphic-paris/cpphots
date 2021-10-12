@@ -63,47 +63,36 @@ void SerializingLayer::fromStream(std::istream& in) {
 
 
 
-SuperCell::SuperCell(uint16_t width, uint16_t height, uint16_t K, uint16_t overlap)
-    :width(width), height(height), K(K), o(overlap) {
+SuperCell::SuperCell(uint16_t width, uint16_t height, uint16_t K)
+    :width(width), height(height), K(K) {
 
     // width
-    wcell = 1 + (width - K) / (K - overlap);
-    wmax = K + (wcell-1)*(K - overlap);
+    wcell = 1 + (width - K) / K;
+    wmax = K + (wcell - 1) * K;
     if (width != wmax) {
-        std::cerr << "Width " << width << " is higher than the multiple of K and overlap. Events with x over " << wmax << " will be ignored" << std::endl;
+        std::cerr << "Width " << width << " is higher than the closest multiple of K. Events with x over " << wmax << " will be ignored" << std::endl;
     }
 
     // heigth
-    hcell = 1 + (height - K) / (K - overlap);
-    hmax = K + (hcell-1)*(K - overlap);
+    hcell = 1 + (height - K) / K;
+    hmax = K + (hcell - 1) * K;
     if (height != hmax) {
-        std::cerr << "Height " << height << " is higher than the multiple of K and overlap. Events with y over " << hmax << " will be ignored" << std::endl;
+        std::cerr << "Height " << height << " is higher than the closest multiple of K. Events with y over " << hmax << " will be ignored" << std::endl;
     }
 
 }
 
-std::vector<std::pair<uint16_t, uint16_t>> SuperCell::findCells(uint16_t ex, uint16_t ey) const {
+std::pair<uint16_t, uint16_t> SuperCell::findCell(uint16_t ex, uint16_t ey) const {
 
     if (ex >= wmax || ey >= hmax){
-        return {};
+        return invalid_coordinates;
     }
 
-    // get best cell coordinates
-    uint16_t lx = (ex >= o ? ex-o : 0) / (K-o);
-    uint16_t ly = (ey >= o ? ey-o : 0) / (K-o);
-    
-    std::vector<std::pair<uint16_t, uint16_t>> cells{{lx, ly}};
+    // get cell coordinates
+    uint16_t lx = ex / K;
+    uint16_t ly = ey / K;
 
-    if (o > 0) {
-        if ((lx+1 < wcell) && (ly+0 < hcell) && isInCell(lx+1, ly+0, ex, ey))
-            cells.push_back({lx+1, ly+0});
-        if ((lx+0 < wcell) && (ly+1 < hcell) && isInCell(lx+0, ly+1, ex, ey))
-            cells.push_back({lx+0, ly+1});
-        if ((lx+1 < wcell) && (ly+1 < hcell) && isInCell(lx+1, ly+1, ex, ey))
-            cells.push_back({lx+1, ly+1});
-    }
-
-    return cells;
+    return {lx, ly};
 
 }
 
@@ -124,7 +113,6 @@ void SuperCell::toStream(std::ostream& out) const {
     out << width << " ";
     out << height << " ";
     out << K << " ";
-    out << o << " ";
     out << wcell << " ";
     out << hcell << " ";
     out << wmax << " ";
@@ -136,7 +124,6 @@ void SuperCell::fromStream(std::istream& in) {
     in >> width;
     in >> height;
     in >> K;
-    in >> o;
     in >> wcell;
     in >> hcell;
     in >> wmax;
@@ -145,7 +132,7 @@ void SuperCell::fromStream(std::istream& in) {
 
 std::pair<uint16_t, uint16_t> SuperCell::getCellCenter(uint16_t cx, uint16_t cy) const {
 
-    return {cx * (K - o) + K / 2, cy * (K-o) + K / 2};
+    return {cx * K + K / 2, cy * K + K / 2};
 
 }
 
@@ -162,8 +149,8 @@ bool SuperCell::isInCell(uint16_t cx, uint16_t cy, uint16_t ex, uint16_t ey) con
 }
 
 
-SuperCellAverage::SuperCellAverage(uint16_t width, uint16_t height, uint16_t K, uint16_t overlap)
-    :SuperCell(width, height, K, overlap) {
+SuperCellAverage::SuperCellAverage(uint16_t width, uint16_t height, uint16_t K)
+    :SuperCell(width, height, K) {
 
     cells = std::vector<std::vector<CellMem>>(hcell, std::vector<CellMem>(wcell));
 
@@ -195,7 +182,6 @@ void SuperCellAverage::toStream(std::ostream& out) const {
     out << width << " ";
     out << height << " ";
     out << K << " ";
-    out << o << " ";
     out << wcell << " ";
     out << hcell << " ";
     out << wmax << " ";
@@ -207,7 +193,6 @@ void SuperCellAverage::fromStream(std::istream& in) {
     in >> width;
     in >> height;
     in >> K;
-    in >> o;
     in >> wcell;
     in >> hcell;
     in >> wmax;

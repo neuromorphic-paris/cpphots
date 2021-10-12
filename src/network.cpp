@@ -18,32 +18,27 @@ void Network::addLayer(const Layer& layer) {
     layers.push_back(layer);
 }
 
-Events Network::process(uint64_t t, uint16_t x, uint16_t y, uint16_t p, bool skip_check) {
+event Network::process(uint64_t t, uint16_t x, uint16_t y, uint16_t p, bool skip_check) {
 
     return process({t, x, y, p}, skip_check);
 
 }
 
-Events Network::process(const event& ev, bool skip_check) {
+event Network::process(const event& ev, bool skip_check) {
 
-    Events evs{ev};
+    event nev = ev;
     for (auto& layer : layers) {
 
-        Events next_evs;
+        // Events next_evs;
+        nev = layer.process(nev, skip_check);
 
-        for (auto& nev : evs) {
-            Events pevs = layer.process(nev, skip_check);
-            next_evs.insert(next_evs.end(), pevs.begin(), pevs.end());
+        if (nev == invalid_event) {
+            return invalid_event;
         }
-
-        if (next_evs.empty())
-            return next_evs;
-
-        evs = next_evs;
 
     }
 
-    return evs;
+    return nev;
 
 }
 

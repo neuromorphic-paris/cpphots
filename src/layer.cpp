@@ -211,7 +211,7 @@ const interfaces::SuperCell& Layer::getSuperCell() const {
 
 }
 
-Events Layer::process(uint64_t t, uint16_t x, uint16_t y, uint16_t p, bool skip_check) {
+event Layer::process(uint64_t t, uint16_t x, uint16_t y, uint16_t p, bool skip_check) {
 
     cpphots_assert(tspool != nullptr);
 
@@ -219,58 +219,31 @@ Events Layer::process(uint64_t t, uint16_t x, uint16_t y, uint16_t p, bool skip_
 
     // if the surface is not good we say it upstream
     if (!skip_check && !good) {
-        return Events{};
+        return invalid_event;
     }
 
-    // no-supercell
-    if (!supercell) {
-
-        uint16_t k = p;
-
-        // if there is a clustering algorithm we can use it
-        if (clusterer) {
-            k = clusterer->cluster(surface);
+    // supercell modifier
+    if (supercell) {
+        std::tie(x, y) = supercell->findCell(x, y);
+        surface = supercell->averageTS(surface, x, y);
+        if (x == invalid_coordinates.first || y == invalid_coordinates.second) {
+            return invalid_event;
         }
-
-        if (remapper) {
-            return {remapper->remapEvent(event{t, x, y, p}, k)};
-        } else {
-            return {{t, x, y, k}};  // default behaviour
-        }
-
     }
 
-    // if there is a supercell modifier we use it
-    std::vector<TimeSurfaceType> surfaces;
-    std::vector<std::pair<uint16_t, uint16_t>> coords;
+    uint16_t k = p;
 
-    coords = supercell->findCells(x, y);
-    for (auto [cx, cy] : coords) {
-        surfaces.push_back(supercell->averageTS(surface, cx, cy));
+    // if there is a clustering algorithm we can use it
+    if (clusterer) {
+        k = clusterer->cluster(surface);
     }
 
-    Events retevents;
-
-    for (size_t i = 0; i < surfaces.size(); i++) {
-
-        auto& surface = surfaces[i];
-        auto [x, y] = coords[i];
-
-        uint16_t k = p;
-
-        if (clusterer) {
-            k = clusterer->cluster(surface);
-        }
-
-        if (remapper) {
-            retevents.push_back(remapper->remapEvent(event{t, x, y, p}, k));
-        } else {
-            retevents.push_back(event{t, x, y, k});
-        }
-
+    // remap event
+    if (remapper) {
+        return {remapper->remapEvent(event{t, x, y, p}, k)};
     }
 
-    return retevents;
+    return {t, x, y, k};  // default behaviour
 
 }
 

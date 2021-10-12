@@ -102,11 +102,10 @@ public:
      * @param width width of the context
      * @param height height of the context
      * @param K size of the cells
-     * @param overlap cells overlap
      */
-    SuperCell(uint16_t width, uint16_t height, uint16_t K, uint16_t overlap = 0);
+    SuperCell(uint16_t width, uint16_t height, uint16_t K);
 
-    std::vector<std::pair<uint16_t, uint16_t>> findCells(uint16_t ex, uint16_t ey) const override;
+    std::pair<uint16_t, uint16_t> findCell(uint16_t ex, uint16_t ey) const override;
 
     std::pair<uint16_t, uint16_t> getSize() const override;
 
@@ -144,11 +143,6 @@ protected:
      * @brief Size of the cells
      */
     uint16_t K;
-
-    /**
-     * @brief Overlap of the cells
-     */
-    uint16_t o;
 
     /**
      * @brief Number of cells (horizontal)
@@ -217,9 +211,8 @@ public:
      * @param width width of the context
      * @param height height of the context
      * @param K size of the cells
-     * @param overlap cells overlap
      */
-    SuperCellAverage(uint16_t width, uint16_t height, uint16_t K, uint16_t overlap = 0);
+    SuperCellAverage(uint16_t width, uint16_t height, uint16_t K);
 
     /**
      * @copydoc interfaces::SuperCell::averageTS

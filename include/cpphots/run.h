@@ -44,8 +44,7 @@ Events process(P& processor, const Events& events, bool reset = true, bool skip_
 
     Events ret;
     for (const auto& ev : events) {
-        Events nev = processor.process(ev, skip_check);
-        ret.insert(ret.end(), nev.begin(), nev.end());
+        ret.push_back(processor.process(ev, skip_check));
     }
 
     return ret;

@@ -44,7 +44,6 @@ struct EventRemapper : public virtual Streamable, public ClonableBase<EventRemap
  * 
  * Usually such modifiers, changes the output coordinates of the events
  * using cells, thus reducing the output dimensionality.
- * Cells may be overlapping, causing the layer to emit more than one event.
  * 
  * Modifiers can also average time surfaces from the same cell.
  */
@@ -58,15 +57,13 @@ public:
     ~SuperCell() {}
 
     /**
-     * @brief Find coordinates of cells that are over certain coordinates
-     * 
-     * The output contains more than one set of coordinates only if overlap > 0.
+     * @brief Find the coordinates of the cell that contains certain coordinates
      * 
      * @param ex x coordinate of the event
      * @param ey y coordinate of the event
-     * @return vector of cell coordinates
+     * @return cell coordinates
      */
-    virtual std::vector<std::pair<uint16_t, uint16_t>> findCells(uint16_t ex, uint16_t ey) const = 0;
+    virtual std::pair<uint16_t, uint16_t> findCell(uint16_t ex, uint16_t ey) const = 0;
 
     /**
      * @brief Returns the size of the context

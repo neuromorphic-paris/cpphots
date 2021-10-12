@@ -55,67 +55,22 @@ TEST(TestModifiers, SerializingLayer) {
 
 }
 
-TEST(TestModifiers, SuperCellOverride) {
-    
-    cpphots::SuperCell sup(50, 50, 5, 1);
-
-    std::vector<std::pair<PointType, std::vector<PointType>>> cases{
-        {{9, 5}, {{2, 1}}},
-        {{14, 10}, {{3, 2}}},
-        {{8, 36}, {{1, 8}, {2, 8}, {1, 9}, {2, 9}}},
-        {{39, 40}, {{9, 9}, {9, 10}}},
-        {{24, 15}, {{5, 3}, {6, 3}}},
-        {{48, 48}, {{11, 11}}},
-        {{48, 0}, {{11, 0}}},
-        {{0, 48}, {{0, 11}}},
-        {{0, 0}, {{0, 0}}}
-    };
-
-    for (auto [tp, tr] : cases) {
-        auto cells = sup.findCells(tp.first, tp.second);
-        EXPECT_EQ(cells, tr);
-    }
-
-}
-
 TEST(TestModifiers, SuperCell) {
 
-    {
-        cpphots::SuperCell sup(103, 50, 4, 0);
+    cpphots::SuperCell sup(103, 50, 4);
 
-        auto [supw, suph] = sup.getCellSizes();
+    auto [supw, suph] = sup.getCellSizes();
 
-        ASSERT_EQ(supw, 25);
-        ASSERT_EQ(suph, 12);
+    ASSERT_EQ(supw, 25);
+    ASSERT_EQ(suph, 12);
 
-        for (uint16_t x = 0; x < 103; x++) {
-            for (uint16_t y = 0; y < 50; y++) {
-                auto cells = sup.findCells(x, y);
-                if (x < 100 && y < 48) {
-                    EXPECT_FALSE(cells.empty()) << " with " << x << ", " << y;
-                } else {
-                    EXPECT_TRUE(cells.empty()) << " with " << x << ", " << y;
-                }
-            }
-        }
-    }
-
-    {
-        cpphots::SuperCell sup(105, 50, 4, 1);
-
-        auto [supw, suph] = sup.getCellSizes();
-
-        ASSERT_EQ(supw, 34);
-        ASSERT_EQ(suph, 16);
-
-        for (uint16_t x = 0; x < 105; x++) {
-            for (uint16_t y = 0; y < 50; y++) {
-                auto cells = sup.findCells(x, y);
-                if (x < 103 && y < 49) {
-                    EXPECT_FALSE(cells.empty()) << " with " << x << ", " << y;
-                } else {
-                    EXPECT_TRUE(cells.empty()) << " with " << x << ", " << y;
-                }
+    for (uint16_t x = 0; x < 103; x++) {
+        for (uint16_t y = 0; y < 50; y++) {
+            auto cell = sup.findCell(x, y);
+            if (x < 100 && y < 48) {
+                EXPECT_NE(cell, cpphots::invalid_coordinates);
+            } else {
+                EXPECT_EQ(cell, cpphots::invalid_coordinates);
             }
         }
     }
@@ -133,7 +88,7 @@ TEST(TestModifiersLayer, ArrayLayer) {
 
     for (int i = 0; i < 10000; i++) {
         auto evin = reg();
-        auto evout = layer.process(evin, true)[0];
+        auto evout = layer.process(evin, true);
         EXPECT_EQ(evout.t, evin.t);
         EXPECT_EQ(evout.x, i % 10);
         EXPECT_EQ(evout.y, evin.y);
@@ -154,7 +109,7 @@ TEST(TestModifiersLayer, SerializingLayer) {
     for (int i = 0; i < 1000; i++) {
         auto evin = reg();
         try {
-            auto evout = layer.process(evin, true)[0];
+            auto evout = layer.process(evin, true);
             EXPECT_EQ(evout.t, evin.t);
             EXPECT_EQ(evout.x, 10*10*(i % 10) + 10*evin.y + evin.x);
             EXPECT_EQ(evout.y, 0);
@@ -180,7 +135,7 @@ TEST(TestModifiersLayer, SerializingLayerException) {
     for (int i = 0; i < 10; i++) {
         auto evin = reg();
         try {
-            auto evout = layer.process(evin, true)[0];
+            auto evout = layer.process(evin, true);
             EXPECT_EQ(evout.t, evin.t);
             EXPECT_EQ(evout.x, 100*100*(i % 10) + 100*evin.y + evin.x);
             EXPECT_EQ(evout.y, 0);
@@ -194,26 +149,39 @@ TEST(TestModifiersLayer, SerializingLayerException) {
 
 }
 
+TEST(TestModifiers, SuperCellCoordinates) {
+
+    cpphots::SuperCell sup(50, 50, 5);
+
+    std::vector<std::pair<PointType, PointType>> cases{
+        {{9, 5}, {1, 1}},
+        {{14, 10}, {2, 2}},
+        {{8, 36}, {1, 7}},
+        {{39, 40}, {7, 8}},
+        {{24, 15}, {4, 3}},
+        {{48, 48}, {9, 9}},
+        {{48, 0}, {9, 0}},
+        {{0, 48}, {0, 9}},
+        {{0, 0}, {0, 0}}
+    };
+
+    for (auto [tp, tr] : cases) {
+        auto cell = sup.findCell(tp.first, tp.second);
+        EXPECT_EQ(cell, tr);
+    }
+
+}
+
+
 TEST(TestModifiersLayer, SuperCell) {
 
     cpphots::Layer layer(cpphots::create_pool_ptr<cpphots::LinearTimeSurface>(2, 50, 50, 5, 5, 10000));
     layer.createClusterer<MockClusterer>(10);
-    layer.createSuperCell<cpphots::SuperCell>(50, 50, 5, 1);
+    layer.createSuperCell<cpphots::SuperCell>(50, 50, 5);
 
-    auto evts = layer.process(10, 8, 36, 0, true);
+    auto evt = layer.process(10, 8, 36, 0, true);
 
-    ASSERT_EQ(evts.size(), 4);
-
-    EXPECT_EQ(evts[0].x, 1);
-    EXPECT_EQ(evts[0].y, 8);
-
-    EXPECT_EQ(evts[1].x, 2);
-    EXPECT_EQ(evts[1].y, 8);
-
-    EXPECT_EQ(evts[2].x, 1);
-    EXPECT_EQ(evts[2].y, 9);
-
-    EXPECT_EQ(evts[3].x, 2);
-    EXPECT_EQ(evts[3].y, 9);
+    EXPECT_EQ(evt.x, 1);
+    EXPECT_EQ(evt.y, 7);
 
 }

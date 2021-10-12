@@ -278,7 +278,7 @@ TEST(TestSaveLoad, SerializingLayer) {
 
 TEST(TestSaveLoad, SuperCell) {
 
-    cpphots::SuperCell mod1(49, 9, 5, 1);
+    cpphots::SuperCell mod1(49, 9, 5);
 
     std::stringstream outstream;
     outstream << mod1;
@@ -314,7 +314,7 @@ TEST(TestSaveLoad, SuperCell) {
 
 TEST(TestSaveLoad, SuperCellAverage) {
 
-    cpphots::SuperCellAverage mod1(49, 9, 5, 1);
+    cpphots::SuperCellAverage mod1(49, 9, 5);
 
     std::stringstream outstream;
     outstream << mod1;

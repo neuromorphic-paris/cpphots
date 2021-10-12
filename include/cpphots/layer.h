@@ -252,25 +252,25 @@ public:
     const interfaces::SuperCell& getSuperCell() const;
 
     /**
-     * @brief Process an event and return zero or more events
+     * @brief Process an event and return a new one
      * 
      * @param t time of the event
      * @param x horizontal coordinate of the event
      * @param y vertical coordinate of the event
      * @param p polarity of the event
      * @param skip_check if true consider the event as valid
-     * @return the emitted events, possibly empty
+     * @return the emitted event, possibly invalid
      */
-    Events process(uint64_t t, uint16_t x, uint16_t y, uint16_t p, bool skip_check = false);
+    event process(uint64_t t, uint16_t x, uint16_t y, uint16_t p, bool skip_check = false);
 
     /**
-     * @brief Process an event and return zero or more events
+     * @brief Process an event and return a new one
      * 
      * @param ev the event
      * @param skip_check if true consider the event as valid
-     * @return the emitted events, possibly empty
+     * @return the emitted event, possibly invalid
      */
-    Events process(const event& ev, bool skip_check = false) {
+    event process(const event& ev, bool skip_check = false) {
         return process(ev.t, ev.x, ev.y, ev.p, skip_check);
     }
 

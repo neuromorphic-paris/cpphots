@@ -95,8 +95,7 @@ double test_layer(unsigned int num_layers, unsigned int num_events) {
         auto ev = evgen();
 
         for (unsigned int l = 0; l < num_layers; l++) {
-            auto evts = layers[l].process(ev, true);
-            ev = evts[0];
+            ev = layers[l].process(ev, true);
         }
 
     }

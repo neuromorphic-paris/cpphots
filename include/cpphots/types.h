@@ -65,6 +65,12 @@ inline const event invalid_event{std::numeric_limits<uint64_t>::max(),
                                  std::numeric_limits<uint16_t>::max()};
 
 /**
+ * @brief Invalid event coordinates
+ */
+inline const std::pair<uint16_t, uint16_t> invalid_coordinates{std::numeric_limits<uint16_t>::max(),
+                                                               std::numeric_limits<uint16_t>::max()};
+
+/**
  * @brief Stream insertion operator for events
  * 
  * Insert the event as "(t, x, y, p)".

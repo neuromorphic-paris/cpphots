@@ -63,8 +63,8 @@ public:
     /**
      * @brief Process an event
      * 
-     * Process the event through all the layers of the network, emitting events from the last layer.
-     * If the input event produces a non valid surface in any layer, the output events vector might be empty.
+     * Process the event through all the layers of the network, emitting the event resulting from the last layer.
+     * If the input event produces a non valid surface in any layer, the output event is invalid.
      * 
      * @param t time of the event
      * @param x horizontal coordinate of the event
@@ -73,19 +73,19 @@ public:
      * @param skip_check if true consider the event as valid
      * @return the new emitted events, possibly empty
      */
-    Events process(uint64_t t, uint16_t x, uint16_t y, uint16_t p, bool skip_check = false);
+    event process(uint64_t t, uint16_t x, uint16_t y, uint16_t p, bool skip_check = false);
 
     /**
      * @brief Process an event
      * 
      * Process the event through all the layers of the network, emitting events from the last layer.
-     * If the input event produces a non valid surface in any layer, also the output events might be empty.
+     * If the input event produces a non valid surface in any layer, the output event is invalid
      * 
      * @param ev the event
      * @param skip_check if true consider the event as valid
      * @return the new emitted events, possibly empty
      */
-    Events process(const event& ev, bool skip_check = false);
+    event process(const event& ev, bool skip_check = false);
 
     /**
      * @brief Get the number of layers in the network
