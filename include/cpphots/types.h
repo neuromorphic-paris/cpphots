@@ -5,7 +5,7 @@
 #ifndef CPPHOTS_TYPES_H
 #define CPPHOTS_TYPES_H
 
-
+#include <vector>
 #include <Eigen/Dense>
 
 
