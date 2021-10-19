@@ -36,8 +36,9 @@ public:
      * The constructor will not seed the centroids.
      * 
      * @param clusters number of clusters
+     * @param homeostasis homeostatic regulation
      */
-    CosineClusterer(uint16_t clusters);
+    CosineClusterer(uint16_t clusters, TimeSurfaceScalarType homeostasis = 0.0);
 
     /**
      * @copydoc interfaces::Clusterer::cluster
@@ -82,8 +83,10 @@ public:
 private:
     std::vector<TimeSurfaceType> centroids;
     std::vector<uint32_t> centroids_activations;
+    uint32_t tot_centroids_activations;
     uint16_t clusters;
     bool learning = true;
+    TimeSurfaceScalarType homeostasis;
 
 };
 

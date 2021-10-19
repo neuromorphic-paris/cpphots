@@ -7,10 +7,16 @@ namespace cpphots {
 
 CosineClusterer::CosineClusterer() {}
 
-CosineClusterer::CosineClusterer(uint16_t clusters)
-    :clusters(clusters) {
+CosineClusterer::CosineClusterer(uint16_t clusters, TimeSurfaceScalarType homeostasis)
+    :clusters(clusters), homeostasis(homeostasis) {
+
+    if (homeostasis > 0) {
+        throw std::invalid_argument("Homeostatic regulation parameters should be < 0");
+    }
 
     reset();
+
+    tot_centroids_activations = 0;
 
 }
 
@@ -23,11 +29,18 @@ uint16_t CosineClusterer::cluster(const TimeSurfaceType& surface) {
     TimeSurfaceScalarType mindist = std::numeric_limits<TimeSurfaceScalarType>::max();
     for (uint i = 0; i < centroids.size(); i++) {
         TimeSurfaceScalarType d = (surface - centroids[i]).matrix().norm();
+        if (learning && tot_centroids_activations > 0) {
+            TimeSurfaceScalarType gamma_arg = homeostasis * ((TimeSurfaceScalarType)centroids_activations[i] / tot_centroids_activations * clusters - 1);
+            TimeSurfaceScalarType gamma = std::exp(gamma_arg);
+            d /= gamma;
+        }
         if (d < mindist) {
             mindist = d;
             k = i;
         }
     }
+
+    cpphots_assert(k != -1);
 
     // update histogram
     updateHistogram(k);
@@ -36,6 +49,7 @@ uint16_t CosineClusterer::cluster(const TimeSurfaceType& surface) {
 
         // increase kernel activation
         centroids_activations[k]++;
+        tot_centroids_activations++;
 
         // beta
         TimeSurfaceScalarType beta = centroids[k].cwiseProduct(surface).sum() / centroids[k].matrix().norm() / surface.matrix().norm();
@@ -69,6 +83,7 @@ bool CosineClusterer::toggleLearning(bool enable) {
 void CosineClusterer::clearCentroids() {
     centroids.clear();
     centroids_activations.clear();
+    tot_centroids_activations = 0;
 }
 
 void CosineClusterer::addCentroid(const TimeSurfaceType& centroid) {
@@ -94,6 +109,9 @@ void CosineClusterer::toStream(std::ostream& out) const {
     out << centroids[0].rows() << " ";
     out << centroids[0].cols() << " ";
 
+    out << homeostasis << " ";
+    out << tot_centroids_activations << " ";
+
     for (const auto& pa : centroids_activations) {
         out << pa << " ";
     }
@@ -116,6 +134,9 @@ void CosineClusterer::fromStream(std::istream& in) {
     in >> n_centroids;
     in >> wy;
     in >> wx;
+
+    in >> homeostasis;
+    in >> tot_centroids_activations;
 
     centroids_activations.clear();
     centroids_activations.resize(n_centroids);
