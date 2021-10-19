@@ -44,7 +44,9 @@ Events process(P& processor, const Events& events, bool reset = true, bool skip_
 
     Events ret;
     for (const auto& ev : events) {
-        ret.push_back(processor.process(ev, skip_check));
+        auto rev = processor.process(ev, skip_check);
+        if (rev != invalid_event)
+            ret.push_back(rev);
     }
 
     return ret;
