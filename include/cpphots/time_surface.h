@@ -394,7 +394,7 @@ public:
         return ret;
     }
 
-    size_t getNumSurfaces() override {
+    size_t getNumSurfaces() const override {
         return surfaces.size();
     }
 

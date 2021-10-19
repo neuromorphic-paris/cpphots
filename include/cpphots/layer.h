@@ -323,7 +323,7 @@ public:
         return tspool->sampleContexts(t);
     }
 
-    size_t getNumSurfaces() override {
+    size_t getNumSurfaces() const override {
         return tspool->getNumSurfaces();
     }
 
