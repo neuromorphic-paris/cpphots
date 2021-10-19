@@ -30,9 +30,7 @@ uint16_t CosineClusterer::cluster(const TimeSurfaceType& surface) {
     for (uint i = 0; i < centroids.size(); i++) {
         TimeSurfaceScalarType d = (surface - centroids[i]).matrix().norm();
         if (learning && tot_centroids_activations > 0) {
-            TimeSurfaceScalarType gamma_arg = homeostasis * ((TimeSurfaceScalarType)centroids_activations[i] / tot_centroids_activations * clusters - 1);
-            TimeSurfaceScalarType gamma = std::exp(gamma_arg);
-            d /= gamma;
+            d /= std::exp(homeostasis * ((TimeSurfaceScalarType)centroids_activations[i] / tot_centroids_activations * clusters - 1));
         }
         if (d < mindist) {
             mindist = d;
