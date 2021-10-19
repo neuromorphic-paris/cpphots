@@ -297,7 +297,7 @@ public:
      * 
      * @return number of surfaces
      */
-    virtual size_t getNumSurfaces() = 0;
+    virtual size_t getNumSurfaces() const = 0;
 
 };
 
