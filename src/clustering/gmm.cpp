@@ -204,7 +204,7 @@ void GMMClusterer::addCentroid(const TimeSurfaceType& centroid) {
 
 }
 
-std::vector<TimeSurfaceType> GMMClusterer::getCentroids() const {
+const std::vector<TimeSurfaceType>&GMMClusterer::getCentroids() const {
 
     std::vector<TimeSurfaceType> centroids;
 

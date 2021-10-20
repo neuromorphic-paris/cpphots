@@ -68,7 +68,7 @@ uint16_t CosineClusterer::getNumClusters() const {
     return clusters;
 }
 
-std::vector<TimeSurfaceType> CosineClusterer::getCentroids() const {
+const std::vector<TimeSurfaceType>& CosineClusterer::getCentroids() const {
     return centroids;
 }
 

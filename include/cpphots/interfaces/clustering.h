@@ -62,7 +62,7 @@ public:
      * 
      * @return the list of centroids
      */
-    virtual std::vector<TimeSurfaceType> getCentroids() const = 0;
+    virtual const std::vector<TimeSurfaceType>& getCentroids() const = 0;
 
     /**
      * @brief Remove all centroids

@@ -343,7 +343,7 @@ public:
         clusterer->addCentroid(centroid);
     }
 
-    std::vector<TimeSurfaceType> getCentroids() const override {
+    const std::vector<TimeSurfaceType>& getCentroids() const override {
         cpphots_assert(clusterer != nullptr);
         return clusterer->getCentroids();
     }

@@ -84,7 +84,7 @@ public:
 
     void addCentroid(const TimeSurfaceType& centroid) override;
 
-    std::vector<TimeSurfaceType> getCentroids() const override;
+    const std::vector<TimeSurfaceType>& getCentroids() const override;
 
     void clearCentroids() override;
 

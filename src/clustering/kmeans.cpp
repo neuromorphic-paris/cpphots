@@ -137,7 +137,7 @@ void KMeansClusterer::addCentroid(const TimeSurfaceType& centroid) {
     centroids.push_back(centroid);
 }
 
-std::vector<TimeSurfaceType> KMeansClusterer::getCentroids() const {
+const std::vector<TimeSurfaceType>& KMeansClusterer::getCentroids() const {
     return centroids;
 }
 

@@ -112,7 +112,7 @@ public:
 
     void addCentroid(const cpphots::TimeSurfaceType& centroid) override {}
 
-    std::vector<cpphots::TimeSurfaceType> getCentroids() const override {
+    const std::vector<cpphots::TimeSurfaceType>& getCentroids() const override {
         return {};
     }
 
