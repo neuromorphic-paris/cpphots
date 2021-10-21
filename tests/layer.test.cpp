@@ -252,11 +252,21 @@ TEST_F(TestLayerSeeding, Uniform) {
     cpphots::layerSeedCentroids(cpphots::ClustererUniformSeeding, layer, events);
     ASSERT_TRUE(layer.hasCentroids());
 
+    for (const auto& c : layer.getCentroids()) {
+        ASSERT_GE(c.minCoeff(), 0.0);
+        ASSERT_LE(c.maxCoeff(), 1.0);
+    }
+
     layer.clearCentroids();
     ASSERT_FALSE(layer.hasCentroids());
 
     cpphots::layerSeedCentroids(cpphots::ClustererUniformSeeding, layer, {events, events});
     ASSERT_TRUE(layer.hasCentroids());
+
+    for (const auto& c : layer.getCentroids()) {
+        ASSERT_GE(c.minCoeff(), 0.0);
+        ASSERT_LE(c.maxCoeff(), 1.0);
+    }
 
 }
 
@@ -265,11 +275,21 @@ TEST_F(TestLayerSeeding, PlusPLus) {
     cpphots::layerSeedCentroids(cpphots::ClustererPlusPlusSeeding, layer, events);
     ASSERT_TRUE(layer.hasCentroids());
 
+    for (const auto& c : layer.getCentroids()) {
+        ASSERT_GE(c.minCoeff(), 0.0);
+        ASSERT_LE(c.maxCoeff(), 1.0);
+    }
+
     layer.clearCentroids();
     ASSERT_FALSE(layer.hasCentroids());
 
     cpphots::layerSeedCentroids(cpphots::ClustererPlusPlusSeeding, layer, {events, events});
     ASSERT_TRUE(layer.hasCentroids());
+
+    for (const auto& c : layer.getCentroids()) {
+        ASSERT_GE(c.minCoeff(), 0.0);
+        ASSERT_LE(c.maxCoeff(), 1.0);
+    }
 
 }
 
@@ -278,11 +298,21 @@ TEST_F(TestLayerSeeding, AFKMC2) {
     cpphots::layerSeedCentroids(cpphots::ClustererAFKMC2Seeding(5), layer, events);
     ASSERT_TRUE(layer.hasCentroids());
 
+    for (const auto& c : layer.getCentroids()) {
+        ASSERT_GE(c.minCoeff(), 0.0);
+        ASSERT_LE(c.maxCoeff(), 1.0);
+    }
+
     layer.clearCentroids();
     ASSERT_FALSE(layer.hasCentroids());
 
     cpphots::layerSeedCentroids(cpphots::ClustererAFKMC2Seeding(5), layer, {events, events});
     ASSERT_TRUE(layer.hasCentroids());
+
+    for (const auto& c : layer.getCentroids()) {
+        ASSERT_GE(c.minCoeff(), 0.0);
+        ASSERT_LE(c.maxCoeff(), 1.0);
+    }
 
 }
 
@@ -291,11 +321,21 @@ TEST_F(TestLayerSeeding, Random) {
     cpphots::layerSeedCentroids(cpphots::ClustererRandomSeeding(5, 5), layer, events);
     ASSERT_TRUE(layer.hasCentroids());
 
+    for (const auto& c : layer.getCentroids()) {
+        ASSERT_GE(c.minCoeff(), 0.0);
+        ASSERT_LE(c.maxCoeff(), 1.0);
+    }
+
     layer.clearCentroids();
     ASSERT_FALSE(layer.hasCentroids());
 
     cpphots::layerSeedCentroids(cpphots::ClustererRandomSeeding(5, 5), layer, {events, events});
     ASSERT_TRUE(layer.hasCentroids());
+
+    for (const auto& c : layer.getCentroids()) {
+        ASSERT_GE(c.minCoeff(), 0.0);
+        ASSERT_LE(c.maxCoeff(), 1.0);
+    }
 
 }
 
