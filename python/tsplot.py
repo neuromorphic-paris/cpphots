@@ -25,24 +25,54 @@ def plot_ts_1d(ts, ax=None, color=None):
         plt.show()
 
 
-def plot_ts_2d(ts, ax=None, color=None):
+def plot_ts_heatmap(ts, ax=None, cmap=None):
+    """
+    Plot a two-dimensional time surface as a heatmap, either in a single figure or in a subplot
+
+    :param ts: the time surface to be plotted
+    :param ax: the axis of the subplot (leave it to None to create a new figure)
+    :param cmap: color map, has higher priority over color
+    """
+    fig = None
+
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.gca()
+
+    if cmap is None:
+        cmap = plt.cm.plasma
+
+    ax.imshow(ts, cmap=cmap)
+
+    if fig is not None:
+        plt.show()
+
+
+def plot_ts_2d(ts, ax=None, color=None, cmap=None):
     """
     Plot a two-dimensional time surface in a 3D plot, either in a single figure or in a subplot
 
     :param ts: the time surface to be plotted
     :param ax: the axis of the subplot (leave it to None to create a new figure)
     :param color: color of the plot (leave it to None to use the next color in the rotation)
+    :param cmap: color map, has higher priority over color
     """
     fig = None
 
     if ax is None:
         fig = plt.figure()
         ax = fig.gca(projection='3d')
+
+    if color is None and cmap is None:
+        cmap = plt.cm.plasma
+    elif cmap is not None:
+        color = None
+
     x = np.arange(ts.shape[0])
     y = np.arange(ts.shape[1])
     x, y, = np.meshgrid(x, y)
-    # we need to transpose the ts, otherwise it will not work when is not sqared
-    ax.plot_surface(x, y, ts.transpose(), color=color)
+    # we need to transpose the ts, otherwise it will not work when is not squared
+    ax.plot_surface(x, y, ts.transpose(), color=color, cmap=cmap, alpha=0.5)
     ax.set_xlabel("x")
     ax.set_ylabel("y")
     ax.set_zlim(0.0, 1.0)

@@ -1,5 +1,6 @@
 import sys
 import argparse
+import os
 
 import numpy as np
 
@@ -12,7 +13,7 @@ else:
         FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
 from matplotlib.figure import Figure
 
-from tsplot import plot_ts_1d, plot_ts_2d
+from tsplot import plot_ts_1d, plot_ts_2d, plot_ts_heatmap
 
 
 class ControlToolbar(QtWidgets.QToolBar):
@@ -44,6 +45,12 @@ class ControlToolbar(QtWidgets.QToolBar):
         self._cols_le.setFocusPolicy(QtCore.Qt.ClickFocus)
         self._cols_le.editingFinished.connect(self.change_arrangement)
         self.addWidget(self._cols_le)
+        self.addSeparator()
+        # self.addWidget(QtWidgets.QLabel("3D:"))
+        self._3dcheckbox = QtWidgets.QCheckBox("3D")
+        self._3dcheckbox.stateChanged.connect(self.change_3d)
+        self.addWidget(self._3dcheckbox)
+
 
         # just some space
         spacer = QtWidgets.QWidget()
@@ -104,6 +111,26 @@ class ControlToolbar(QtWidgets.QToolBar):
         """
         self._idx_le.setText(str(self._parent.current + 1))
 
+    def change_3d(self):
+        """
+        Ask parent to change display of TS between 2D and 3D
+        """
+        self._parent.change_3d_plots(enable3d=self._3dcheckbox.checkState() == QtCore.Qt.Checked)
+
+    def update_3d(self):
+        """
+        Update the 3D checkbox
+        """
+        if self._parent.is2d():
+            self._3dcheckbox.setEnabled(False)
+            self._3dcheckbox.setCheckState(QtCore.Qt.Unchecked)
+        else:
+            self._3dcheckbox.setEnabled(True)
+            if self._parent.isshowing3d():
+                self._3dcheckbox.setCheckState(QtCore.Qt.Checked)
+            else:
+                self._3dcheckbox.setCheckState(QtCore.Qt.Unchecked)
+
     def reset(self):
         """
         Reset displayed information
@@ -116,6 +143,7 @@ class ControlToolbar(QtWidgets.QToolBar):
         else:
             self._idx_le.setText(str(self._parent.current + 1))
         self._total.setText(f" / {self._parent.total}")
+        self.update_3d()
 
     def change_arrangement(self):
         """
@@ -234,6 +262,9 @@ class TSVisualizer(QtWidgets.QMainWindow):
         self._x = None
         self._y = None
         self._times = None
+        self._show3d = False
+        self._lastdatafolder = "."
+        self._3dcallbackid = None
 
         # create central widget and layout
         self._main = QtWidgets.QWidget()
@@ -278,7 +309,7 @@ class TSVisualizer(QtWidgets.QMainWindow):
         """
         Select a file with a dialog and load its data
         """
-        datapath = QtWidgets.QFileDialog.getOpenFileName(self, "Open TS file", ".")
+        datapath = QtWidgets.QFileDialog.getOpenFileName(self, "Open TS file", self._lastdatafolder)
         datapath = datapath[0]
         if datapath != "":
             self.change_data(datapath, replot=True)
@@ -354,14 +385,27 @@ class TSVisualizer(QtWidgets.QMainWindow):
         if self._ctrltb is not None:
             self._ctrltb.reset()
 
+        # 3d
+        if self.is2d():
+            self._show3d = False
+
+        # datapath
+        self._lastdatafolder = os.path.dirname(datapath)
+
         if replot:
             self.rearrange_plots()
 
     def is2d(self):
         """
-        Return True if the TS are 2D, false otherwise
+        Return True if the TS are 2D, False otherwise
         """
         return self._y is None
+
+    def isshowing3d(self):
+        """
+        Return True if 3D visualization is enabled, False otherwise
+        """
+        return self._show3d
 
     def rearrange_plots(self, subplots=None):
         """
@@ -372,8 +416,9 @@ class TSVisualizer(QtWidgets.QMainWindow):
 
         self._nsubplots = self._subplots[0] * self._subplots[1]
 
+        self._canvas.mpl_disconnect(self._3dcallbackid)
         self._canvas.figure.clf()
-        if self.is2d():
+        if self.is2d() or not self._show3d:
             self._axs = self._canvas.figure.subplots(nrows=self._subplots[0],
                                                      ncols=self._subplots[1],
                                                      sharex=True, sharey=True)
@@ -381,7 +426,7 @@ class TSVisualizer(QtWidgets.QMainWindow):
             self._axs = self._canvas.figure.subplots(nrows=self._subplots[0],
                                                      ncols=self._subplots[1],
                                                      subplot_kw=dict(projection='3d'))
-            self._canvas.mpl_connect("motion_notify_event", self.on_3dmove)
+            self._3dcallbackid = self._canvas.mpl_connect("motion_notify_event", self.on_3dmove)
         self._axs = self._axs.reshape(self._nsubplots)
 
         self._current = 0
@@ -430,9 +475,12 @@ class TSVisualizer(QtWidgets.QMainWindow):
                     plot_ts_1d(ts, ax)
                 else:
                     lines[0].set_data(self._x, ts)
-            else:
+            elif self._show3d:
                 ax.clear()
                 plot_ts_2d(ts, ax)
+            else:
+                ax.clear()
+                plot_ts_heatmap(ts, ax)
 
             if self._times is None:
                 ax.set_title(data_idx + 1)
@@ -500,6 +548,13 @@ class TSVisualizer(QtWidgets.QMainWindow):
         self.plot_current()
 
         self._ctrltb.update_number()
+
+    def change_3d_plots(self, enable3d):
+        """
+        Switch between heatmap and 3d visualization
+        """
+        self._show3d = enable3d
+        self.rearrange_plots()
 
     def on_3dmove(self, event):
         """
