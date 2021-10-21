@@ -282,4 +282,96 @@ void TimeSurfacePool::delete_surfaces() {
     surfaces.clear();
 }
 
+
+TimeSurfacePoolAllContexts::~TimeSurfacePoolAllContexts() {
+    delete_surfaces();
+}
+
+TimeSurfacePoolAllContexts::TimeSurfacePoolAllContexts(const TimeSurfacePoolAllContexts& other) {
+
+    for (auto surf : other.surfaces) {
+        surfaces.push_back(surf->clone());
+    }
+
+}
+
+TimeSurfacePoolAllContexts::TimeSurfacePoolAllContexts(TimeSurfacePoolAllContexts&& other) {
+
+    surfaces = other.surfaces;
+    other.surfaces.clear();
+
+}
+
+TimeSurfacePoolAllContexts& TimeSurfacePoolAllContexts::operator=(const TimeSurfacePoolAllContexts& other) {
+
+    delete_surfaces();
+    for (auto surf : other.surfaces) {
+        surfaces.push_back(surf->clone());
+    }
+
+    return *this;
+
+}
+
+TimeSurfacePoolAllContexts& TimeSurfacePoolAllContexts::operator=(TimeSurfacePoolAllContexts&& other) {
+
+    surfaces = other.surfaces;
+    other.surfaces.clear();
+
+    return *this;
+
+}
+
+void TimeSurfacePoolAllContexts::toStream(std::ostream& out) const {
+
+    writeMetacommand(out, "TIMESURFACEPOOLAC");
+
+    out << surfaces.size() << "\n";
+    for (const auto& ts : surfaces) {
+        out << *ts;
+    }
+
+}
+
+void TimeSurfacePoolAllContexts::fromStream(std::istream& in) {
+
+    delete_surfaces();
+
+    matchMetacommandOptional(in, "TIMESURFACEPOOLAC");
+
+    surfaces.clear();
+    size_t n_surfaces;
+    in >> n_surfaces;
+    surfaces.resize(n_surfaces);
+    for (auto& sur : surfaces) {
+        sur = loadTSFromStream(in);
+    }
+
+}
+
+void TimeSurfacePoolAllContexts::delete_surfaces() {
+    for (size_t i = 0; i < surfaces.size(); i++) {
+        delete surfaces[i];
+    }
+    surfaces.clear();
+}
+
+std::pair<TimeSurfaceType, bool> TimeSurfacePoolAllContexts::compute(uint64_t t, uint16_t x, uint16_t y, uint16_t p) const {
+    cpphots_assert(p < surfaces.size());
+
+    uint16_t w = surfaces[0]->getWx();
+    uint16_t h = surfaces[0]->getWy();
+
+    bool retgood = true;
+    TimeSurfaceType retts = TimeSurfaceType::Zero(h*getNumSurfaces(), w);
+
+    for (size_t i = 0; i < surfaces.size(); i++) {
+        auto [ts, good] = surfaces[i]->compute(t, x, y);
+        retts.block(i*h, 0, h, w) = ts;
+        retgood = retgood && good;
+    }
+
+    return {retts, retgood};
+}
+
 }

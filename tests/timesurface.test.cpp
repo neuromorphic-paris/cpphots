@@ -357,3 +357,28 @@ TEST_F(TimeSurfacePoolClone, MoveAssignment) {
     EXPECT_EQ(ts, orig_ts);
 
 }
+
+
+TEST(TestTimeSurfacePoolAllContexts, Processing) {
+
+    // load data
+    cpphots::Events events = cpphots::loadFromFile("data/trcl0.es");
+
+    // create time surfaces
+    auto tspn = cpphots::create_pool<cpphots::LinearTimeSurface>(2, 32, 32, 2, 2, 1000);
+    auto tspac = cpphots::create_pool_allcontexts<cpphots::LinearTimeSurface>(2, 32, 32, 2, 2, 1000);
+
+    for (auto& ev : events) {
+
+        auto [nts, ngood] = tspn.updateAndCompute(ev.t, ev.x, ev.y, ev.p);
+        auto [acts, acgood] = tspac.updateAndCompute(ev.t, ev.x, ev.y, ev.p);
+
+        if (ev.p == 0) {
+            EXPECT_FLOAT_EQ(nts.matrix().norm(), acts.block(0, 0, 5, 5).matrix().norm());
+        } else {
+            EXPECT_FLOAT_EQ(nts.matrix().norm(), acts.block(5, 0, 5, 5).matrix().norm());
+        }
+
+    }
+
+}

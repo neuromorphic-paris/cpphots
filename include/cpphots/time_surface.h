@@ -448,6 +448,222 @@ TimeSurfacePool* create_pool_ptr(uint16_t polarities, TSArgs... tsargs) {
     return TimeSurfacePool::create_ptr<TS>(polarities, std::forward<TSArgs>(tsargs)...);
 }
 
+
+/**
+ * @brief Pool of time surface computations, using all contexts
+ * 
+ * This class holds a pool of time surfaces so that it can dispatch
+ * events with different polarities to the appropriate time surface.
+ * 
+ * When generating a time surface, all time contexts are sampled and concatenated.
+ * 
+ */
+class TimeSurfacePoolAllContexts : public interfaces::Clonable<TimeSurfacePoolAllContexts, interfaces::TimeSurfacePoolCalculator> {
+
+public:
+
+    /**
+     * @brief Construct a new pool of time surfaces
+     * 
+     * This constructor is provided only to create containers
+     * with TimeSurfacePoolAllContexts instances or to load a pool from file.
+     * It should not be used to create an usable pool.
+     * 
+     * See TimeSurfacePool::create.
+     */
+    TimeSurfacePoolAllContexts() {}
+
+    /**
+     * @brief Destroy the TimeSurfacePoolAllContexts
+     */
+    ~TimeSurfacePoolAllContexts();
+
+    /**
+     * @brief Copy constructor
+     * 
+     * @param other pool to be copied
+     */
+    TimeSurfacePoolAllContexts(const TimeSurfacePoolAllContexts& other);
+
+    /**
+     * @brief Move constructor
+     * 
+     * @param other pool to be copied
+     */
+    TimeSurfacePoolAllContexts(TimeSurfacePoolAllContexts&& other);
+
+    /**
+     * Copy assignment
+     * 
+     * @param other pool to be copied
+     */
+    TimeSurfacePoolAllContexts& operator=(const TimeSurfacePoolAllContexts& other);
+
+    /**
+     * Move assignment
+     * 
+     * @param other pool to be moved
+     */
+    TimeSurfacePoolAllContexts& operator=(TimeSurfacePoolAllContexts&& other);
+
+    /**
+     * @brief Create a time surface pool
+     * 
+     * This function creates a pool of time surfaces, forwarding arguments to
+     * the time surface constructors.
+     * 
+     * @tparam TS time surface type
+     * @tparam TSArgs types of the time surface constructor arguments
+     * @param polarities numer of polarities (size of the pool)
+     * @param tsargs arguments forwarded to the time surface constructor
+     * @return the constructed pool
+     */
+    template <typename TS, typename... TSArgs>
+    static TimeSurfacePoolAllContexts create(uint16_t polarities, TSArgs... tsargs) {
+
+        TimeSurfacePoolAllContexts tsp;
+
+        for (uint16_t i = 0; i < polarities; i++) {
+            tsp.surfaces.push_back(TimeSurfacePtr(new TS(std::forward<TSArgs>(tsargs)...)));
+        }
+
+        return tsp;
+
+    }
+
+    /**
+     * @brief Create pointer to a new time surface pool
+     * 
+     * This function creates a pool of time surfaces, forwarding arguments to
+     * the time surface constructors.
+     * 
+     * @tparam TS time surface type
+     * @tparam TSArgs types of the time surface constructor arguments
+     * @param polarities numer of polarities (size of the pool)
+     * @param tsargs arguments forwarded to the time surface constructor
+     * @return pointer to the constructed pool
+     */
+    template <typename TS, typename... TSArgs>
+    static TimeSurfacePoolAllContexts* create_ptr(uint16_t polarities, TSArgs... tsargs) {
+
+        TimeSurfacePoolAllContexts* tsp = new TimeSurfacePoolAllContexts();
+
+        for (uint16_t i = 0; i < polarities; i++) {
+            tsp->surfaces.push_back(TimeSurfacePtr(new TS(std::forward<TSArgs>(tsargs)...)));
+        }
+
+        return tsp;
+
+    }
+
+    void update(uint64_t t, uint16_t x, uint16_t y, uint16_t p) override {
+        cpphots_assert(p < surfaces.size());
+        surfaces[p]->update(t, x, y);
+    }
+
+    void update(const event& ev) override {
+        update(ev.t, ev.x, ev.y, ev.p);
+    }
+
+    std::pair<TimeSurfaceType, bool> compute(uint64_t t, uint16_t x, uint16_t y, uint16_t p) const override;
+
+    std::pair<TimeSurfaceType, bool> compute(const event& ev) const override {
+        return compute(ev.t, ev.x, ev.y, ev.p);
+    }
+
+    std::pair<TimeSurfaceType, bool> updateAndCompute(uint64_t t, uint16_t x, uint16_t y, uint16_t p) override {
+        update(t, x, y, p);
+        return compute(t, x, y, p);
+    }
+
+    std::pair<TimeSurfaceType, bool> updateAndCompute(const event& ev) override {
+        update(ev.t, ev.x, ev.y, ev.p);
+        return compute(ev.t, ev.x, ev.y, ev.p);
+    }
+
+    std::pair<uint16_t, uint16_t> getSize() const override {
+        return surfaces[0]->getSize();
+    }
+
+    void reset() override {
+        for (auto& ts : surfaces) {
+            ts->reset();
+        }
+    }
+
+    TimeSurfacePtr& getSurface(size_t idx) override {
+        cpphots_assert(idx < surfaces.size());
+        return surfaces[idx];
+    }
+
+    const TimeSurfacePtr& getSurface(size_t idx) const override {
+        cpphots_assert(idx < surfaces.size());
+        return surfaces[idx];
+    }
+
+    std::vector<TimeSurfaceType> sampleContexts(uint64_t t) override {
+        std::vector<TimeSurfaceType> ret;
+        for (const auto& ts : surfaces) {
+            ret.push_back(ts->sampleContext(t));
+        }
+        return ret;
+    }
+
+    size_t getNumSurfaces() const override {
+        return surfaces.size();
+    }
+
+    /**
+     * @copydoc interfaces::Streamable::toStream
+     * 
+     * Save paramaters for all time surfaces to the stream.
+     */
+    void toStream(std::ostream& out) const override;
+
+    /**
+     * @copydoc interfaces::Streamable::fromStream
+     * 
+     * Load parameters for all time surfaces from the stream.
+     */
+    void fromStream(std::istream& in) override;
+
+private:
+    std::vector<TimeSurfacePtr> surfaces;
+
+    void delete_surfaces();
+
+};
+
+
+/**
+ * @brief Shorthand for TimeSurfacePoolAllContexts::create
+ * 
+ * @tparam TS time surface type
+ * @tparam TSArgs types of the time surface constructor arguments
+ * @param polarities numer of polarities (size of the pool)
+ * @param tsargs arguments forwarded to the time surface constructor
+ * @return the constructed pool
+ */
+template <typename TS, typename... TSArgs>
+TimeSurfacePoolAllContexts create_pool_allcontexts(uint16_t polarities, TSArgs... tsargs) {
+    return TimeSurfacePoolAllContexts::create<TS>(polarities, std::forward<TSArgs>(tsargs)...);
+}
+
+/**
+ * @brief Shorthand for TimeSurfacePoolAllContexts::create_ptr
+ * 
+ * @tparam TS time surface type
+ * @tparam TSArgs types of the time surface constructor arguments
+ * @param polarities numer of polarities (size of the pool)
+ * @param tsargs arguments forwarded to the time surface constructor
+ * @return pointer to the constructed pool
+ */
+template <typename TS, typename... TSArgs>
+TimeSurfacePoolAllContexts* create_pool_allcontexts_ptr(uint16_t polarities, TSArgs... tsargs) {
+    return TimeSurfacePoolAllContexts::create_ptr<TS>(polarities, std::forward<TSArgs>(tsargs)...);
+}
+
+
 }
 
 #endif
