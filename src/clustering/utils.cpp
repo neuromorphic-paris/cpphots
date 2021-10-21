@@ -226,7 +226,7 @@ void ClustererRandomSeedingImpl(interfaces::Clusterer& clusterer, const std::vec
     std::srand((unsigned int) std::time(0));
 
     for (uint16_t i = 0; i < clusterer.getNumClusters(); i++) {
-        clusterer.addCentroid(TimeSurfaceType::Random(height, width) + 1.f /2.f);
+        clusterer.addCentroid((TimeSurfaceType::Random(height, width) + 1.f) /2.f);
     }
 
 }
