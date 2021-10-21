@@ -206,13 +206,13 @@ void GMMClusterer::addCentroid(const TimeSurfaceType& centroid) {
 
 const std::vector<TimeSurfaceType>&GMMClusterer::getCentroids() const {
 
-    std::vector<TimeSurfaceType> centroids;
+    converted_centroids.clear();
 
     for (size_t i = 0; i < clusters; i++) {
-        centroids.push_back(vectorToTS(blaze::row(mean, i), ts_shape.first, ts_shape.second));
+        converted_centroids.push_back(vectorToTS(blaze::row(mean, i), ts_shape.first, ts_shape.second));
     }
 
-    return centroids;
+    return converted_centroids;
 }
 
 void GMMClusterer::clearCentroids() {

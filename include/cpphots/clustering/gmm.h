@@ -118,6 +118,8 @@ private:
     unsigned int max_iterations;
     std::pair<uint16_t, uint16_t> ts_shape;
 
+    mutable std::vector<TimeSurfaceType> converted_centroids;
+
     void fit();
 
     uint16_t predict(const BlazeVector& vec, int top_k = 1);
