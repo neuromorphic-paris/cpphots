@@ -43,6 +43,7 @@ def plot_ts_heatmap(ts, ax=None, cmap=None):
         cmap = plt.cm.plasma
 
     ax.imshow(ts, cmap=cmap)
+    ax.tick_params(axis="both", which="both", bottom=False, labelbottom=False, left=False, labelleft=False)
 
     if fig is not None:
         plt.show()
