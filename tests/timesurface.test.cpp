@@ -32,7 +32,7 @@ TEST(TestTimeSurfaceSize, Ry0) {
 TEST(TestTimeSurface, Processing) {
 
     // load data
-    cpphots::Events events = cpphots::loadFromFile("data/trcl0.es");
+    cpphots::Events events = cpphots::loadFromFile("tests/data/trcl0.es");
 
     // create time surface
     cpphots::LinearTimeSurface ts(32, 32, 2, 2, 1000);
@@ -114,7 +114,7 @@ TEST(TestTimeSurface, FullContext) {
 TEST(TestWeightedTimeSurface, Processing) {
 
     // load data
-    cpphots::Events events = cpphots::loadFromFile("data/trcl0.es");
+    cpphots::Events events = cpphots::loadFromFile("tests/data/trcl0.es");
 
     // create time surface
     cpphots::WeightedLinearTimeSurface ts(32, 32, 2, 2, 1000, cpphots::TimeSurfaceType::Constant(32, 32, 0.5f));
@@ -207,7 +207,7 @@ TEST(TestWeightedTimeSurface, FullContext) {
 TEST(TestTimeSurfacePool, Processing) {
 
     // load data
-    cpphots::Events events = cpphots::loadFromFile("data/trcl0.es");
+    cpphots::Events events = cpphots::loadFromFile("tests/data/trcl0.es");
 
     // create time surface
     auto ts = cpphots::create_pool<cpphots::LinearTimeSurface>(2, 32, 32, 2, 2, 1000);
@@ -240,7 +240,7 @@ TEST(TestTimeSurfacePool, Processing) {
 TEST(TestWeightedTimeSurfacePool, Processing) {
 
     // load data
-    cpphots::Events events = cpphots::loadFromFile("data/trcl0.es");
+    cpphots::Events events = cpphots::loadFromFile("tests/data/trcl0.es");
 
     // create time surface
     auto ts = cpphots::create_pool<cpphots::WeightedLinearTimeSurface>(2, 32, 32, 2, 2, 1000, cpphots::TimeSurfaceType::Constant(32, 32, 0.5));

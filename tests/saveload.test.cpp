@@ -83,7 +83,7 @@ TEST(TestSaveLoad, SimpleWTSLoad) {
 TEST(TestSaveLoad, TSProcess) {
 
     // load data
-    cpphots::Events events = cpphots::loadFromFile("data/trcl0.es");
+    cpphots::Events events = cpphots::loadFromFile("tests/data/trcl0.es");
 
     // create time surface
     cpphots::LinearTimeSurface ts(32, 32, 2, 2, 1000);

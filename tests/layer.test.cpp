@@ -165,7 +165,7 @@ class TestLayerProcessing : public ::testing::Test {
 protected:
 
     void SetUp() override {
-        events = cpphots::loadFromFile("data/trcl0.es");
+        events = cpphots::loadFromFile("tests/data/trcl0.es");
         layer.addTSPool(cpphots::create_pool_ptr<cpphots::LinearTimeSurface>(1, 32, 32, 2, 2, 1000));
         layer.createClusterer<cpphots::CosineClusterer>(8);
     }
@@ -237,7 +237,7 @@ class TestLayerSeeding : public ::testing::Test {
 protected:
 
     void SetUp() override {
-        events = cpphots::loadFromFile("data/trcl0.es");
+        events = cpphots::loadFromFile("tests/data/trcl0.es");
         layer.addTSPool(cpphots::create_pool_ptr<cpphots::LinearTimeSurface>(2, 32, 32, 2, 2, 1000));
         layer.createClusterer<cpphots::CosineClusterer>(8);
     }
@@ -355,7 +355,7 @@ TEST(TestLayer, NoSeeding) {
 
 TEST(TestLayer, SkipValidityCheck) {
 
-    cpphots::Events events = cpphots::loadFromFile("data/trcl0.es");
+    cpphots::Events events = cpphots::loadFromFile("tests/data/trcl0.es");
 
     cpphots::Layer layer(cpphots::create_pool_ptr<cpphots::LinearTimeSurface>(2, 32, 32, 2, 2, 1000),
                          new cpphots::CosineClusterer(8));
