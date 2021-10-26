@@ -56,6 +56,9 @@ endif()
 # option for peregrine
 option(WITH_PEREGRINE "Enable GMM support" OFF)
 
+# option for python bindings
+option(BUILD_PYTHON_BINDINGS "Build Python bindings" OFF)
+
 # dependencies
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
@@ -107,6 +110,12 @@ endif()
 
 # main library
 add_subdirectory(src)
+
+
+# python bindings
+if (BUILD_PYTHON_BINDINGS)
+  add_subdirectory(bindings)
+endif()
 
 
 # installing
