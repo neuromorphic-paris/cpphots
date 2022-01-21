@@ -386,7 +386,7 @@ public:
         return surfaces[idx];
     }
 
-    std::vector<TimeSurfaceType> sampleContexts(uint64_t t) override {
+    std::vector<TimeSurfaceType> sampleContexts(uint64_t t) const override {
         std::vector<TimeSurfaceType> ret;
         for (const auto& ts : surfaces) {
             ret.push_back(ts->sampleContext(t));

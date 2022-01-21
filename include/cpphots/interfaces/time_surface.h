@@ -290,7 +290,7 @@ public:
      * @param t sample time
      * @return vector of decayed temporal contexts
      */
-    virtual std::vector<TimeSurfaceType> sampleContexts(uint64_t t) = 0;
+    virtual std::vector<TimeSurfaceType> sampleContexts(uint64_t t) const = 0;
 
     /**
      * @brief Get the number of surfaces in the pool

@@ -319,7 +319,7 @@ public:
         return tspool->getSurface(idx);
     }
 
-    std::vector<TimeSurfaceType> sampleContexts(uint64_t t) override {
+    std::vector<TimeSurfaceType> sampleContexts(uint64_t t) const override {
         return tspool->sampleContexts(t);
     }
 
