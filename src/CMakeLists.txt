@@ -13,7 +13,8 @@ set(CPPHOTS_SOURCES
     clustering/kmeans.cpp
     layer_modifiers.cpp
     load.cpp
-    assert.cpp)
+    assert.cpp
+    dynamic_time_surface.cpp)
 
 if (BUILD_PLOTS)
     file(READ ../python/tsplot.py PYTHON_PLOT_CODE)
