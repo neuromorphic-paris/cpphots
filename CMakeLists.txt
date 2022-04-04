@@ -90,7 +90,7 @@ if (WITH_PEREGRINE)
   FetchContent_Declare(
     peregrine
     GIT_REPOSITORY git@github.com:OOub/peregrine.git
-    GIT_TAG        master)
+    GIT_TAG        6a0b0a15add7ae952029b6ac1565839dfdae8ae7)
 
   FetchContent_GetProperties(peregrine)
   if(NOT peregrine_POPULATED)
