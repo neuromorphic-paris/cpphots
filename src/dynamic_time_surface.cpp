@@ -9,8 +9,8 @@ DynamicTimeSurface::DynamicTimeSurface(uint16_t width, uint16_t height, uint16_t
 
 void DynamicTimeSurface::update(uint64_t t, uint16_t x, uint16_t y) {
     TimeSurfaceBase::update(t, x, y);
-    TimeSurfaceScalarType d = 1.0 / (TimeSurfaceScalarType(t - last_timestamp) / 1e6 * m + 1.0);
-    m = d * m + 1;
+    TimeSurfaceScalarType d = 1.0 / (TimeSurfaceScalarType(t - last_timestamp) * m + 1.0);
+    m = d * m + 1.0e-6;
     last_timestamp = t;
 }
 
@@ -25,17 +25,19 @@ std::pair<TimeSurfaceType, bool> DynamicTimeSurface::compute(uint64_t t, uint16_
 
     TimeSurfaceType retmat = context.block(y, x, Wy, Wx);  // should be (x-Rx, y-Ry), but the context is padded
 
-    TimeSurfaceType ret = 1. / ((t - retmat) / 1e6 * m + 1.0);
+    bool good = (retmat > 0.).count() >= min_events;
 
-    return std::make_pair(ret, true);
+    TimeSurfaceType ret = 1. / ((t - retmat) * m + 1.0);
+
+    return std::make_pair((retmat <= 0.).select(0., ret), good);
 }
 
 std::pair<TimeSurfaceType, bool> DynamicTimeSurface::compute(const event& ev) const {
-    return compute(ev.x, ev.x, ev.y);
+    return compute(ev.t, ev.x, ev.y);
 }
 
 TimeSurfaceType DynamicTimeSurface::sampleContext(uint64_t t) const {
-    return 1. / ((t - getContext()) / 1e6 * m + 1.0);
+    return 1. / ((t - getContext()) * m + 1.0);
 }
 
 void DynamicTimeSurface::reset() {
